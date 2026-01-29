@@ -70,7 +70,7 @@ export function Navbar() {
       <div className="max-w-[1200px] mx-auto">
         <div className="relative">
           {/* Glassmorphic Background */}
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-xl rounded-2xl border border-foreground/10 shadow-lg" />
+          <div className="absolute inset-0 bg-background/30 backdrop-blur-md rounded-2xl border border-foreground/10 shadow-lg" />
 
           <div className="relative flex items-center justify-between px-6 py-4">
             {/* Logo */}
@@ -131,8 +131,9 @@ export function Navbar() {
               ) : (
                 <Link
                   href="/login"
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-xl text-sm font-semibold hover:scale-105 transition-transform"
+                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-xl text-sm font-semibold hover:scale-105 transition-transform overflow-hidden relative group"
                 >
+                  <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                   Sign In
                 </Link>
               )}
@@ -218,8 +219,9 @@ export function Navbar() {
                     <Link
                       href="/login"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center px-4 py-2.5 bg-foreground text-background rounded-lg text-sm font-semibold hover:scale-105 transition-transform"
+                      className="flex items-center justify-center px-4 py-2.5 bg-foreground text-background rounded-lg text-sm font-semibold hover:scale-105 transition-transform overflow-hidden relative group"
                     >
+                      <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                       Sign In
                     </Link>
                   )}

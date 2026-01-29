@@ -46,15 +46,16 @@ export function Newsletter() {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-3 bg-primary text-background rounded-xl font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-6 py-3 bg-primary text-background rounded-xl font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 overflow-hidden relative group"
                 >
+                    <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                     {loading ? (
                         "..."
                     ) : (
-                        <>
+                        <div className="relative z-10 flex items-center gap-2">
                             <span className="hidden sm:inline">Subscribe</span>
                             <ArrowRight className="w-4 h-4" />
-                        </>
+                        </div>
                     )}
                 </button>
             </form>

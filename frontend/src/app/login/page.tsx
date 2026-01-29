@@ -68,130 +68,140 @@ export default function LoginPage() {
   const isAnyLoading = isSubmitting || globalLoading;
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background relative overflow-hidden">
-      {/* Background blurs */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-
+    <div className="min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md relative z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="w-full max-w-[440px] relative z-10"
       >
-        <div className="glass-panel rounded-[2.5rem] p-10 shadow-2xl">
-          {/* Logo & Header */}
-          <div className="text-center mb-10">
-            <Link href="/" className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-foreground text-background mb-6 shadow-xl">
-              <Code2 className="w-8 h-8" />
-            </Link>
-            <h1 className="text-3xl font-black tracking-tight mb-2">
-              {mode === "login" ? "Welcome Back" : "Create Account"}
-            </h1>
-            <p className="text-foreground/60 font-medium">
-              {mode === "login"
-                ? "Sign in to continue your journey."
-                : "Join the elite engineering community."}
-            </p>
-          </div>
-
-          {/* Error Message */}
-          <AnimatePresence>
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                className="mb-6 overflow-hidden"
-              >
-                <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium">
-                  {error}
+        {/* Main Card */}
+        <div className="glass-panel rounded-[2.5rem] border border-white/5 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] overflow-hidden">
+          <div className="p-10 md:p-12">
+            {/* Header */}
+            <div className="flex flex-col items-center mb-10">
+              <Link href="/" className="group mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-foreground text-background flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform duration-500">
+                  <Code2 className="w-8 h-8" />
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Social Login */}
-          <button
-            onClick={handleGitHubLogin}
-            disabled={isAnyLoading}
-            className="w-full h-14 bg-foreground text-background rounded-2xl font-bold flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {isAnyLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Github className="w-5 h-5" />}
-            <span>Continue with GitHub</span>
-          </button>
-
-          {/* Divider */}
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-foreground/5" />
+              </Link>
+              <h1 className="text-3xl md:text-4xl font-black text-center tracking-tighter mb-3">
+                {mode === "login" ? "Welcome Back" : "Join CoForge"}
+              </h1>
+              <p className="text-foreground/40 text-center font-medium leading-relaxed max-w-[280px]">
+                {mode === "login"
+                  ? "Continue your engineering journey with real experience."
+                  : "Start building your verified engineering history today."}
+              </p>
             </div>
-            <div className="relative flex justify-center text-xs uppercase tracking-widest font-bold">
-              <span className="px-4 bg-transparent text-foreground/30">
-                or use email
-              </span>
-            </div>
-          </div>
 
-          {/* Email Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "signup" && (
+            {/* Error Message */}
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, y: -10 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -10 }}
+                  className="mb-6"
+                >
+                  <div className="p-4 rounded-2xl bg-red-500/5 border border-red-500/10 text-red-500 text-xs font-bold flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    {error}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Social Login */}
+            <button
+              onClick={handleGitHubLogin}
+              disabled={isAnyLoading}
+              className="w-full h-14 bg-foreground text-background rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 shadow-xl shadow-foreground/5 mb-8 overflow-hidden relative group"
+            >
+              <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+              <div className="relative z-10 flex items-center justify-center gap-3">
+                {isAnyLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Github className="w-5 h-5" />}
+                <span className="tracking-tight text-sm">Continue with GitHub</span>
+              </div>
+            </button>
+
+            {/* Divider */}
+            <div className="relative mb-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-foreground/[0.05]" />
+              </div>
+              <div className="relative flex justify-center text-[10px] uppercase tracking-[0.3em] font-black">
+                <span className="px-4 bg-transparent text-foreground/20">
+                  or email
+                </span>
+              </div>
+            </div>
+
+            {/* Email Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {mode === "signup" && (
+                <div className="relative group">
+                  <User className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    required
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className="w-full h-14 pl-12 pr-4 rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] focus:border-primary/50 outline-none transition-all font-bold text-sm tracking-tight placeholder:text-foreground/20"
+                  />
+                </div>
+              )}
+
               <div className="relative group">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
                 <input
-                  type="text"
-                  placeholder="Username"
+                  type="email"
+                  placeholder="Email Address"
                   required
-                  value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                  className="w-full h-14 pl-12 pr-4 rounded-2xl bg-foreground/[0.03] border border-foreground/5 focus:border-primary outline-none transition-all font-medium"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full h-14 pl-12 pr-4 rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] focus:border-primary/50 outline-none transition-all font-bold text-sm tracking-tight placeholder:text-foreground/20"
                 />
               </div>
-            )}
 
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/20 group-focus-within:text-primary transition-colors" />
-              <input
-                type="email"
-                placeholder="Email Address"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full h-14 pl-12 pr-4 rounded-2xl bg-foreground/[0.03] border border-foreground/5 focus:border-primary outline-none transition-all font-medium"
-              />
-            </div>
+              <div className="relative group">
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full h-14 pl-12 pr-4 rounded-2xl bg-foreground/[0.02] border border-foreground/[0.05] focus:border-primary/50 outline-none transition-all font-bold text-sm tracking-tight placeholder:text-foreground/20"
+                />
+              </div>
 
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/20 group-focus-within:text-primary transition-colors" />
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full h-14 pl-12 pr-4 rounded-2xl bg-foreground/[0.03] border border-foreground/5 focus:border-primary outline-none transition-all font-medium"
-              />
-            </div>
+              <button
+                type="submit"
+                disabled={isAnyLoading}
+                className="w-full h-14 bg-primary text-white rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 shadow-xl shadow-primary/20 mt-6 overflow-hidden relative group"
+              >
+                <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                {isAnyLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span className="tracking-tight text-sm">
+                      {mode === "login" ? "Sign In" : "Create Account"}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
 
-            <button
-              type="submit"
-              disabled={isAnyLoading}
-              className="w-full h-14 bg-primary text-white rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {isAnyLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <>
-                  {mode === "login" ? "Sign In" : "Create Account"}
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Mode Toggle */}
-          <div className="mt-8 text-center">
+          {/* Footer Area */}
+          <div className="p-8 md:p-10 bg-foreground/[0.02] border-t border-foreground/[0.05] text-center">
             <button
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="text-sm font-bold text-foreground/40 hover:text-primary transition-colors"
+              className="text-xs font-black uppercase tracking-[0.2em] text-foreground/30 hover:text-primary transition-colors"
             >
               {mode === "login"
                 ? "Don't have an account? Sign Up"
@@ -200,10 +210,19 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Footer Info */}
-        <p className="text-center text-[10px] uppercase tracking-widest font-bold text-foreground/20 mt-10">
-          Professional Engineering Platform
-        </p>
+        {/* System Info */}
+        <div className="flex flex-col items-center gap-2 mt-10">
+          <p className="text-[10px] uppercase tracking-[0.4em] font-black text-foreground/10">
+            Professional Engineering History Verified
+          </p>
+          <div className="flex items-center gap-4 text-[8px] font-black text-foreground/5 uppercase tracking-[0.2em]">
+            <span>Secure Access</span>
+            <div className="w-1 h-1 rounded-full bg-foreground/5" />
+            <span>AI Verification</span>
+            <div className="w-1 h-1 rounded-full bg-foreground/5" />
+            <span>Immutable Ledger</span>
+          </div>
+        </div>
       </motion.div>
     </div>
   );

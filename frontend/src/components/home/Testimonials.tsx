@@ -63,7 +63,7 @@ export function Testimonials() {
                             transition={{ delay: i * 0.1 }}
                             className="glass-card p-8 rounded-3xl relative group hover:scale-[1.02] transition-transform duration-300"
                         >
-                            <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl`} />
+                            <div className={`absolute inset-0 bg-gradient-to-br ${testimonial.color} opacity-0 group-hover:opacity-40 transition-opacity duration-500 rounded-3xl`} />
 
                             <div className="relative z-10">
                                 <Quote className="w-10 h-10 text-primary/40 mb-6" />

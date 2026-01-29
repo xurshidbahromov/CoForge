@@ -122,12 +122,14 @@ export function Pricing() {
 
                                     <Link
                                         href="/login"
-                                        className={`block w-full py-4 rounded-xl font-bold text-center transition-all mb-8 ${plan.popular
+                                        className={`block w-full py-4 rounded-xl font-bold text-center transition-all mb-8 overflow-hidden relative group ${plan.popular
                                             ? "bg-primary text-background hover:scale-105 shadow-lg shadow-primary/30"
                                             : "bg-foreground/5 hover:bg-foreground/10"
                                             }`}
                                     >
-                                        {plan.cta}
+                                        <div className={`absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out ${plan.popular ? "bg-white/20" : "bg-foreground/10"
+                                            }`} />
+                                        <span className="relative z-10">{plan.cta}</span>
                                     </Link>
 
                                     <div className="space-y-4">

@@ -75,11 +75,13 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <Link href="/login" className="bg-foreground text-background px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-xl shadow-foreground/20">
+            <Link href="/login" className="bg-foreground text-background px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-xl shadow-foreground/20 overflow-hidden relative group">
+              <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
               <Github className="w-5 h-5" />
               Start Building
             </Link>
-            <Link href="#engine" className="px-8 py-4 border border-foreground/10 rounded-2xl font-bold hover:bg-foreground/5 transition-colors backdrop-blur-sm">
+            <Link href="#engine" className="px-8 py-4 border border-foreground/10 rounded-2xl font-bold hover:bg-foreground/5 transition-colors backdrop-blur-sm overflow-hidden relative group">
+              <div className="absolute inset-0 bg-foreground/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
               See How It Works
             </Link>
           </motion.div>
@@ -200,27 +202,29 @@ export default function Home() {
         <div className="max-w-[1200px] mx-auto">
           <h2 className="text-5xl md:text-7xl font-black text-center mb-32 tracking-tighter">Your Journey</h2>
           <div className="grid md:grid-cols-3 gap-12 relative">
-            {/* Connecting Line (Desktop) */}
-            <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-foreground/20 to-transparent" />
+            {/* Connecting Line (Desktop) - Adjusted for medium circles */}
+            <div className="hidden md:block absolute top-16 left-[15%] right-[15%] h-[1px] bg-foreground/5" />
 
             {[
-              { step: "01", title: "Identity", desc: "Define your stack. AI builds your persona." },
-              { step: "02", title: "Execution", desc: "Ship real code in high-performance teams." },
-              { step: "03", title: "Evidence", desc: "Your verification history becomes your portfolio." }
+              { step: "1", title: "Identity", desc: "Define your stack. AI builds your persona." },
+              { step: "2", title: "Execution", desc: "Ship real code in high-performance teams." },
+              { step: "3", title: "Evidence", desc: "Your verification history becomes your portfolio." }
             ].map((item, i) => (
               <motion.div
                 key={item.step}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.2 }}
+                transition={{ delay: i * 0.1 }}
                 className="text-center group relative z-10"
               >
-                <div className="w-24 h-24 mx-auto bg-background border border-foreground/10 rounded-full flex items-center justify-center mb-8 shadow-xl group-hover:scale-110 transition-transform duration-500">
-                  <span className="text-3xl font-black text-foreground/40 group-hover:text-primary transition-colors">{item.step}</span>
+                <div className="w-32 h-32 mx-auto bg-background/50 backdrop-blur-sm border border-foreground/5 rounded-full flex items-center justify-center mb-10 group-hover:scale-105 group-hover:border-primary/20 transition-all duration-500">
+                  <span className="text-5xl font-black text-foreground/5 group-hover:text-primary/30 transition-colors uppercase italic tracking-tighter">{item.step}</span>
                 </div>
-                <h3 className="text-2xl font-black mb-3">{item.title}</h3>
-                <p className="opacity-60 max-w-xs mx-auto text-lg leading-relaxed">{item.desc}</p>
+                <h3 className="text-3xl font-black mb-4 tracking-tight">{item.title}</h3>
+                <p className="text-foreground/40 max-w-[240px] mx-auto text-lg leading-relaxed font-medium group-hover:text-foreground/60 transition-colors">
+                  {item.desc}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -281,7 +285,8 @@ export default function Home() {
               Join the <br /><span className="text-primary italic">Elite.</span>
             </h2>
             <p className="text-xl text-background/60 mb-12 max-w-md font-medium">Stop building in silos. Join thousands of high-growth developers today.</p>
-            <Link href="/login" className="bg-background text-foreground px-12 py-5 rounded-2xl font-bold text-lg hover:scale-105 transition-transform flex items-center gap-3">
+            <Link href="/login" className="bg-background text-foreground px-12 py-5 rounded-2xl font-bold text-lg hover:scale-105 transition-transform flex items-center gap-3 overflow-hidden relative group border border-foreground/10">
+              <div className="absolute inset-0 bg-foreground/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
               <Github className="w-5 h-5" />
               Apply Now
             </Link>
