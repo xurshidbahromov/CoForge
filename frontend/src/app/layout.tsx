@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { AppShell } from "@/components/layout/AppShell";
+import { Toaster } from "sonner";
 import "./globals.css";
-import { Navbar, Footer } from "@/components/layout";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <Navbar />
-        <main className="pt-24 pb-8 min-h-[calc(100vh-6rem)]">
+        <AppShell>
           {children}
-        </main>
-        <Footer />
+        </AppShell>
+        <Toaster position="top-right" richColors expand={false} />
       </body>
     </html>
   );

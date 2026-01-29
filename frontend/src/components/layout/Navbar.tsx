@@ -28,22 +28,22 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] p-4">
-      <div className="max-w-7xl mx-auto bg-background/80 backdrop-blur-xl rounded-2xl border border-foreground/10 shadow-2xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+    <nav className="fixed top-6 left-0 right-0 z-[100] px-4">
+      <div className="max-w-5xl mx-auto glass-panel rounded-2xl">
+        <div className="px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-9 h-9 rounded-xl bg-foreground flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
-                <Code2 className="w-5 h-5 text-background" />
+              <div className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center group-hover:rotate-3 transition-transform duration-300">
+                <Code2 className="w-5 h-5" />
               </div>
-              <span className="text-xl font-bold tracking-tighter">
+              <span className="text-lg font-bold tracking-tight">
                 CoForge
               </span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-8">
               {isAuthenticated && navItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
@@ -51,80 +51,67 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "text-sm font-semibold transition-all duration-300",
+                      "text-sm font-medium transition-colors duration-200",
                       isActive
-                        ? "text-foreground"
-                        : "text-foreground/40 hover:text-foreground"
+                        ? "text-foreground font-semibold"
+                        : "text-foreground/60 hover:text-foreground"
                     )}
                   >
-                    <span>{item.name}</span>
+                    {item.name}
                   </Link>
                 );
               })}
             </div>
 
             {/* Right Side */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {isAuthenticated ? (
-                <div className="flex items-center gap-6 pl-4 border-l border-foreground/5">
-                  <div className="flex items-center gap-3">
-                    {user?.avatar_url ? (
-                      <img
-                        src={user.avatar_url}
-                        alt={user.username}
-                        className="w-8 h-8 rounded-full border border-foreground/10 grayscale-[0.5] hover:grayscale-0 transition-all"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center text-background text-[10px] font-bold">
-                        {user?.username?.charAt(0).toUpperCase() || "U"}
-                      </div>
-                    )}
-                    <span className="text-xs font-bold tracking-tight hidden lg:block uppercase opacity-70">
-                      {user?.username || "User"}
-                    </span>
+                <div className="flex items-center gap-4 pl-4 border-l border-foreground/10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center text-[10px] font-bold">
+                      {user?.username?.charAt(0).toUpperCase() || "U"}
+                    </div>
                   </div>
                   <button
                     onClick={logout}
-                    className="p-2 rounded-xl hover:bg-white/10 transition-colors"
-                    title="Logout"
+                    className="p-1.5 rounded-lg hover:bg-foreground/5 transition-colors opacity-60 hover:opacity-100"
                   >
-                    <LogOut className="w-5 h-5" />
+                    <LogOut className="w-4 h-4" />
                   </button>
                 </div>
               ) : (
                 <Link
                   href="/login"
-                  className="glass-button flex items-center gap-2 text-primary"
+                  className="bg-foreground text-background px-5 py-2 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity flex items-center gap-2"
                 >
-                  <Github className="w-5 h-5" />
-                  <span>Sign in with GitHub</span>
+                  <Github className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sign In</span>
                 </Link>
               )}
+              {/* Mobile Menu Button */}
+              <button
+                className="md:hidden p-2 rounded-lg hover:bg-foreground/5 ml-2"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                {mobileMenuOpen ? (
+                  <X className="w-5 h-5 opacity-60" />
+                ) : (
+                  <Menu className="w-5 h-5 opacity-60" />
+                )}
+              </button>
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 rounded-xl hover:bg-white/10"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="md:hidden border-t border-white/10"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-t border-foreground/5 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-2">
+            <div className="p-2 space-y-1">
               {isAuthenticated && navItems.map((item) => {
                 const isActive = pathname === item.href;
                 return (
@@ -133,39 +120,17 @@ export function Navbar() {
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
+                      "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
                       isActive
-                        ? "bg-white/20 text-primary"
-                        : "hover:bg-white/10"
+                        ? "bg-foreground/5 text-foreground"
+                        : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
                     )}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-4 h-4" />
                     <span>{item.name}</span>
                   </Link>
                 );
               })}
-
-              {isAuthenticated ? (
-                <button
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/10 w-full text-left"
-                >
-                  <LogOut className="w-5 h-5" />
-                  <span>Logout</span>
-                </button>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="glass-button flex items-center justify-center gap-2 text-primary w-full"
-                >
-                  <Github className="w-5 h-5" />
-                  <span>Sign in with GitHub</span>
-                </Link>
-              )}
             </div>
           </motion.div>
         )}

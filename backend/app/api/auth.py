@@ -8,8 +8,23 @@ import jwt
 
 from ..core.database import get_async_session
 from ..models.user import User
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr
 
 router = APIRouter()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# ----------------------------------------------------------------------
+# Schemas
+# ----------------------------------------------------------------------
+class UserRegister(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
 # ----------------------------------------------------------------------
 # Config
@@ -36,7 +51,70 @@ def decode_jwt_token(token: str) -> int:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
 # ----------------------------------------------------------------------
-# Routes
+# Local Auth Routes
+# ----------------------------------------------------------------------
+
+@router.post("/register")
+async def register(user_data: UserRegister, response: Response):
+    async with get_async_session() as session:
+        # Check if email exists
+        stmt = select(User).where(User.email == user_data.email)
+        result = await session.execute(stmt)
+        if result.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Check if username exists
+        stmt = select(User).where(User.username == user_data.username)
+        result = await session.execute(stmt)
+        if result.scalar_one_or_none():
+            raise HTTPException(status_code=400, detail="Username already taken")
+
+        # Create user
+        hashed_password = pwd_context.hash(user_data.password)
+        db_user = User(
+            username=user_data.username,
+            email=user_data.email,
+            hashed_password=hashed_password
+        )
+        session.add(db_user)
+        await session.commit()
+        await session.refresh(db_user)
+        
+        token = create_jwt_token(db_user.id)
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            max_age=JWT_EXPIRE_MINUTES * 60,
+            samesite="lax"
+        )
+        return db_user
+
+@router.post("/login/email")
+async def login_email(credentials: UserLogin, response: Response):
+    async with get_async_session() as session:
+        stmt = select(User).where(User.email == credentials.email)
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()
+        
+        if not user or not user.hashed_password:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        if not pwd_context.verify(credentials.password, user.hashed_password):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+            
+        token = create_jwt_token(user.id)
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            httponly=True,
+            max_age=JWT_EXPIRE_MINUTES * 60,
+            samesite="lax"
+        )
+        return user
+
+# ----------------------------------------------------------------------
+# GitHub OAuth Routes
 # ----------------------------------------------------------------------
 @router.get("/login")
 def login():

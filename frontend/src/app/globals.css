@@ -1,19 +1,36 @@
 @import "tailwindcss";
 
 :root {
+  /* Base - Clean High Contrast */
   --background: #ffffff;
-  --foreground: #000000;
+  --foreground: #09090b;
+  /* Pure black is too harsh, soften slightly */
   --primary: #2563eb;
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(0, 0, 0, 0.1);
+
+  /* Glassmorphism System */
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+
+  /* Depth & Accents */
+  --shimmer-color: rgba(0, 0, 0, 0.05);
+  --card-hover: rgba(0, 0, 0, 0.03);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #000000;
+    /* OLED Black */
     --foreground: #ffffff;
-    --glass-bg: rgba(20, 20, 20, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary: #3b82f6;
+
+    /* Dark Glass */
+    --glass-bg: rgba(20, 20, 20, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+
+    --shimmer-color: rgba(255, 255, 255, 0.05);
+    --card-hover: rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -21,13 +38,37 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+
+  /* Custom Utilities */
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-border: var(--glass-border);
+  --box-shadow-glass: var(--glass-shadow);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  /* Premium Dot Pattern Background */
+  background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Utilities for Premium Feel */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, var(--foreground), var(--foreground), var(--primary));
 }
 
 /* Base Headings */
