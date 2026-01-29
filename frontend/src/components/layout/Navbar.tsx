@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  Code2, 
-  LayoutDashboard, 
-  User, 
-  LogOut, 
+import {
+  Code2,
+  LayoutDashboard,
+  User,
+  LogOut,
   Github,
   Menu,
   X
@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/auth";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Project Hub", href: "/hub", icon: Code2 },
   { name: "Profile", href: "/profile", icon: User },
 ];
 
@@ -51,8 +52,8 @@ export function Navbar() {
                     href={item.href}
                     className={cn(
                       "flex items-center gap-2 px-4 py-2 rounded-xl transition-all",
-                      isActive 
-                        ? "bg-white/20 text-primary" 
+                      isActive
+                        ? "bg-white/20 text-primary"
                         : "hover:bg-white/10 text-foreground/70"
                     )}
                   >
@@ -65,19 +66,19 @@ export function Navbar() {
               {isAuthenticated ? (
                 <div className="flex items-center gap-4 pl-6 border-l border-white/20">
                   <div className="flex items-center gap-3">
-                    {user?.avatar ? (
-                      <img 
-                        src={user.avatar} 
-                        alt={user.name}
+                    {user?.avatar_url ? (
+                      <img
+                        src={user.avatar_url}
+                        alt={user.username}
                         className="w-9 h-9 rounded-full ring-2 ring-primary/30"
                       />
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-medium">
-                        {user?.name?.charAt(0) || "U"}
+                        {user?.username?.charAt(0).toUpperCase() || "U"}
                       </div>
                     )}
                     <span className="text-sm font-medium hidden lg:block">
-                      {user?.name || "User"}
+                      {user?.username || "User"}
                     </span>
                   </div>
                   <button
@@ -131,8 +132,8 @@ export function Navbar() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
                       "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
-                      isActive 
-                        ? "bg-white/20 text-primary" 
+                      isActive
+                        ? "bg-white/20 text-primary"
                         : "hover:bg-white/10"
                     )}
                   >
@@ -141,7 +142,7 @@ export function Navbar() {
                   </Link>
                 );
               })}
-              
+
               {isAuthenticated ? (
                 <button
                   onClick={() => {

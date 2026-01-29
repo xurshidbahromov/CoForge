@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight, ChevronLeft, Check, Code2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { api } from "@/lib/api";
 
 const steps = [
   { id: "stack", title: "Tech Stack" },
@@ -88,18 +89,29 @@ export default function OnboardingPage() {
     return false;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else if (user) {
-      const updatedUser = {
-        ...user,
-        stack: formData.stack,
-        experienceLevel: formData.level as "beginner" | "junior" | "confident_junior",
-        goal: formData.goal as "experience" | "portfolio" | "job_prep",
-      };
-      setUser(updatedUser);
-      router.push("/dashboard");
+      try {
+        const response = await api.patch('/auth/me', {
+          stack: formData.stack,
+          level: formData.level,
+          goal: formData.goal,
+        });
+
+        // Update local state with the returned user from backend
+        // We might need to split the stack string back into an array if the backend joined it
+        const savedUser = response.data;
+        if (typeof savedUser.stack === 'string') {
+          savedUser.stack = savedUser.stack.split(',').filter(Boolean);
+        }
+
+        setUser(savedUser);
+        router.push("/dashboard");
+      } catch (error) {
+        console.error("Failed to save onboarding data:", error);
+      }
     }
   };
 
@@ -142,8 +154,8 @@ export default function OnboardingPage() {
                     index < currentStep
                       ? "bg-primary text-white"
                       : index === currentStep
-                      ? "bg-primary/20 ring-2 ring-primary"
-                      : "bg-white/10"
+                        ? "bg-primary/20 ring-2 ring-primary"
+                        : "bg-white/10"
                   )}
                 >
                   {index < currentStep ? (

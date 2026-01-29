@@ -11,38 +11,12 @@ export default function LoginPage() {
   const { login, setLoading, isLoading } = useAuth();
   const [error, setError] = useState("");
 
-  const handleGitHubLogin = async () => {
+  const handleGitHubLogin = () => {
     setLoading(true);
     setError("");
-
-    try {
-      // Simulate GitHub OAuth flow
-      // In production, this would redirect to GitHub OAuth
-      // For demo, we'll simulate a successful login
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-
-      // Mock user data - in production this comes from GitHub OAuth
-      const mockUser = {
-        id: "user_" + Math.random().toString(36).substr(2, 9),
-        name: "Alex Developer",
-        email: "alex@example.com",
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random()}`,
-        githubUsername: "alexdev",
-        stack: ["React", "TypeScript", "Node.js"],
-        experienceLevel: "junior" as const,
-        goal: "job_prep" as const,
-        createdAt: new Date().toISOString(),
-      };
-
-      login(mockUser);
-      router.push("/onboarding");
-    } catch (err) {
-      setError("Failed to sign in with GitHub. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    // Redirect to the backend auth endpoint
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    window.location.href = `${apiBaseUrl}/auth/login`;
   };
 
   return (
