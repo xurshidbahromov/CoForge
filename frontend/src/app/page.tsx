@@ -20,10 +20,10 @@ const features = [
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen w-full overflow-x-hidden bg-background">
+    <main className="flex flex-col min-h-screen w-full overflow-x-hidden">
 
       {/* 1. HERO SECTION */}
-      <section id="vision" className="w-full flex flex-col items-center justify-center pt-40 pb-32 px-6 bg-background text-foreground relative overflow-hidden">
+      <section id="vision" className="w-full flex flex-col items-center justify-center pt-40 pb-32 px-6 text-foreground relative overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -111,7 +111,7 @@ export default function Home() {
       </section>
 
       {/* 3. PARADOX SECTION */}
-      <section className="w-full py-32 px-6 bg-background relative">
+      <section className="w-full py-32 px-6 relative">
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -158,7 +158,8 @@ export default function Home() {
       </section>
 
       {/* 4. ENGINE SECTION (Bento Grid) */}
-      <section id="engine" className="w-full py-40 bg-foreground text-background relative overflow-hidden">
+      <section id="engine" className="w-full py-40 text-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-foreground/95 pointer-events-none" />
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 blur-[150px] rounded-full opacity-20 pointer-events-none" />
 
         <div className="max-w-[1200px] mx-auto px-6 relative z-10">
@@ -197,7 +198,7 @@ export default function Home() {
       </section>
 
       {/* 5. JOURNEY SECTION */}
-      <section id="journey" className="w-full py-40 px-6 bg-background text-foreground relative">
+      <section id="journey" className="w-full py-40 px-6 text-foreground relative">
         <div className="max-w-[1200px] mx-auto">
           <h2 className="text-5xl md:text-7xl font-black text-center mb-32 tracking-tighter">Your Journey</h2>
           <div className="grid md:grid-cols-3 gap-12 relative">
@@ -229,7 +230,7 @@ export default function Home() {
       </section>
 
       {/* 5.5 PROOF MARQUEE */}
-      <section className="w-full bg-background pb-32">
+      <section className="w-full pb-32">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 text-green-500">
@@ -266,7 +267,7 @@ export default function Home() {
       <FAQ />
 
       {/* 6. CTA SECTION */}
-      <section className="w-full py-24 px-6 bg-background mb-20">
+      <section className="w-full py-24 px-6 mb-20">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}

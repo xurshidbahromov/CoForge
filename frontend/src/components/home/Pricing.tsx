@@ -60,7 +60,7 @@ const plans = [
 
 export function Pricing() {
     return (
-        <section id="pricing" className="w-full py-32 px-6 bg-background relative overflow-hidden">
+        <section id="pricing" className="w-full py-32 px-6 relative overflow-hidden">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
 
             <div className="max-w-[1200px] mx-auto relative z-10">
@@ -103,8 +103,8 @@ export function Pricing() {
 
                             <div
                                 className={`glass-card p-8 rounded-3xl h-full flex flex-col relative overflow-hidden ${plan.popular
-                                        ? "border-2 border-primary/50 shadow-2xl shadow-primary/20"
-                                        : "border border-foreground/10"
+                                    ? "border-2 border-primary/50 shadow-2xl shadow-primary/20"
+                                    : "border border-foreground/10"
                                     }`}
                             >
                                 {plan.popular && (
@@ -123,8 +123,8 @@ export function Pricing() {
                                     <Link
                                         href="/login"
                                         className={`block w-full py-4 rounded-xl font-bold text-center transition-all mb-8 ${plan.popular
-                                                ? "bg-primary text-background hover:scale-105 shadow-lg shadow-primary/30"
-                                                : "bg-foreground/5 hover:bg-foreground/10"
+                                            ? "bg-primary text-background hover:scale-105 shadow-lg shadow-primary/30"
+                                            : "bg-foreground/5 hover:bg-foreground/10"
                                             }`}
                                     >
                                         {plan.cta}
