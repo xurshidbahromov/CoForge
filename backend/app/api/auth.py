@@ -100,7 +100,8 @@ async def callback(code: str = None, state: str = None):
         await session.refresh(db_user)
         token = create_jwt_token(db_user.id)
 
-    response = Response(status_code=status.HTTP_302_FOUND, headers={"Location": "/dashboard"})
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    response = Response(status_code=status.HTTP_302_FOUND, headers={"Location": f"{FRONTEND_URL}/dashboard"})
     response.set_cookie(
         key="access_token",
         value=token,

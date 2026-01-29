@@ -59,8 +59,8 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
-/* Glassmorphism utility class */
-.glass {
+/* Glassmorphism utility */
+@utility glass {
   background: var(--glass-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -68,20 +68,20 @@ body {
   box-shadow: var(--glass-shadow);
 }
 
-.glass-card {
+@utility glass-card {
   @apply glass rounded-2xl p-6 transition-all duration-300;
+  
+  &:hover {
+    @apply shadow-lg transform -translate-y-1;
+  }
 }
 
-.glass-card:hover {
-  @apply shadow-lg transform -translate-y-1;
-}
-
-.glass-button {
+@utility glass-button {
   @apply glass px-6 py-3 rounded-xl font-medium transition-all duration-300;
   @apply hover:bg-white/20 hover:shadow-lg active:scale-95;
 }
 
-.glass-input {
+@utility glass-input {
   @apply glass px-4 py-3 rounded-xl outline-none transition-all duration-300;
   @apply focus:bg-white/30 focus:ring-2 focus:ring-primary/50;
 }

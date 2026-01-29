@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+asyncpg
+httpx
+pyjwt
+openai
+python-dotenv
