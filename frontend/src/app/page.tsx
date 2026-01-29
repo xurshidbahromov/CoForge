@@ -3,7 +3,7 @@
 import { Github, Zap, ArrowRight, Code2, Users, Trophy, GitPullRequest, Search, BookOpen, Activity } from "lucide-react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { VisionTerminal, Marquee } from "@/components/home/InteractiveElements";
+import { VisionTerminal, Marquee, TiltCard } from "@/components/home/InteractiveElements";
 import { useRef } from "react";
 
 const features = [
@@ -11,7 +11,7 @@ const features = [
   { icon: Users, title: "Team Collaboration", description: "Work with other developers in sprints. Build real teamwork skills.", span: "col-span-1" },
   { icon: Trophy, title: "Proof of Experience", description: "Your profile becomes a verified portfolio. Show employers exactly what you've built.", span: "col-span-1" },
   { icon: GitPullRequest, title: "GitHub Integration", description: "Seamless PR integration. Your contributions are automatically tracked and verified.", span: "col-span-1 md:col-span-2" },
-  { icon: Search, title: "AI Code Review", description: "Get instant feedback on your code. Learn best practices from an AI mentor.", span: "col-span-1" },
+  { icon: Search, title: "AI Code Review", description: "Get instant feedback on your code. Learn best practices from an AI mentor.", span: "col-span-1 md:col-span-2" },
   { icon: BookOpen, title: "Structured Learning", description: "Skill recommendations tailored to your growth. Never feel lost about what to learn next.", span: "col-span-1" },
 ];
 
@@ -24,7 +24,7 @@ export default function Home() {
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="max-w-4xl w-full text-center relative z-10">
+        <div className="max-w-[1200px] w-full text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -85,7 +85,7 @@ export default function Home() {
 
       {/* 2. STATS BAR */}
       <section className="w-full border-y border-foreground/5 bg-foreground/[0.02] backdrop-blur-sm">
-        <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 divide-x divide-foreground/5">
+        <div className="max-w-[1200px] mx-auto px-4 grid grid-cols-2 md:grid-cols-4 divide-x divide-foreground/5">
           {[
             { label: "Developers", value: "10K+" },
             { label: "Projects", value: "5K+" },
@@ -109,7 +109,7 @@ export default function Home() {
 
       {/* 3. PARADOX SECTION */}
       <section className="w-full py-32 px-6 bg-background relative">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -158,7 +158,7 @@ export default function Home() {
       <section className="w-full py-40 bg-foreground text-background relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 blur-[150px] rounded-full opacity-20 pointer-events-none" />
 
-        <div className="max-w-6xl mx-auto px-6 relative z-10">
+        <div className="max-w-[1200px] mx-auto px-6 relative z-10">
           <div className="mb-24 text-center md:text-left">
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 relative inline-block">
               The Engine
@@ -173,18 +173,20 @@ export default function Home() {
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                whileHover={{ scale: 1.02 }}
-                className={`p-10 rounded-[2rem] bg-white/5 border border-white/10 hover:bg-white/10 transition-all ${feature.span || 'col-span-1'}`}
+                whileHover={{ y: -5 }}
+                className={`p-8 rounded-[2rem] bg-background/[0.02] border border-background/10 hover:border-primary/50 transition-all duration-300 group relative overflow-hidden ${feature.span || 'col-span-1'}`}
               >
-                <div className="w-14 h-14 rounded-2xl bg-primary/20 flex items-center justify-center mb-6 text-primary">
-                  <feature.icon className="w-7 h-7" />
+                <div className="relative z-10 h-full flex flex-col items-start text-left">
+                  <div className="mb-6 p-3 rounded-xl bg-primary/10 text-primary">
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
+                  <p className="text-sm text-background/60 leading-relaxed font-medium">{feature.description}</p>
                 </div>
-                <h3 className="text-2xl font-bold mb-3">{feature.title}</h3>
-                <p className="text-background/60 leading-relaxed font-medium">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -193,7 +195,7 @@ export default function Home() {
 
       {/* 5. JOURNEY SECTION */}
       <section className="w-full py-40 px-6 bg-background text-foreground relative">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-[1200px] mx-auto">
           <h2 className="text-5xl md:text-7xl font-black text-center mb-32 tracking-tighter">Your Journey</h2>
           <div className="grid md:grid-cols-3 gap-12 relative">
             {/* Connecting Line (Desktop) */}
@@ -225,7 +227,7 @@ export default function Home() {
 
       {/* 5.5 PROOF MARQUEE */}
       <section className="w-full bg-background pb-32">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="max-w-[1200px] mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
             <div className="flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 text-green-500">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -257,7 +259,7 @@ export default function Home() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="max-w-5xl mx-auto bg-foreground text-background p-12 md:p-24 rounded-[3rem] text-center relative overflow-hidden shadow-2xl"
+          className="max-w-[1200px] mx-auto bg-foreground text-background p-12 md:p-24 rounded-[3rem] text-center relative overflow-hidden shadow-2xl"
         >
           {/* Animated Background */}
           <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50" />

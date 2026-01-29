@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export const Marquee = ({ children, reverse = false }: { children: React.ReactNode, reverse?: boolean }) => {
     return (
@@ -51,5 +51,48 @@ export const VisionTerminal = () => {
                 />
             </div>
         </div>
+    );
+};
+
+export const TiltCard = ({ children, className }: { children: React.ReactNode, className?: string }) => {
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
+    const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
+
+    function onMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+        const { left, top, width, height } = currentTarget.getBoundingClientRect();
+        x.set(clientX - left - width / 2);
+        y.set(clientY - top - height / 2);
+    }
+
+    const rotateX = useTransform(mouseY, [-0.5, 0.5], ["17.5deg", "-17.5deg"]);
+    const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-17.5deg", "17.5deg"]);
+
+    return (
+        <motion.div
+            className={className}
+            onMouseMove={onMouseMove}
+            onMouseLeave={() => {
+                x.set(0);
+                y.set(0);
+            }}
+            style={{
+                perspective: 1000,
+                rotateX,
+                rotateY,
+            }}
+        >
+            <motion.div
+                style={{
+                    transform: "translateZ(75px)",
+                    transformStyle: "preserve-3d",
+                }}
+                className="relative w-full h-full transition-all duration-200 ease-linear"
+            >
+                {children}
+            </motion.div>
+        </motion.div>
     );
 };

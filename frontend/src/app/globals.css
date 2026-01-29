@@ -17,21 +17,19 @@
   --card-hover: rgba(0, 0, 0, 0.03);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    /* OLED Black */
-    --foreground: #ffffff;
-    --primary: #3b82f6;
+.dark {
+  --background: #000000;
+  /* OLED Black */
+  --foreground: #ffffff;
+  --primary: #3b82f6;
 
-    /* Dark Glass */
-    --glass-bg: rgba(20, 20, 20, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  /* Dark Glass */
+  --glass-bg: rgba(20, 20, 20, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 
-    --shimmer-color: rgba(255, 255, 255, 0.05);
-    --card-hover: rgba(255, 255, 255, 0.05);
-  }
+  --shimmer-color: rgba(255, 255, 255, 0.05);
+  --card-hover: rgba(255, 255, 255, 0.05);
 }
 
 @theme {

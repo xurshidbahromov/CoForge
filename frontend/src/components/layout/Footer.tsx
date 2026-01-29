@@ -8,8 +8,8 @@ export function Footer() {
     <footer className="relative mt-20">
       {/* Decorative gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent" />
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+      <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="glass rounded-3xl p-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
@@ -21,36 +21,36 @@ export function Footer() {
                 <span className="text-xl font-bold gradient-text">CoForge</span>
               </Link>
               <p className="text-foreground/70 max-w-md">
-                The first ecosystem that gives junior and intermediate developers 
-                real, proven experience. Build projects, work in teams, and 
+                The first ecosystem that gives junior and intermediate developers
+                real, proven experience. Build projects, work in teams, and
                 showcase your skills to employers.
               </p>
               <div className="flex gap-4 mt-6">
-                <a 
-                  href="https://github.com" 
-                  target="_blank" 
+                <a
+                  href="https://github.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-xl hover:bg-white/10 transition-colors"
                 >
                   <Github className="w-5 h-5" />
                 </a>
-                <a 
-                  href="https://twitter.com" 
-                  target="_blank" 
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-xl hover:bg-white/10 transition-colors"
                 >
                   <Twitter className="w-5 h-5" />
                 </a>
-                <a 
-                  href="https://linkedin.com" 
-                  target="_blank" 
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-xl hover:bg-white/10 transition-colors"
                 >
                   <Linkedin className="w-5 h-5" />
                 </a>
-                <a 
+                <a
                   href="mailto:hello@coforge.dev"
                   className="p-2 rounded-xl hover:bg-white/10 transition-colors"
                 >

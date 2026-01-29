@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -29,7 +30,7 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-6 left-0 right-0 z-[100] px-4">
-      <div className="max-w-5xl mx-auto glass-panel rounded-2xl">
+      <div className="max-w-[1200px] mx-auto glass-panel rounded-2xl">
         <div className="px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
@@ -88,6 +89,11 @@ export function Navbar() {
                   <span className="hidden sm:inline">Sign In</span>
                 </Link>
               )}
+
+              <div className="pl-3 border-l border-foreground/10 ml-1">
+                <ThemeToggle />
+              </div>
+
               {/* Mobile Menu Button */}
               <button
                 className="md:hidden p-2 rounded-lg hover:bg-foreground/5 ml-2"
