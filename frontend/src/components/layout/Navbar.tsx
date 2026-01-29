@@ -28,16 +28,16 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="glass mx-4 mt-4 rounded-2xl">
+    <nav className="fixed top-0 left-0 right-0 z-[100] p-4">
+      <div className="max-w-7xl mx-auto bg-background/80 backdrop-blur-xl rounded-2xl border border-foreground/10 shadow-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-primary to-secondary group-hover:scale-110 transition-transform">
-                <Code2 className="w-6 h-6 text-white" />
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <div className="w-9 h-9 rounded-xl bg-foreground flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                <Code2 className="w-5 h-5 text-background" />
               </div>
-              <span className="text-xl font-bold gradient-text">
+              <span className="text-xl font-bold tracking-tighter">
                 CoForge
               </span>
             </Link>
@@ -51,33 +51,35 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-xl transition-all",
+                      "text-sm font-semibold transition-all duration-300",
                       isActive
-                        ? "bg-white/20 text-primary"
-                        : "hover:bg-white/10 text-foreground/70"
+                        ? "text-foreground"
+                        : "text-foreground/40 hover:text-foreground"
                     )}
                   >
-                    <item.icon className="w-4 h-4" />
                     <span>{item.name}</span>
                   </Link>
                 );
               })}
+            </div>
 
+            {/* Right Side */}
+            <div className="flex items-center gap-4">
               {isAuthenticated ? (
-                <div className="flex items-center gap-4 pl-6 border-l border-white/20">
+                <div className="flex items-center gap-6 pl-4 border-l border-foreground/5">
                   <div className="flex items-center gap-3">
                     {user?.avatar_url ? (
                       <img
                         src={user.avatar_url}
                         alt={user.username}
-                        className="w-9 h-9 rounded-full ring-2 ring-primary/30"
+                        className="w-8 h-8 rounded-full border border-foreground/10 grayscale-[0.5] hover:grayscale-0 transition-all"
                       />
                     ) : (
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-medium">
+                      <div className="w-8 h-8 rounded-full bg-foreground flex items-center justify-center text-background text-[10px] font-bold">
                         {user?.username?.charAt(0).toUpperCase() || "U"}
                       </div>
                     )}
-                    <span className="text-sm font-medium hidden lg:block">
+                    <span className="text-xs font-bold tracking-tight hidden lg:block uppercase opacity-70">
                       {user?.username || "User"}
                     </span>
                   </div>

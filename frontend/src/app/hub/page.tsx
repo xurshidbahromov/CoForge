@@ -82,104 +82,86 @@ export default function ProjectHubPage() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Hero Header */}
-            <div className="relative mb-12 overflow-hidden rounded-3xl glass p-8 md:p-12">
-                <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-                <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+            <div className="relative mb-16 overflow-hidden rounded-[3rem] border border-foreground/[0.05] bg-foreground/[0.01] p-12 md:p-20">
+                <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
+                <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-4">
-                            <Sparkles className="w-4 h-4" />
-                            AI-Powered Innovation
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/5 border border-foreground/10 text-foreground/40 text-[10px] font-bold uppercase tracking-widest mb-6">
+                            <Sparkles className="w-3.5 h-3.5 text-primary" />
+                            AI-Powered Design
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                            The <span className="gradient-text">Project Hub</span>
+                        <h1 className="text-5xl md:text-6xl font-bold tracking-tighter mb-8 leading-[1.1]">
+                            The <span className="opacity-30">Project</span> Hub
                         </h1>
-                        <p className="text-lg text-foreground/70 mb-8 max-w-lg">
-                            Generate custom project ideas tailored to your stack or join a team
-                            to work on trending open-source challenges.
+                        <p className="text-xl text-foreground/50 mb-10 max-w-lg leading-relaxed">
+                            Generate custom projects tailored to your stack or join teams
+                            to solve high-impact challenges.
                         </p>
                         <div className="flex flex-wrap gap-4">
                             <button
                                 onClick={handleGenerateIdea}
                                 disabled={isGenerating}
-                                className="glass-button bg-gradient-to-r from-primary to-secondary text-white flex items-center gap-2 px-8 py-4"
+                                className="glass-button bg-foreground text-background flex items-center gap-3 px-8 py-4 group"
                             >
                                 {isGenerating ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        Generating your idea...
+                                        <span>Roadmap loading...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <Zap className="w-5 h-5" />
-                                        Generate AI Idea
+                                        <Zap className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                                        <span>Generate AI Idea</span>
                                     </>
                                 )}
                             </button>
-                            <button className="glass-button flex items-center gap-2 px-8 py-4">
-                                <Users className="w-5 h-5" />
-                                Form a Team
+                            <button className="glass-button flex items-center gap-3 px-8 py-4">
+                                <Users className="w-5 h-5 opacity-40" />
+                                <span>Form a Team</span>
                             </button>
                         </div>
                     </div>
-                    <div className="hidden md:flex justify-center">
+                    <div className="hidden md:flex justify-end pr-8">
                         <motion.div
-                            animate={{ y: [0, -10, 0] }}
-                            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                            className="relative"
+                            animate={{ y: [0, -8, 0] }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                            className="w-72 h-44 rounded-3xl border border-foreground/[0.05] bg-foreground/[0.02] p-8 relative"
                         >
-                            <div className="glass p-6 rounded-3xl border-primary/30 w-64 shadow-2xl">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 rounded-lg bg-primary/20">
-                                        <Code2 className="w-6 h-6 text-primary" />
-                                    </div>
-                                    <div className="h-4 w-32 bg-white/10 rounded" />
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="h-2 w-full bg-white/5 rounded" />
-                                    <div className="h-2 w-5/6 bg-white/5 rounded" />
-                                    <div className="h-2 w-4/6 bg-white/5 rounded" />
-                                </div>
-                                <div className="mt-6 flex justify-between items-center">
-                                    <div className="h-6 w-16 bg-primary/20 rounded-full" />
-                                    <div className="h-6 w-6 bg-white/10 rounded-full" />
-                                </div>
+                            <div className="w-10 h-10 rounded-xl bg-foreground/5 flex items-center justify-center mb-6">
+                                <Code2 className="w-5 h-5 text-foreground/20" />
                             </div>
+                            <div className="space-y-3">
+                                <div className="h-1.5 w-full bg-foreground/5 rounded-full" />
+                                <div className="h-1.5 w-4/5 bg-foreground/5 rounded-full" />
+                            </div>
+                            <div className="absolute bottom-8 right-8 w-8 h-8 rounded-full bg-primary/10" />
                         </motion.div>
                     </div>
                 </div>
             </div>
 
             {/* Filters & Search */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-8">
-                <div className="relative w-full md:w-96">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
+            <div className="flex flex-col md:flex-row gap-6 justify-between items-center mb-12">
+                <div className="relative w-full md:w-[28rem]">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20" />
                     <input
                         type="text"
-                        placeholder="Search projects..."
+                        placeholder="Search for projects, stacks, or keywords..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="glass-input w-full pl-12"
+                        className="glass-input w-full pl-14 h-14"
                     />
                 </div>
-                <div className="flex gap-2 p-1 glass rounded-xl w-full md:w-auto">
-                    <button
-                        onClick={() => setFilterType("all")}
-                        className={`flex-1 md:px-6 py-2 rounded-lg text-sm font-medium transition-all ${filterType === 'all' ? 'bg-primary text-white shadow-lg' : 'hover:bg-white/5'}`}
-                    >
-                        All Projects
-                    </button>
-                    <button
-                        onClick={() => setFilterType("solo")}
-                        className={`flex-1 md:px-6 py-2 rounded-lg text-sm font-medium transition-all ${filterType === 'solo' ? 'bg-primary text-white shadow-lg' : 'hover:bg-white/5'}`}
-                    >
-                        Solo
-                    </button>
-                    <button
-                        onClick={() => setFilterType("team")}
-                        className={`flex-1 md:px-6 py-2 rounded-lg text-sm font-medium transition-all ${filterType === 'team' ? 'bg-primary text-white shadow-lg' : 'hover:bg-white/5'}`}
-                    >
-                        Team
-                    </button>
+                <div className="flex gap-1.5 p-1.5 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.01] w-full md:w-auto h-14">
+                    {["all", "solo", "team"].map((type) => (
+                        <button
+                            key={type}
+                            onClick={() => setFilterType(type as any)}
+                            className={`flex-1 md:px-8 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${filterType === type ? 'bg-foreground text-background shadow-md' : 'text-foreground/40 hover:text-foreground'}`}
+                        >
+                            {type}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -196,36 +178,36 @@ export default function ProjectHubPage() {
                     <p className="text-foreground/60">Try adjusting your search or filters.</p>
                 </div>
             ) : (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredProjects.map((project) => (
                         <motion.div
                             layout
-                            initial={{ opacity: 0, scale: 0.9 }}
+                            initial={{ opacity: 0, scale: 0.98 }}
                             animate={{ opacity: 1, scale: 1 }}
                             key={project.id}
-                            className="glass-card group flex flex-col"
+                            className="p-10 rounded-[2.5rem] border border-foreground/[0.05] bg-foreground/[0.01] hover:bg-foreground/[0.02] transition-colors flex flex-col group"
                         >
-                            <div className="flex justify-between items-start mb-4">
-                                <div className={`px-3 py-1 rounded-full text-xs font-bold ${project.type === 'team' ? 'bg-secondary/20 text-secondary' : 'bg-primary/20 text-primary'}`}>
-                                    {project.type.toUpperCase()}
+                            <div className="flex justify-between items-center mb-8">
+                                <div className="px-3 py-1.5 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/40 text-[9px] font-bold uppercase tracking-widest">
+                                    {project.type}
                                 </div>
-                                <div className="text-[10px] text-foreground/40 font-mono">
-                                    ID: {project.id}
+                                <div className="text-[9px] font-bold uppercase tracking-widest text-foreground/20">
+                                    ID {project.id}
                                 </div>
                             </div>
 
-                            <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
+                            <h3 className="text-2xl font-bold tracking-tighter mb-4 group-hover:text-primary transition-colors">
                                 {project.title}
                             </h3>
 
-                            <p className="text-sm text-foreground/70 mb-6 line-clamp-3">
+                            <p className="text-foreground/40 text-sm leading-relaxed mb-10 line-clamp-3">
                                 {project.description}
                             </p>
 
-                            <div className="mt-auto pt-6 border-t border-white/5">
-                                <div className="flex flex-wrap gap-2 mb-6">
+                            <div className="mt-auto">
+                                <div className="flex flex-wrap gap-1.5 mb-10">
                                     {project.stack.split(',').map(s => (
-                                        <span key={s} className="px-2 py-1 rounded-md bg-white/5 text-[10px] font-medium border border-white/10">
+                                        <span key={s} className="px-2.5 py-1 rounded-lg bg-foreground/5 text-foreground/40 text-[10px] font-bold uppercase tracking-wider">
                                             {s.trim()}
                                         </span>
                                     ))}
@@ -233,9 +215,9 @@ export default function ProjectHubPage() {
 
                                 <Link
                                     href={`/projects/${project.id}`}
-                                    className="glass-button w-full flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white"
+                                    className="glass-button w-full flex items-center justify-center gap-3 py-4 group-hover:bg-foreground group-hover:text-background"
                                 >
-                                    View Details
+                                    <span>View Details</span>
                                     <ArrowRight className="w-4 h-4" />
                                 </Link>
                             </div>

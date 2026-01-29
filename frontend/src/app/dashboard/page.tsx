@@ -58,55 +58,43 @@ export default function DashboardPage() {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16 px-2">
                 <div>
-                    <h1 className="text-3xl font-bold gradient-text mb-2">
-                        Welcome back, {user?.username || 'Developer'}!
+                    <h1 className="text-4xl font-bold tracking-tighter mb-3">
+                        Welcome back, {user?.username || 'Developer'}
                     </h1>
-                    <p className="text-foreground/70">
-                        Track your progress and build new real-world experience.
+                    <p className="text-lg text-foreground/50 tracking-tight">
+                        Your development journey at a glance.
                     </p>
                 </div>
                 <div className="flex gap-4">
                     <Link
                         href="/hub"
-                        className="glass-button bg-gradient-to-r from-primary to-secondary text-white flex items-center gap-2"
+                        className="glass-button bg-foreground text-background flex items-center gap-2 group"
                     >
-                        <Plus className="w-5 h-5" />
-                        New Project
+                        <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform duration-300" />
+                        <span>New Project</span>
                     </Link>
                 </div>
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <div className="glass-card flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-primary/20">
-                        <TrendingUp className="w-6 h-6 text-primary" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                {[
+                    { label: "Active Projects", value: projects.length, icon: TrendingUp },
+                    { label: "Tasks Completed", value: "0", icon: CheckCircle2 },
+                    { label: "Experience Points", value: "0", icon: Award }
+                ].map((stat) => (
+                    <div key={stat.label} className="p-10 rounded-[2.5rem] border border-foreground/[0.05] bg-foreground/[0.01] flex items-center gap-6">
+                        <div className="w-14 h-14 rounded-2xl bg-foreground/5 flex items-center justify-center">
+                            <stat.icon className="w-6 h-6 text-foreground/40" />
+                        </div>
+                        <div>
+                            <div className="text-xs font-bold uppercase tracking-widest text-foreground/30 mb-1">{stat.label}</div>
+                            <div className="text-3xl font-bold tracking-tighter">{stat.value}</div>
+                        </div>
                     </div>
-                    <div>
-                        <div className="text-sm text-foreground/60">Active Projects</div>
-                        <div className="text-2xl font-bold">{projects.length}</div>
-                    </div>
-                </div>
-                <div className="glass-card flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-success/20">
-                        <CheckCircle2 className="w-6 h-6 text-success" />
-                    </div>
-                    <div>
-                        <div className="text-sm text-foreground/60">Tasks Completed</div>
-                        <div className="text-2xl font-bold">0</div>
-                    </div>
-                </div>
-                <div className="glass-card flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-accent/20">
-                        <Award className="w-6 h-6 text-accent" />
-                    </div>
-                    <div>
-                        <div className="text-sm text-foreground/60">XP Earned</div>
-                        <div className="text-2xl font-bold">0</div>
-                    </div>
-                </div>
+                ))}
             </div>
 
             {/* Main Content */}
@@ -124,57 +112,57 @@ export default function DashboardPage() {
                     </div>
 
                     {projects.length === 0 ? (
-                        <div className="glass rounded-3xl p-12 text-center">
-                            <div className="inline-flex items-center justify-center p-4 rounded-2xl bg-white/5 mb-4">
-                                <Zap className="w-8 h-8 text-foreground/20" />
+                        <div className="p-20 rounded-[3rem] border border-foreground/[0.05] bg-foreground/[0.01] text-center">
+                            <div className="w-20 h-20 rounded-[2rem] bg-foreground/5 flex items-center justify-center mx-auto mb-8">
+                                <Zap className="w-8 h-8 text-foreground/10" />
                             </div>
-                            <h3 className="text-xl font-medium mb-2">No active projects yet</h3>
-                            <p className="text-foreground/60 mb-8 max-w-sm mx-auto">
-                                Start by generating an AI project or joining a team to build your experience.
+                            <h3 className="text-2xl font-bold mb-4 tracking-tighter">No active projects</h3>
+                            <p className="text-foreground/40 mb-10 max-w-xs mx-auto text-lg leading-relaxed">
+                                Start by generating an AI project or joining a team.
                             </p>
                             <Link
                                 href="/hub"
-                                className="glass-button inline-flex items-center gap-2"
+                                className="glass-button inline-flex items-center gap-3 py-4"
                             >
-                                Go to Project Hub
+                                <span>Go to Project Hub</span>
                                 <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid gap-4">
+                        <div className="grid gap-6">
                             {projects.map((proj) => (
                                 <Link
                                     key={proj.id}
                                     href={`/projects/${proj.id}`}
-                                    className="glass-card hover:translate-x-1 flex items-center justify-between group"
+                                    className="p-8 rounded-[2rem] border border-foreground/[0.05] bg-foreground/[0.01] hover:bg-foreground/[0.02] transition-colors flex items-center justify-between group px-10"
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                            <Layout className="w-6 h-6 text-primary" />
+                                    <div className="flex items-center gap-8">
+                                        <div className="w-14 h-14 rounded-2xl bg-foreground/5 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+                                            <Layout className="w-6 h-6 text-foreground/20 group-hover:text-primary transition-colors" />
                                         </div>
                                         <div>
-                                            <h3 className="font-semibold group-hover:text-primary transition-colors">
+                                            <h3 className="text-xl font-bold tracking-tight group-hover:text-primary transition-colors mb-2">
                                                 {proj.title}
                                             </h3>
-                                            <div className="flex items-center gap-3 text-xs text-foreground/50 mt-1">
-                                                <span className="flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" />
-                                                    Just started
+                                            <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-foreground/30">
+                                                <span className="flex items-center gap-1.5 grayscale opacity-50">
+                                                    <Clock className="w-3.5 h-3.5" />
+                                                    Started
                                                 </span>
-                                                <span className="px-2 py-0.5 rounded-full bg-white/10">
+                                                <span className="bg-foreground/5 px-2.5 py-1 rounded-lg">
                                                     {proj.stack}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-10">
                                         <div className="text-right hidden sm:block">
-                                            <div className="text-xs text-foreground/40 mb-1">Progress</div>
-                                            <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                                <div className="h-full bg-primary w-[10%]" />
+                                            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 mb-3">Progress</div>
+                                            <div className="w-24 h-1 bg-foreground/5 rounded-full overflow-hidden">
+                                                <div className="h-full bg-primary w-[10%] opacity-70" />
                                             </div>
                                         </div>
-                                        <ArrowRight className="w-5 h-5 text-foreground/20 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                                        <ArrowRight className="w-5 h-5 text-foreground/10 group-hover:text-foreground group-hover:translate-x-1 transition-all duration-300" />
                                     </div>
                                 </Link>
                             ))}

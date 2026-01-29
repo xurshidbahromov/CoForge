@@ -1,306 +1,152 @@
 "use client";
 
+import { Github, Zap, ArrowRight, Code2, Users, Trophy, GitPullRequest, Search, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { 
-  Code2, 
-  Users, 
-  Sparkles, 
-  Trophy,
-  GitBranch,
-  MessageSquare,
-  ArrowRight,
-  Github,
-  Zap,
-  Shield
-} from "lucide-react";
 
 const features = [
-  {
-    icon: Sparkles,
-    title: "AI-Powered Projects",
-    description: "Get personalized project ideas based on your stack and experience level. AI breaks them into manageable tasks."
-  },
-  {
-    icon: Users,
-    title: "Team Collaboration",
-    description: "Work with other developers in sprints. Build real teamwork skills while creating impressive projects."
-  },
-  {
-    icon: Trophy,
-    title: "Proof of Experience",
-    description: "Your profile becomes a verified portfolio. Show employers exactly what you've built and accomplished."
-  },
-  {
-    icon: GitBranch,
-    title: "GitHub Integration",
-    description: "Seamless PR integration. Your contributions are automatically tracked and verified."
-  },
-  {
-    icon: MessageSquare,
-    title: "AI Code Review",
-    description: "Get instant feedback on your code. Learn best practices from an AI mentor that actually cares."
-  },
-  {
-    icon: Shield,
-    title: "Structured Learning",
-    description: "Skill recommendations tailored to your growth. Never feel lost about what to learn next."
-  }
-];
-
-const stats = [
-  { value: "10K+", label: "Developers" },
-  { value: "5K+", label: "Projects Completed" },
-  { value: "500+", label: "Team Formations" },
-  { value: "95%", label: "Success Rate" }
+  { icon: Zap, title: "AI-Powered Projects", description: "Get personalized project ideas based on your stack and experience level." },
+  { icon: Users, title: "Team Collaboration", description: "Work with other developers in sprints. Build real teamwork skills." },
+  { icon: Trophy, title: "Proof of Experience", description: "Your profile becomes a verified portfolio. Show employers exactly what you've built." },
+  { icon: GitPullRequest, title: "GitHub Integration", description: "Seamless PR integration. Your contributions are automatically tracked and verified." },
+  { icon: Search, title: "AI Code Review", description: "Get instant feedback on your code. Learn best practices from an AI mentor." },
+  { icon: BookOpen, title: "Structured Learning", description: "Skill recommendations tailored to your growth. Never feel lost about what to learn next." },
 ];
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/20 rounded-full blur-3xl" />
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/20 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-        </div>
+    <main className="flex flex-col min-h-screen w-full overflow-x-hidden bg-background">
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center max-w-4xl mx-auto"
-          >
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-8">
-              <Zap className="w-4 h-4 text-accent" />
-              <span className="text-sm font-medium">For Junior & Intermediate Developers</span>
-            </div>
+      {/* 1. HERO SECTION */}
+      <section className="w-full flex flex-col items-center justify-center pt-32 pb-20 px-6 bg-background text-foreground">
+        <div className="max-w-4xl w-full text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 bg-foreground/5 border border-foreground/10 text-foreground/60 mx-auto">
+            <Zap className="w-4 h-4 text-primary" />
+            <span className="text-xs font-bold uppercase tracking-widest">The Future of Engineering</span>
+          </div>
 
-            {/* Heading */}
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="gradient-text">Build Real Experience.</span>
-              <br />
-              <span className="text-foreground">Land Your Dream Job.</span>
-            </h1>
+          <h1 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tight">
+            Experience <br />
+            <span className="text-foreground/20 italic">Verified.</span>
+          </h1>
 
-            {/* Subheading */}
-            <p className="text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
-              CoForge is the first ecosystem that gives junior and intermediate developers 
-              real, proven experience. Stop struggling with "need experience to get experience."
-            </p>
+          <p className="text-xl text-foreground/60 max-w-xl mx-auto mb-12 font-medium">
+            CoForge provides developers with real engineering history.
+            Stop building in silos. Start building in production-grade teams.
+          </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/login"
-                className="glass-button bg-gradient-to-r from-primary to-secondary text-white flex items-center justify-center gap-2 text-lg px-8 py-4"
-              >
-                <Github className="w-5 h-5" />
-                Start Building with GitHub
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="#features"
-                className="glass-button flex items-center justify-center gap-2 text-lg px-8 py-4"
-              >
-                Learn More
-              </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl font-bold gradient-text mb-1">{stat.value}</div>
-                  <div className="text-foreground/60">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/login" className="bg-foreground text-background px-8 py-4 rounded-xl font-bold hover:scale-105 transition-transform flex items-center gap-2">
+              <Github className="w-5 h-5" />
+              Start Building
+            </Link>
+            <Link href="#engine" className="px-8 py-4 border border-foreground/10 rounded-xl font-bold hover:bg-foreground/5 transition-colors">
+              See How It Works
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Problem Section */}
-      <section className="py-24 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass rounded-3xl p-8 md:p-12"
-          >
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                  The <span className="text-red-500">Problem</span>
-                </h2>
-                <p className="text-lg text-foreground/70 mb-6">
-                  Junior developers face an impossible catch-22: employers demand experience, 
-                  but new graduates can't get experience without a job.
-                </p>
-                <p className="text-lg text-foreground/70">
-                  Most resort to fake portfolio projects that don't impress employers. 
-                  They learn in isolation, missing real teamwork skills.
-                </p>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-2xl blur-xl" />
-                <div className="relative glass-card bg-red-500/10 border-red-500/20">
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-xl bg-red-500/20">
-                      <Code2 className="w-6 h-6 text-red-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">The Experience Gap</h3>
-                      <ul className="space-y-2 text-foreground/70">
-                        <li>• 73% of junior devs struggle to find their first job</li>
-                        <li>• Average time to land first job: 8-12 months</li>
-                        <li>• 65% say "portfolio projects aren't enough"</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {/* 2. STATS BAR */}
+      <section className="w-full border-y border-foreground/10 bg-foreground/[0.02]">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 divide-x divide-foreground/10">
+          {[
+            { label: "Developers", value: "10K+" },
+            { label: "Projects", value: "5K+" },
+            { label: "Teams", value: "500+" },
+            { label: "Success", value: "95%" }
+          ].map((stat) => (
+            <div key={stat.label} className="py-10 flex flex-col items-center text-center">
+              <div className="text-3xl font-black mb-1">{stat.value}</div>
+              <div className="text-xs font-bold uppercase tracking-widest opacity-50">{stat.label}</div>
             </div>
-          </motion.div>
+          ))}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              How <span className="gradient-text">CoForge</span> Works
+      {/* 3. PARADOX SECTION */}
+      <section className="w-full py-32 px-6 bg-background">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          <div className="flex flex-col gap-6">
+            <h2 className="text-5xl font-black leading-none tracking-tight">
+              The <br /><span className="text-primary opacity-30">Paradox.</span>
             </h2>
-            <p className="text-xl text-foreground/70 max-w-2xl mx-auto">
-              Everything you need to build real experience and showcase your skills.
-            </p>
-          </motion.div>
+            <p className="text-xl font-bold">Employers demand experience.</p>
+            <p className="text-lg opacity-60">Junior developers can't get it without that first hire. We bridge that gap.</p>
+          </div>
+          <div className="p-8 md:p-12 bg-foreground/[0.02] border border-foreground/5 rounded-3xl">
+            <h3 className="text-xs font-black uppercase tracking-widest opacity-40 mb-8">Reality Check</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-gray-100 text-black">
+                <span className="font-bold">Struggle for role</span>
+                <span className="text-2xl font-black">73%</span>
+              </div>
+              <div className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-gray-100 text-black">
+                <span className="font-bold">Avg Time to Hire</span>
+                <span className="text-2xl font-black">8mo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* 4. ENGINE SECTION (BLACK) */}
+      <section className="w-full py-40 bg-foreground text-background">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-20">
+            <h2 className="text-5xl md:text-6xl font-black tracking-tighter mb-4">The Engine</h2>
+            <p className="text-lg opacity-60 max-w-xl">Every tool defined to transform your career.</p>
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="glass-card group"
-              >
-                <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 w-fit mb-4 group-hover:scale-110 transition-transform">
-                  <feature.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-foreground/70">{feature.description}</p>
-              </motion.div>
+            {features.map((feature) => (
+              <div key={feature.title} className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                <feature.icon className="w-8 h-8 text-primary mb-6" />
+                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                <p className="text-sm opacity-60 leading-relaxed">{feature.description}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-24 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Your Journey to <span className="gradient-text">Real Experience</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
+      {/* 5. JOURNEY SECTION (WHITE) */}
+      <section className="w-full py-32 px-6 bg-background text-foreground">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-5xl font-black text-center mb-24 tracking-tighter">Your Journey</h2>
+          <div className="grid md:grid-cols-3 gap-12">
             {[
-              {
-                step: "01",
-                title: "Tell Us About Yourself",
-                description: "Select your tech stack, experience level, and goals. Our AI learns what you need."
-              },
-              {
-                step: "02",
-                title: "Build Real Projects",
-                description: "Work solo or in teams on AI-curated projects. Get guidance every step of the way."
-              },
-              {
-                step: "03",
-                title: "Prove Your Skills",
-                description: "Your profile becomes verified proof of experience. Share it with employers."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={item.step}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                className="relative"
-              >
-                {index < 2 && (
-                  <div className="hidden md:block absolute top-12 left-1/2 w-full h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
-                )}
-                <div className="relative glass-card text-center h-full">
-                  <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary text-white font-bold text-lg mb-6">
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">{item.title}</h3>
-                  <p className="text-foreground/70">{item.description}</p>
-                </div>
-              </motion.div>
+              { step: "01", title: "Identity", desc: "Define your stack. AI builds your persona." },
+              { step: "02", title: "Execution", desc: "Ship real code in high-performance teams." },
+              { step: "03", title: "Evidence", desc: "Your verification history becomes your portfolio." }
+            ].map((item) => (
+              <div key={item.step} className="text-center group">
+                <div className="text-8xl font-black opacity-5 mb-6 group-hover:opacity-10 transition-opacity">{item.step}</div>
+                <h3 className="text-2xl font-bold mb-2">{item.title}</h3>
+                <p className="opacity-60 max-w-xs mx-auto">{item.desc}</p>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass rounded-3xl p-8 md:p-16 text-center relative overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10" />
-            <div className="relative">
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                Ready to Build <span className="gradient-text">Real Experience</span>?
-              </h2>
-              <p className="text-xl text-foreground/70 max-w-2xl mx-auto mb-10">
-                Join thousands of developers who are building their future with CoForge. 
-                Start your journey today.
-              </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 glass-button bg-gradient-to-r from-primary to-secondary text-white text-lg px-8 py-4"
-              >
-                <Github className="w-5 h-5" />
-                Get Started with GitHub
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-          </motion.div>
+      {/* 6. CTA SECTION */}
+      <section className="w-full py-24 px-6 bg-background">
+        <div className="max-w-5xl mx-auto bg-foreground text-background p-16 md:p-24 rounded-[3rem] text-center relative overflow-hidden">
+          <div className="relative z-10 flex flex-col items-center">
+            <h2 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter">
+              Join the <br /><span className="text-primary italic">Elite.</span>
+            </h2>
+            <p className="text-lg opacity-60 mb-12 max-w-md">Stop building in silos. Start your engineering career today.</p>
+            <Link href="/login" className="bg-background text-foreground px-10 py-5 rounded-xl font-bold text-lg hover:scale-105 transition-transform flex items-center gap-3">
+              <Github className="w-5 h-5" />
+              Apply Now
+            </Link>
+          </div>
+          {/* Decorative Background Fade */}
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
         </div>
       </section>
-    </div>
+
+    </main>
   );
 }
-

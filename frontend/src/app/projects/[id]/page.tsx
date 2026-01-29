@@ -129,49 +129,48 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
             </Link>
 
             {/* Project Header */}
-            <div className="glass rounded-3xl p-8 mb-8 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="p-10 md:p-14 rounded-[3rem] border border-foreground/[0.05] bg-foreground/[0.01] mb-12 relative overflow-hidden">
                 <div className="relative z-10">
-                    <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                        <h1 className="text-3xl md:text-4xl font-bold">{project.title}</h1>
-                        <div className="flex items-center gap-2">
-                            <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase">
+                    <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">{project.title}</h1>
+                        <div className="flex items-center gap-3">
+                            <span className="px-3 py-1.5 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/40 text-[10px] font-bold uppercase tracking-widest">
                                 {project.type}
                             </span>
-                            <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-foreground/60 text-xs">
+                            <span className="px-3 py-1.5 rounded-xl bg-foreground/5 border border-foreground/10 text-foreground/40 text-[10px] font-bold uppercase tracking-widest">
                                 {project.stack}
                             </span>
                         </div>
                     </div>
-                    <p className="text-lg text-foreground/70 mb-8 max-w-3xl">
+                    <p className="text-xl text-foreground/50 mb-12 max-w-2xl leading-relaxed">
                         {project.description}
                     </p>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center gap-10">
                         <div className="flex-1">
-                            <div className="flex justify-between text-sm mb-2">
-                                <span className="text-foreground/60">Overall Progress</span>
-                                <span className="font-bold">{Math.round(progress)}%</span>
+                            <div className="flex justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/20 mb-4">
+                                <span>Project Completion</span>
+                                <span>{Math.round(progress)}%</span>
                             </div>
-                            <div className="h-3 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progress}%` }}
-                                    className="h-full bg-gradient-to-r from-primary to-secondary"
+                                    className="h-full bg-foreground opacity-70"
                                 />
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                             <Link
                                 href={`/projects/${id}/kanban`}
-                                className="glass-button bg-primary/20 hover:bg-primary/30 text-primary border-primary/30 flex items-center gap-2 px-6"
+                                className="glass-button bg-foreground text-background flex items-center gap-2 group"
                             >
                                 <Layout className="w-4 h-4" />
-                                Open Kanban
+                                <span>Open Kanban</span>
                             </Link>
-                            <div className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-2xl glass bg-primary/5 border-primary/20">
-                                <Trophy className="w-5 h-5 text-accent" />
-                                <span className="font-bold text-primary">+{completedTasks * 50} XP</span>
+                            <div className="hidden sm:flex items-center gap-3 px-6 py-3.5 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.02]">
+                                <Trophy className="w-4 h-4 text-foreground/20" />
+                                <span className="text-sm font-bold tracking-tight">+{completedTasks * 50} XP</span>
                             </div>
                         </div>
                     </div>
@@ -199,19 +198,19 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                     </div>
 
                     {tasks.length === 0 ? (
-                        <div className="glass rounded-3xl p-12 text-center border-dashed">
-                            <Sparkles className="w-12 h-12 text-primary/20 mx-auto mb-4" />
-                            <h3 className="font-medium mb-2">No tasks generated yet</h3>
-                            <p className="text-sm text-foreground/50 mb-6">
-                                Let AI break down this project into actionable steps for you.
+                        <div className="p-16 rounded-[2.5rem] border border-dashed border-foreground/10 text-center">
+                            <Sparkles className="w-10 h-10 text-foreground/5 mx-auto mb-6" />
+                            <h3 className="text-xl font-bold mb-3 tracking-tight">Generate Roadmap</h3>
+                            <p className="text-sm text-foreground/40 mb-8 max-w-xs mx-auto leading-relaxed">
+                                Let AI break down this project into actionable milestones for you.
                             </p>
                             <button
                                 onClick={handleGenerateTasks}
                                 disabled={isGenerating}
-                                className="glass-button inline-flex items-center gap-2"
+                                className="glass-button inline-flex items-center gap-3 py-3.5 group"
                             >
-                                {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                                {isGenerating ? "Processing..." : "Generate AI Task Breakdown"}
+                                {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 group-hover:scale-110 transition-transform" />}
+                                <span>{isGenerating ? "Roadmap loading..." : "Generate AI Roadmap"}</span>
                             </button>
                         </div>
                     ) : (
@@ -220,24 +219,24 @@ export default function ProjectDetailsPage({ params }: { params: Promise<{ id: s
                                 <motion.div
                                     layout
                                     key={task.id}
-                                    className={`glass-card p-5 cursor-pointer hover:border-primary/50 transition-all ${task.status === 'done' ? 'opacity-60 grayscale-[0.5]' : ''}`}
+                                    className={`p-6 rounded-2xl border border-foreground/[0.05] bg-foreground/[0.01] cursor-pointer hover:bg-foreground/[0.02] transition-colors mb-4 ${task.status === 'done' ? 'opacity-40 grayscale-[0.8]' : ''}`}
                                     onClick={() => toggleTaskStatus(task)}
                                 >
-                                    <div className="flex gap-4">
-                                        <div className="pt-1">
+                                    <div className="flex gap-5">
+                                        <div className="pt-0.5">
                                             {updatingTaskId === task.id ? (
-                                                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                                                <Loader2 className="w-5 h-5 animate-spin text-foreground/20" />
                                             ) : task.status === 'done' ? (
-                                                <CheckCircle2 className="w-6 h-6 text-success" />
+                                                <CheckCircle2 className="w-5 h-5 text-foreground/40" />
                                             ) : (
-                                                <Circle className="w-6 h-6 text-foreground/20" />
+                                                <Circle className="w-5 h-5 text-foreground/10" />
                                             )}
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className={`font-semibold mb-1 ${task.status === 'done' ? 'line-through text-foreground/40' : ''}`}>
+                                            <h3 className={`font-bold tracking-tight mb-1.5 ${task.status === 'done' ? 'line-through opacity-50' : ''}`}>
                                                 {task.title}
                                             </h3>
-                                            <p className="text-sm text-foreground/60">
+                                            <p className="text-sm text-foreground/40 leading-relaxed">
                                                 {task.description}
                                             </p>
                                         </div>
