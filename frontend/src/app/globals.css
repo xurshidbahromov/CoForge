@@ -52,94 +52,107 @@ body {
   /* Subtle Dot Pattern */
   background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
   background-size: 32px 32px;
+  background-attachment: fixed;
 }
 
-/* Modern Animated Background System */
+/* Ultra Smooth Minimalist Background Animation */
 body::before {
   content: "";
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: -25%;
+  left: -25%;
+  width: 150%;
+  height: 150%;
   z-index: -1;
   pointer-events: none;
 
-  /* Gradient Mesh */
+  /* Smooth Mesh Gradient - Light Mode */
   background:
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    radial-gradient(ellipse at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 30%, rgba(147, 51, 234, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 40%);
 
-  animation: gradientShift 20s ease-in-out infinite;
+  animation: meshFlow 40s ease-in-out infinite;
+  will-change: transform;
 }
 
-/* Floating Orbs Layer */
+/* Floating Accent Layer */
 body::after {
   content: "";
   position: fixed;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
+  top: -20%;
+  left: -20%;
+  width: 140%;
+  height: 140%;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.3;
 
   background:
-    radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 25%),
-    radial-gradient(circle at 70% 50%, rgba(147, 51, 234, 0.1) 0%, transparent 25%),
-    radial-gradient(circle at 50% 70%, rgba(59, 130, 246, 0.12) 0%, transparent 25%);
+    radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 30%),
+    radial-gradient(circle at 80% 60%, rgba(147, 51, 234, 0.1) 0%, transparent 30%),
+    radial-gradient(circle at 60% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 30%);
 
-  filter: blur(60px);
-  animation: floatingOrbs 30s ease-in-out infinite;
+  filter: blur(80px);
+  animation: floatingSoft 50s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
-/* Dark mode adjustments */
+/* Dark mode adjustments - More vibrant */
 .dark body::before {
   background:
-    radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(147, 51, 234, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(59, 130, 246, 0.07) 0%, transparent 50%);
+    radial-gradient(ellipse at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 30%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
 }
 
 .dark body::after {
-  opacity: 0.6;
+  opacity: 0.5;
   background:
-    radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.2) 0%, transparent 25%),
-    radial-gradient(circle at 70% 50%, rgba(147, 51, 234, 0.15) 0%, transparent 25%),
-    radial-gradient(circle at 50% 70%, rgba(59, 130, 246, 0.18) 0%, transparent 25%);
+    radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 80% 60%, rgba(147, 51, 234, 0.18) 0%, transparent 30%),
+    radial-gradient(circle at 60% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 30%);
 }
 
-@keyframes gradientShift {
+/* Ultra Smooth Mesh Animation */
+@keyframes meshFlow {
 
   0%,
   100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) scale(1) rotate(0deg);
   }
 
-  33% {
-    transform: translate(2%, -2%) scale(1.05);
+  25% {
+    transform: translate(3%, -4%) scale(1.05) rotate(1deg);
   }
 
-  66% {
-    transform: translate(-2%, 2%) scale(0.95);
+  50% {
+    transform: translate(-2%, 2%) scale(0.98) rotate(-0.5deg);
+  }
+
+  75% {
+    transform: translate(4%, 3%) scale(1.03) rotate(0.8deg);
   }
 }
 
-@keyframes floatingOrbs {
-
-  0%,
-  100% {
-    transform: translate(0, 0) rotate(0deg);
+/* Soft Floating Animation */
+@keyframes floatingSoft {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
   }
 
   33% {
-    transform: translate(5%, -5%) rotate(120deg);
+    transform: translate(-3%, 4%) rotate(2deg) scale(1.05);
   }
 
   66% {
-    transform: translate(-5%, 5%) rotate(240deg);
+    transform: translate(4%, -3%) rotate(-1.5deg) scale(0.97);
+  }
+
+  100% {
+    transform: translate(-2%, 2%) rotate(1deg) scale(1.02);
   }
 }
 

@@ -32,9 +32,7 @@ const testimonials = [
 
 export function Testimonials() {
     return (
-        <section className="w-full py-32 px-6 bg-foreground/[0.02] relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-
+        <section className="w-full py-32 px-6 relative overflow-hidden">
             <div className="max-w-[1200px] mx-auto">
                 <div className="text-center mb-20">
                     <motion.div

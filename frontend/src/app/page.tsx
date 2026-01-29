@@ -87,7 +87,7 @@ export default function Home() {
       </section>
 
       {/* 2. STATS BAR */}
-      <section className="w-full border-y border-foreground/5 bg-foreground/[0.02] backdrop-blur-sm">
+      <section className="w-full border-y border-foreground/5">
         <div className="max-w-[1200px] mx-auto px-4 grid grid-cols-2 md:grid-cols-4 divide-x divide-foreground/5">
           {[
             { label: "Developers", value: "10K+" },
@@ -158,9 +158,7 @@ export default function Home() {
       </section>
 
       {/* 4. ENGINE SECTION (Bento Grid) */}
-      <section id="engine" className="w-full py-40 text-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-foreground/95 pointer-events-none" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 blur-[150px] rounded-full opacity-20 pointer-events-none" />
+      <section id="engine" className="w-full py-40 text-foreground relative overflow-hidden">
 
         <div className="max-w-[1200px] mx-auto px-6 relative z-10">
           <div className="mb-24 text-center md:text-left">
@@ -168,7 +166,7 @@ export default function Home() {
               The Engine
               <span className="absolute -top-6 -right-6 text-primary animate-pulse">.</span>
             </h2>
-            <p className="text-xl text-background/60 max-w-xl font-medium">
+            <p className="text-xl text-foreground/60 max-w-xl font-medium">
               Every tool defined to transform your career. Proven methodologies.
             </p>
           </div>
@@ -182,14 +180,14 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
                 whileHover={{ y: -5 }}
-                className={`p-8 rounded-[2rem] bg-background/[0.02] border border-background/10 hover:border-primary/50 transition-all duration-300 group relative overflow-hidden ${feature.span || 'col-span-1'}`}
+                className={`p-8 rounded-[2rem] glass-card border border-foreground/10 hover:border-primary/50 transition-all duration-300 group relative overflow-hidden ${feature.span || 'col-span-1'}`}
               >
                 <div className="relative z-10 h-full flex flex-col items-start text-left">
                   <div className="mb-6 p-3 rounded-xl bg-primary/10 text-primary">
                     <feature.icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">{feature.title}</h3>
-                  <p className="text-sm text-background/60 leading-relaxed font-medium">{feature.description}</p>
+                  <p className="text-sm text-foreground/60 leading-relaxed font-medium">{feature.description}</p>
                 </div>
               </motion.div>
             ))}
