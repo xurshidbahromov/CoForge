@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Code2, Github, Twitter, Linkedin, Mail } from "lucide-react";
+import { Newsletter } from "@/components/home/Newsletter";
 
 export function Footer() {
   return (
@@ -11,6 +12,11 @@ export function Footer() {
 
       <div className="relative max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="glass rounded-3xl p-8">
+          {/* Newsletter Section */}
+          <div className="mb-12">
+            <Newsletter />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="md:col-span-2">

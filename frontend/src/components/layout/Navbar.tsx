@@ -23,6 +23,12 @@ const navItems = [
   { name: "Profile", href: "/profile", icon: User },
 ];
 
+const publicLinks = [
+  { name: "Vision", href: "/#vision" },
+  { name: "Engine", href: "/#engine" },
+  { name: "Journey", href: "/#journey" },
+];
+
 export function Navbar() {
   const pathname = usePathname();
   const { user, isAuthenticated, logout } = useAuth();
@@ -45,23 +51,35 @@ export function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-8">
-              {isAuthenticated && navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "text-sm font-medium transition-colors duration-200",
-                      isActive
-                        ? "text-foreground font-semibold"
-                        : "text-foreground/60 hover:text-foreground"
-                    )}
+              {isAuthenticated ? (
+                navItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "text-sm font-medium transition-colors duration-200",
+                        isActive
+                          ? "text-foreground font-semibold"
+                          : "text-foreground/60 hover:text-foreground"
+                      )}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                })
+              ) : (
+                publicLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors duration-200"
                   >
-                    {item.name}
-                  </Link>
-                );
-              })}
+                    {link.name}
+                  </a>
+                ))
+              )}
             </div>
 
             {/* Right Side */}
@@ -118,25 +136,38 @@ export function Navbar() {
             className="md:hidden border-t border-foreground/5 overflow-hidden"
           >
             <div className="p-2 space-y-1">
-              {isAuthenticated && navItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
+              {isAuthenticated ? (
+                navItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-foreground/5 text-foreground"
+                          : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
+                      )}
+                    >
+                      <item.icon className="w-4 h-4" />
+                      <span>{item.name}</span>
+                    </Link>
+                  );
+                })
+              ) : (
+                publicLinks.map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                      isActive
-                        ? "bg-foreground/5 text-foreground"
-                        : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
-                    )}
+                    className="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-colors"
                   >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
+                    <span>{link.name}</span>
+                  </a>
+                ))
+              )}
             </div>
           </motion.div>
         )}

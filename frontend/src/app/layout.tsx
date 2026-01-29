@@ -17,7 +17,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CoForge - Build Real Experience",
-  description: "The first ecosystem that gives junior and intermediate developers real, proven experience.",
+  description: "The first ecosystem that gives junior and intermediate developers real, proven experience. Work on real projects, collaborate with teams, and showcase verified skills to employers.",
+  keywords: ["junior developer", "software engineering", "mentorship", "real projects", "developer portfolio", "coding experience", "team collaboration"],
+  authors: [{ name: "CoForge" }],
+  openGraph: {
+    title: "CoForge - Build Real Experience",
+    description: "Transform your career with real engineering experience. Join thousands of developers building verified portfolios.",
+    type: "website",
+    locale: "en_US",
+    siteName: "CoForge",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CoForge - Build Real Experience",
+    description: "The first ecosystem that gives junior and intermediate developers real, proven experience.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
