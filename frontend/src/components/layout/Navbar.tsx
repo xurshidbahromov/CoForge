@@ -27,6 +27,8 @@ const publicLinks = [
   { name: "Vision", href: "/#vision" },
   { name: "Engine", href: "/#engine" },
   { name: "Journey", href: "/#journey" },
+  { name: "Pricing", href: "/#pricing" },
+  { name: "FAQ", href: "/#faq" },
 ];
 
 export function Navbar() {
