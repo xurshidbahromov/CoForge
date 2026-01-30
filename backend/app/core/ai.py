@@ -1,23 +1,23 @@
 import os
 import json
-from openai import AsyncOpenAI
+from groq import Groq
 
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
-    # Handle missing API key gracefully for development
     client = None
-    print("WARNING: OPENAI_API_KEY not found. AI features will stay in dummy mode.")
+    print("WARNING: GROQ_API_KEY not found. AI features will be in dummy mode.")
 else:
-    client = AsyncOpenAI(api_key=api_key)
+    client = Groq(api_key=api_key)
+    print("✅ Groq AI client initialized successfully!")
 
 async def generate_project_idea(stack: str, level: str, goal: str):
     """
-    Generate a project idea using OpenAI based on user preferences.
+    Generate a project idea using Groq AI based on user preferences.
     """
     if not client:
         return {
             "title": "Example Project (No API Key)",
-            "description": "Please set OPENAI_API_KEY significantly to get real AI-generated projects. For now, here is a placeholder.",
+            "description": "Please set GROQ_API_KEY to get real AI-generated projects.",
             "stack_details": "Next.js, FastAPI, PostgreSQL",
             "difficulty": "beginner"
         }
@@ -32,27 +32,38 @@ async def generate_project_idea(stack: str, level: str, goal: str):
     - description: A clear 2-3 sentence overview
     - stack_details: A specific list of technologies to use (e.g. "Next.js, FastAPI, PostgreSQL, Tailwind")
     - difficulty: beginner, junior, or intermediate
+    
+    Return ONLY valid JSON, no other text.
     """
     
-    response = await client.chat.completions.create(
-        model="gpt-4o",
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": "You are an expert technical mentor who helps developers build real-world experience."},
+            {"role": "system", "content": "You are an expert technical mentor who helps developers build real-world experience. Always respond with valid JSON only."},
             {"role": "user", "content": prompt}
         ],
-        response_format={"type": "json_object"}
+        temperature=0.7,
+        max_tokens=500
     )
     
-    return json.loads(response.choices[0].message.content)
+    content = response.choices[0].message.content
+    # Clean up response if needed
+    if content.startswith("```"):
+        content = content.split("```")[1]
+        if content.startswith("json"):
+            content = content[4:]
+    
+    return json.loads(content.strip())
 
 async def break_down_tasks(title: str, description: str, stack: str):
     """
-    Break a project into 5-7 actionable tasks.
+    Break a project into 5-7 actionable tasks using Groq AI.
     """
     if not client:
         return [
-            {"title": "Setup Project", "description": "Initialize repo and dependencies (Dummy Task)", "order": 1},
-            {"title": "Build UI", "description": "Create frontend components (Dummy Task)", "order": 2}
+            {"title": "Setup Project", "description": "Initialize repo and dependencies", "order": 1},
+            {"title": "Build UI", "description": "Create frontend components", "order": 2},
+            {"title": "Add Backend", "description": "Create API endpoints", "order": 3}
         ]
 
     prompt = f"""
@@ -66,15 +77,26 @@ async def break_down_tasks(title: str, description: str, stack: str):
     - title: Short task name
     - description: What needs to be done
     - order: Integer (1-7)
+    
+    Return ONLY valid JSON, no other text.
     """
     
-    response = await client.chat.completions.create(
-        model="gpt-4o",
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": "You are a senior project manager who breaks down complex features into manageable developer tasks."},
+            {"role": "system", "content": "You are a senior project manager who breaks down complex features into manageable developer tasks. Always respond with valid JSON only."},
             {"role": "user", "content": prompt}
         ],
-        response_format={"type": "json_object"}
+        temperature=0.7,
+        max_tokens=800
     )
     
-    return json.loads(response.choices[0].message.content).get("tasks", [])
+    content = response.choices[0].message.content
+    # Clean up response if needed
+    if content.startswith("```"):
+        content = content.split("```")[1]
+        if content.startswith("json"):
+            content = content[4:]
+    
+    result = json.loads(content.strip())
+    return result.get("tasks", [])

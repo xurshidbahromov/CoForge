@@ -4,7 +4,7 @@ sqlmodel
 asyncpg
 httpx
 pyjwt
-openai
 python-dotenv
 aiosqlite
 passlib[bcrypt]
+groq
