@@ -122,7 +122,7 @@ export default function Home() {
                         className="flex flex-col gap-8"
                     >
                         <h2 className="text-5xl md:text-6xl font-black leading-none tracking-tight">
-                            The <br /><span className="text-primary opacity-40">Paradox.</span>
+                            The <br /><span className="text-primary opacity-40">Paradox</span>
                         </h2>
                         <div className="space-y-6">
                             <p className="text-2xl font-bold text-foreground leading-tight">Employers demand experience.</p>
@@ -166,7 +166,7 @@ export default function Home() {
                     <div className="mb-24 text-center md:text-left">
                         <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 relative inline-block">
                             The Engine
-                            <span className="absolute -top-6 -right-6 text-primary animate-pulse">.</span>
+                            <span className="absolute top-14 -right-4 text-primary animate-pulse rounded-full w-2 h-2 bg-primary"></span>
                         </h2>
                         <p className="text-xl text-foreground/60 max-w-xl font-medium">
                             Every tool defined to transform your career. Proven methodologies.
