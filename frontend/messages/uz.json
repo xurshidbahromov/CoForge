@@ -150,5 +150,24 @@
             "privacy": "Maxfiylik Siyosati",
             "cookies": "Cookies"
         }
+    },
+    "auth": {
+        "welcomeBack": "Xush Kelibsiz",
+        "join": "CoForge-ga Qo'shiling",
+        "continue": "Haqiqiy tajriba bilan muhandislik sayohatingizni davom ettiring.",
+        "start": "Tasdiqlangan muhandislik tarixingizni bugun yaratishni boshlang.",
+        "github": "GitHub orqali davom etish",
+        "orEmail": "yoki email",
+        "username": "Foydalanuvchi nomi",
+        "email": "Email Manzil",
+        "password": "Parol",
+        "signIn": "Kirish",
+        "createAccount": "Hisob Yaratish",
+        "noAccount": "Hisobingiz yo'qmi? Ro'yxatdan o'ting",
+        "hasAccount": "Hisobingiz bormi? Kirish",
+        "verifiedHistory": "Professional Muhandislik Tarixi Tasdiqlangan",
+        "secure": "Xavfsiz Kirish",
+        "ai": "AI Tasdiqlash",
+        "ledger": "O'zgarmas Reestr"
     }
 }

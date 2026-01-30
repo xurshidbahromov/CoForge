@@ -9,9 +9,9 @@ export function LanguageSwitcher() {
     const { language, setLanguage } = useLanguage();
 
     const languages = [
-        { code: "en", label: "English", flag: "🇬🇧" },
-        { code: "ru", label: "Русский", flag: "🇷🇺" },
-        { code: "uz", label: "O'zbek", flag: "🇺🇿" },
+        { code: "en", label: "English" },
+        { code: "ru", label: "Русский" },
+        { code: "uz", label: "O'zbek" },
     ];
 
     return (
@@ -43,7 +43,6 @@ export function LanguageSwitcher() {
                                     language === l.code && "bg-foreground/5 text-primary"
                                 )}
                             >
-                                <span className="text-lg">{l.flag}</span>
                                 <span className="flex-1">{l.label}</span>
                                 {language === l.code && <Check className="w-3.5 h-3.5" />}
                             </button>

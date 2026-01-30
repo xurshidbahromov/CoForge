@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useLanguage();
 
   // Form State
   const [formData, setFormData] = useState({
@@ -86,12 +88,12 @@ export default function LoginPage() {
                 </div>
               </Link>
               <h1 className="text-3xl md:text-4xl font-black text-center tracking-tighter mb-3">
-                {mode === "login" ? "Welcome Back" : "Join CoForge"}
+                {mode === "login" ? t("auth.welcomeBack") : t("auth.join")}
               </h1>
               <p className="text-foreground/40 text-center font-medium leading-relaxed max-w-[280px]">
                 {mode === "login"
-                  ? "Continue your engineering journey with real experience."
-                  : "Start building your verified engineering history today."}
+                  ? t("auth.continue")
+                  : t("auth.start")}
               </p>
             </div>
 
@@ -121,7 +123,7 @@ export default function LoginPage() {
               <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
               <div className="relative z-10 flex items-center justify-center gap-3">
                 {isAnyLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Github className="w-5 h-5" />}
-                <span className="tracking-tight text-sm">Continue with GitHub</span>
+                <span className="tracking-tight text-sm">{t("auth.github")}</span>
               </div>
             </button>
 
@@ -132,7 +134,7 @@ export default function LoginPage() {
               </div>
               <div className="relative flex justify-center text-[10px] uppercase tracking-[0.3em] font-black">
                 <span className="px-4 bg-transparent text-foreground/20">
-                  or email
+                  {t("auth.orEmail")}
                 </span>
               </div>
             </div>
@@ -144,7 +146,7 @@ export default function LoginPage() {
                   <User className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
                   <input
                     type="text"
-                    placeholder="Username"
+                    placeholder={t("auth.username")}
                     required
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
@@ -157,7 +159,7 @@ export default function LoginPage() {
                 <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
                 <input
                   type="email"
-                  placeholder="Email Address"
+                  placeholder={t("auth.email")}
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -169,7 +171,7 @@ export default function LoginPage() {
                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/20 group-focus-within:text-primary transition-colors" />
                 <input
                   type="password"
-                  placeholder="Password"
+                  placeholder={t("auth.password")}
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -188,7 +190,7 @@ export default function LoginPage() {
                 ) : (
                   <>
                     <span className="tracking-tight text-sm">
-                      {mode === "login" ? "Sign In" : "Create Account"}
+                      {mode === "login" ? t("auth.signIn") : t("auth.createAccount")}
                     </span>
                     <ArrowRight className="w-4 h-4" />
                   </>
@@ -204,8 +206,8 @@ export default function LoginPage() {
               className="text-xs font-black uppercase tracking-[0.2em] text-foreground/30 hover:text-primary transition-colors"
             >
               {mode === "login"
-                ? "Don't have an account? Sign Up"
-                : "Already have an account? Sign In"}
+                ? t("auth.noAccount")
+                : t("auth.hasAccount")}
             </button>
           </div>
         </div>
@@ -213,14 +215,14 @@ export default function LoginPage() {
         {/* System Info */}
         <div className="flex flex-col items-center gap-2 mt-10">
           <p className="text-[10px] uppercase tracking-[0.4em] font-black text-foreground/10">
-            Professional Engineering History Verified
+            {t("auth.verifiedHistory")}
           </p>
           <div className="flex items-center gap-4 text-[8px] font-black text-foreground/5 uppercase tracking-[0.2em]">
-            <span>Secure Access</span>
+            <span>{t("auth.secure")}</span>
             <div className="w-1 h-1 rounded-full bg-foreground/5" />
-            <span>AI Verification</span>
+            <span>{t("auth.ai")}</span>
             <div className="w-1 h-1 rounded-full bg-foreground/5" />
-            <span>Immutable Ledger</span>
+            <span>{t("auth.ledger")}</span>
           </div>
         </div>
       </motion.div>

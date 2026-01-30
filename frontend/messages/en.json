@@ -150,5 +150,24 @@
       "privacy": "Privacy Policy",
       "cookies": "Cookies"
     }
+  },
+  "auth": {
+    "welcomeBack": "Welcome Back",
+    "join": "Join CoForge",
+    "continue": "Continue your engineering journey with real experience.",
+    "start": "Start building your verified engineering history today.",
+    "github": "Continue with GitHub",
+    "orEmail": "or email",
+    "username": "Username",
+    "email": "Email Address",
+    "password": "Password",
+    "signIn": "Sign In",
+    "createAccount": "Create Account",
+    "noAccount": "Don't have an account? Sign Up",
+    "hasAccount": "Already have an account? Sign In",
+    "verifiedHistory": "Professional Engineering History Verified",
+    "secure": "Secure Access",
+    "ai": "AI Verification",
+    "ledger": "Immutable Ledger"
   }
 }
