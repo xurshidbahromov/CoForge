@@ -9,7 +9,7 @@
     },
     "hero": {
         "buildReal": "Haqiqiy Tajriba",
-        "experience": "Yarating",
+        "experience": "Tajriba",
         "verified": "Tasdiqlangan",
         "description": "Rezyumeingizga soxta loyihalarni qo'shishni to'xtating. AI nazorati ostida jamoalarda ishlab chiqish darajasidagi ilovalar yarating va tasdiqlanadigan sertifikatlarni oling.",
         "startJourney": "Yo'lni Boshlang",
@@ -22,7 +22,7 @@
         "success": "Muvaffaqiyat"
     },
     "paradox": {
-        "title": "",
+        "title": "Paradoks",
         "titleHighlight": "Paradoks.",
         "subtitle": "Ish beruvchilar tajriba talab qiladi.",
         "description": "Kichik dasturchilar tajriba ololmaydilar birinchi ishga qabul qilinmasdan. Biz bu bo'shliqni AI nazoratidagi jamoa muhiti orqali to'ldiramiz.",

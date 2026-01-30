@@ -123,7 +123,7 @@ export default function Home() {
                         className="flex flex-col gap-8"
                     >
                         <h2 className="text-5xl md:text-6xl font-black leading-none tracking-tight">
-                            {t("paradox.title")} <br /><span className="text-primary opacity-40">{t("paradox.titleHighlight")}</span>
+                            <br /><span className="text-primary opacity-40">{t("paradox.title")}</span>
                         </h2>
                         <div className="space-y-6">
                             <p className="text-2xl font-bold text-foreground leading-tight">{t("paradox.subtitle")}</p>
@@ -189,7 +189,7 @@ export default function Home() {
                     <div className="mb-24 text-center md:text-left">
                         <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 relative inline-block">
                             {t("nav.engine")}
-                            <span className="absolute -top-6 -right-6 text-primary animate-pulse">.</span>
+                            <span className="absolute top-13 -right-6 text-primary animate-pulse rounded-full w-2 h-2 bg-primary"></span>
                         </h2>
                         <p className="text-xl text-foreground/60 max-w-xl font-medium">
                             Every tool defined to transform your career. Proven methodologies.
