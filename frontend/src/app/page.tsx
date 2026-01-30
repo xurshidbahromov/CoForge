@@ -308,13 +308,13 @@ export default function Home() {
 
                     <div className="relative z-10 flex flex-col items-center">
                         <h2 className="text-5xl md:text-7xl font-black mb-8 leading-tight tracking-tighter">
-                            Join the <br /><span className="text-primary italic">Elite.</span>
+                            {t("cta.title")}
                         </h2>
-                        <p className="text-xl text-background/60 mb-12 max-w-md font-medium">Stop building in silos. Join thousands of high-growth developers today.</p>
+                        <p className="text-xl text-background/60 mb-12 max-w-md font-medium">{t("cta.subtitle")}</p>
                         <Link href="/login" className="bg-background text-foreground px-12 py-5 rounded-2xl font-bold text-lg hover:scale-105 transition-transform flex items-center gap-3 overflow-hidden relative group border border-foreground/10">
                             <div className="absolute inset-0 bg-foreground/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                             <Github className="w-5 h-5" />
-                            Apply Now
+                            {t("cta.button")}
                         </Link>
                     </div>
                 </motion.div>

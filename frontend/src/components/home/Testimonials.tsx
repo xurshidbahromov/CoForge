@@ -2,35 +2,35 @@
 
 import { motion } from "framer-motion";
 import { Quote } from "lucide-react";
-
-const testimonials = [
-    {
-        name: "Sarah Chen",
-        role: "Junior Developer → Software Engineer @ Google",
-        image: "SC",
-        quote:
-            "CoForge gave me the real-world experience I couldn't get anywhere else. Within 6 months, I had a portfolio that got me hired at Google.",
-        color: "from-blue-500/20 to-purple-500/20",
-    },
-    {
-        name: "Marcus Johnson",
-        role: "Self-Taught Developer → Full-Stack Engineer",
-        image: "MJ",
-        quote:
-            "The mentorship and real projects transformed my career. I went from tutorials to building production apps with actual teams.",
-        color: "from-green-500/20 to-emerald-500/20",
-    },
-    {
-        name: "Priya Sharma",
-        role: "Bootcamp Grad → Lead Engineer @ Stripe",
-        image: "PS",
-        quote:
-            "CoForge filled the experience gap bootcamps leave. The verified contributions on my profile made interviews so much easier.",
-        color: "from-orange-500/20 to-red-500/20",
-    },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Testimonials() {
+    const { t } = useLanguage();
+
+    const testimonials = [
+        {
+            name: "Sarah Chen",
+            role: t("testimonials.sarah.role"),
+            image: "SC",
+            quote: t("testimonials.sarah.quote"),
+            color: "from-blue-500/20 to-purple-500/20",
+        },
+        {
+            name: "Marcus Johnson",
+            role: t("testimonials.marcus.role"),
+            image: "MJ",
+            quote: t("testimonials.marcus.quote"),
+            color: "from-green-500/20 to-emerald-500/20",
+        },
+        {
+            name: "Priya Sharma",
+            role: t("testimonials.priya.role"),
+            image: "PS",
+            quote: t("testimonials.priya.quote"),
+            color: "from-orange-500/20 to-red-500/20",
+        },
+    ];
+
     return (
         <section className="w-full py-32 px-6 relative overflow-hidden">
             <div className="max-w-[1200px] mx-auto">
@@ -42,14 +42,14 @@ export function Testimonials() {
                         className="inline-block mb-4"
                     >
                         <div className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold">
-                            Success Stories
+                            {t("testimonials.tag")}
                         </div>
                     </motion.div>
                     <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter">
-                        Developers Who Made It
+                        {t("testimonials.title")}
                     </h2>
                     <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
-                        Real developers. Real experience. Real careers.
+                        {t("testimonials.subtitle")}
                     </p>
                 </div>
 

@@ -15,20 +15,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-
-const navItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Project Hub", href: "/hub", icon: Code2 },
-  { name: "Profile", href: "/profile", icon: User },
-];
-
-const publicLinks = [
-  { name: "Vision", href: "/#vision" },
-  { name: "Engine", href: "/#engine" },
-  { name: "Journey", href: "/#journey" },
-  { name: "Pricing", href: "/#pricing" },
-  { name: "FAQ", href: "/#faq" },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Navbar() {
   const pathname = usePathname();
@@ -36,6 +23,21 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const { t } = useLanguage();
+
+  const navItems = [
+    { name: t("nav.dashboard"), href: "/dashboard", icon: LayoutDashboard },
+    { name: t("nav.hub"), href: "/hub", icon: Code2 },
+    { name: t("nav.profile"), href: "/profile", icon: User },
+  ];
+
+  const publicLinks = [
+    { name: t("nav.vision"), href: "/#vision" },
+    { name: t("nav.engine"), href: "/#engine" },
+    { name: t("nav.journey"), href: "/#journey" },
+    { name: t("nav.pricing"), href: "/#pricing" },
+    { name: t("nav.faq"), href: "/#faq" },
+  ];
 
   // Scroll direction detection
   useEffect(() => {
@@ -43,14 +45,11 @@ export function Navbar() {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY < 10) {
-        // Always show navbar at the top
         setIsVisible(true);
       } else if (currentScrollY > lastScrollY) {
-        // Scrolling down - hide navbar
         setIsVisible(false);
-        setMobileMenuOpen(false); // Close mobile menu on scroll
+        setMobileMenuOpen(false);
       } else {
-        // Scrolling up - show navbar
         setIsVisible(true);
       }
 
@@ -104,135 +103,123 @@ export function Navbar() {
                 })
               ) : (
                 publicLinks.map((link) => (
-                  <a
-                    key={link.href}
+                  <Link
+                    key={link.name}
                     href={link.href}
-                    className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors duration-200"
+                    className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors"
                   >
                     {link.name}
-                  </a>
+                  </Link>
                 ))
               )}
             </div>
 
-            {/* Right Side */}
-            <div className="flex items-center gap-3">
+            {/* Actions */}
+            <div className="hidden md:flex items-center gap-4">
+              <LanguageSwitcher />
+              <ThemeToggle />
+
               {isAuthenticated ? (
-                <div className="hidden md:flex items-center gap-3">
-                  <span className="text-sm text-foreground/60">
-                    {user?.email}
-                  </span>
-                  <button
-                    onClick={logout}
-                    className="text-sm font-medium text-foreground/60 hover:text-foreground transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <Link
-                  href="/login"
-                  className="hidden md:flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-xl text-sm font-semibold hover:scale-105 transition-transform overflow-hidden relative group"
+                <button
+                  onClick={logout}
+                  className="px-4 py-2 text-sm font-bold border border-foreground/10 rounded-xl hover:bg-foreground/5 transition-colors"
                 >
-                  <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                  Sign In
-                </Link>
+                  Sign Out
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/login"
+                    className="px-5 py-2.5 text-xs font-bold bg-foreground text-background rounded-xl hover:scale-105 transition-transform"
+                  >
+                    {t("nav.signIn")}
+                  </Link>
+                </div>
               )}
-
-              <div className="pl-3 border-l border-foreground/10 ml-1 flex items-center gap-1">
-                <LanguageSwitcher />
-                <ThemeToggle />
-              </div>
-
-              {/* Mobile Menu Toggle */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 hover:bg-foreground/5 rounded-lg transition-colors"
-              >
-                {mobileMenuOpen ? (
-                  <X className="w-5 h-5" />
-                ) : (
-                  <Menu className="w-5 h-5" />
-                )}
-              </button>
             </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-foreground/80 hover:bg-foreground/5 rounded-lg transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.2 }}
-              className="md:hidden mt-2 overflow-hidden"
-            >
-              <div className="relative">
-                {/* Glassmorphic Background for Mobile Menu */}
-                <div className="absolute inset-0 bg-background/70 backdrop-blur-xl rounded-2xl border border-foreground/10" />
-
-                <div className="relative p-2 space-y-1">
-                  {isAuthenticated ? (
-                    navItems.map((item) => {
-                      const isActive = pathname === item.href;
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className={cn(
-                            "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                            isActive
-                              ? "bg-foreground/5 text-foreground"
-                              : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
-                          )}
-                        >
-                          <item.icon className="w-4 h-4" />
-                          <span>{item.name}</span>
-                        </Link>
-                      );
-                    })
-                  ) : (
-                    publicLinks.map((link) => (
-                      <a
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-colors"
-                      >
-                        <span>{link.name}</span>
-                      </a>
-                    ))
-                  )}
-
-                  {isAuthenticated ? (
-                    <button
-                      onClick={() => {
-                        logout();
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center px-4 py-2.5 rounded-lg text-sm font-medium text-foreground/60 hover:bg-foreground/5 hover:text-foreground transition-colors"
-                    >
-                      Logout
-                    </button>
-                  ) : (
-                    <Link
-                      href="/login"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center justify-center px-4 py-2.5 bg-foreground text-background rounded-lg text-sm font-semibold hover:scale-105 transition-transform overflow-hidden relative group"
-                    >
-                      <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                      Sign In
-                    </Link>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-4 right-4 mt-2 p-4 bg-background/80 backdrop-blur-xl border border-foreground/10 rounded-2xl shadow-2xl flex flex-col gap-2 md:hidden overflow-hidden"
+          >
+            {isAuthenticated ? (
+              navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-foreground/5 transition-colors"
+                >
+                  <item.icon className="w-5 h-5 opacity-60" />
+                  <span className="font-bold">{item.name}</span>
+                </Link>
+              ))
+            ) : (
+              publicLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-3 font-bold text-foreground/80 hover:text-foreground hover:bg-foreground/5 rounded-xl transition-all"
+                >
+                  {link.name}
+                </Link>
+              ))
+            )}
+
+            <div className="h-px bg-foreground/5 my-2" />
+
+            <div className="flex items-center justify-between p-2">
+              <span className="text-sm font-medium opacity-60">Theme</span>
+              <ThemeToggle />
+            </div>
+
+            <div className="flex items-center justify-between p-2">
+              <span className="text-sm font-medium opacity-60">Language</span>
+              <LanguageSwitcher />
+            </div>
+
+            <div className="h-px bg-foreground/5 my-2" />
+
+            {isAuthenticated ? (
+              <button
+                onClick={() => {
+                  logout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full py-3 text-center font-bold text-red-500 bg-red-500/10 rounded-xl"
+              >
+                Sign Out
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3 text-center font-bold bg-foreground text-background rounded-xl"
+              >
+                {t("nav.signIn")}
+              </Link>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }

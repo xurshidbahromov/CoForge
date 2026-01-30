@@ -3,62 +3,65 @@
 import { Check, X, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-
-const plans = [
-    {
-        name: "Free",
-        price: "$0",
-        period: "forever",
-        description: "Perfect for getting started",
-        features: [
-            { text: "1 active project", included: true },
-            { text: "Basic code reviews", included: true },
-            { text: "Community support", included: true },
-            { text: "GitHub integration", included: true },
-            { text: "Priority mentorship", included: false },
-            { text: "Team collaboration", included: false },
-            { text: "Advanced analytics", included: false },
-        ],
-        cta: "Start Free",
-        popular: false,
-    },
-    {
-        name: "Pro",
-        price: "$29",
-        period: "/month",
-        description: "For serious developers",
-        features: [
-            { text: "Unlimited projects", included: true },
-            { text: "AI-powered code reviews", included: true },
-            { text: "Priority support", included: true },
-            { text: "GitHub + GitLab integration", included: true },
-            { text: "1-on-1 mentorship (2hrs/month)", included: true },
-            { text: "Team collaboration (up to 5)", included: true },
-            { text: "Advanced analytics", included: true },
-        ],
-        cta: "Go Pro",
-        popular: true,
-    },
-    {
-        name: "Team",
-        price: "$99",
-        period: "/month",
-        description: "For engineering teams",
-        features: [
-            { text: "Everything in Pro", included: true },
-            { text: "Unlimited team members", included: true },
-            { text: "Dedicated mentor", included: true },
-            { text: "Custom sprint planning", included: true },
-            { text: "Team analytics dashboard", included: true },
-            { text: "Priority project matching", included: true },
-            { text: "White-label option", included: true },
-        ],
-        cta: "Contact Sales",
-        popular: false,
-    },
-];
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Pricing() {
+    const { t } = useLanguage();
+
+    const plans = [
+        {
+            name: t("pricing.free.name"),
+            price: "$0",
+            period: "forever",
+            description: t("pricing.free.description"),
+            features: [
+                { text: t("pricing.features.activeProject"), included: true },
+                { text: t("pricing.features.basicReview"), included: true },
+                { text: t("pricing.features.community"), included: true },
+                { text: t("pricing.features.github"), included: true },
+                { text: t("pricing.features.mentorship"), included: false },
+                { text: t("pricing.features.collab"), included: false },
+                { text: t("pricing.features.analytics"), included: false },
+            ],
+            cta: t("pricing.free.cta"),
+            popular: false,
+        },
+        {
+            name: t("pricing.pro.name"),
+            price: "$29",
+            period: "/month",
+            description: t("pricing.pro.description"),
+            features: [
+                { text: t("pricing.features.unlimited"), included: true },
+                { text: t("pricing.features.aiReview"), included: true },
+                { text: t("pricing.features.priority"), included: true },
+                { text: t("pricing.features.gitlab"), included: true },
+                { text: t("pricing.features.mentorship"), included: true },
+                { text: t("pricing.features.collab"), included: true },
+                { text: t("pricing.features.analytics"), included: true },
+            ],
+            cta: t("pricing.pro.cta"),
+            popular: true,
+        },
+        {
+            name: t("pricing.team.name"),
+            price: "$99",
+            period: "/month",
+            description: t("pricing.team.description"),
+            features: [
+                { text: t("pricing.features.allPro"), included: true },
+                { text: t("pricing.features.unlimitedTeam"), included: true },
+                { text: t("pricing.features.dedicated"), included: true },
+                { text: t("pricing.features.sprint"), included: true },
+                { text: t("pricing.features.teamDashboard"), included: true },
+                { text: t("pricing.features.matching"), included: true },
+                { text: t("pricing.features.whiteLabel"), included: true },
+            ],
+            cta: t("pricing.team.cta"),
+            popular: false,
+        },
+    ];
+
     return (
         <section id="pricing" className="w-full py-32 px-6 relative overflow-hidden">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 blur-[150px] rounded-full pointer-events-none" />
@@ -73,14 +76,14 @@ export function Pricing() {
                     >
                         <div className="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-semibold flex items-center gap-2">
                             <Zap className="w-4 h-4" />
-                            Simple Pricing
+                            {t("pricing.tag")}
                         </div>
                     </motion.div>
                     <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter">
-                        Choose Your Plan
+                        {t("pricing.title")}
                     </h2>
                     <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
-                        Start free, scale as you grow. No hidden fees.
+                        {t("pricing.subtitle")}
                     </p>
                 </div>
 
@@ -97,7 +100,7 @@ export function Pricing() {
                         >
                             {plan.popular && (
                                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-primary text-background text-xs font-bold rounded-full z-20">
-                                    MOST POPULAR
+                                    {t("pricing.mostPopular")}
                                 </div>
                             )}
 
@@ -157,7 +160,7 @@ export function Pricing() {
 
                 <div className="text-center mt-12">
                     <p className="text-foreground/60">
-                        All plans include a 14-day free trial. No credit card required.
+                        {t("pricing.trial")}
                     </p>
                 </div>
             </div>

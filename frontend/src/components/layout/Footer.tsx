@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { Code2, Github, Twitter, Linkedin, Mail, ArrowRight } from "lucide-react";
 import { Newsletter } from "@/components/home/Newsletter";
+import { useLanguage } from "@/context/LanguageContext";
 
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="relative border-t border-foreground/5 overflow-hidden">
       {/* Background Effects */}
@@ -31,11 +34,10 @@ export function Footer() {
                 </div>
               </div>
               <h2 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
-                Experience that{" "}
-                <span className="text-primary italic">actually counts.</span>
+                {t("footer.tagline")}
               </h2>
               <p className="text-lg text-foreground/60 max-w-md">
-                Real projects. Real teams. Real career growth. Built for developers who are serious about their future.
+                {t("footer.description")}
               </p>
             </div>
 
@@ -47,21 +49,21 @@ export function Footer() {
                   href="/#vision"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors mb-4"
                 >
-                  <span>Vision</span>
+                  <span>{t("footer.columns.vision")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <Link
                   href="/#pricing"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors mb-4"
                 >
-                  <span>Pricing</span>
+                  <span>{t("footer.columns.pricing")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <Link
                   href="/dashboard"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors"
                 >
-                  <span>Dashboard</span>
+                  <span>{t("footer.columns.dashboard")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
               </div>
@@ -72,21 +74,21 @@ export function Footer() {
                   href="/about"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors mb-4"
                 >
-                  <span>About</span>
+                  <span>{t("footer.columns.about")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <Link
                   href="/careers"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors mb-4"
                 >
-                  <span>Careers</span>
+                  <span>{t("footer.columns.careers")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <Link
                   href="/blog"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors"
                 >
-                  <span>Blog</span>
+                  <span>{t("footer.columns.blog")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
               </div>
@@ -97,21 +99,21 @@ export function Footer() {
                   href="/docs"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors mb-4"
                 >
-                  <span>Docs</span>
+                  <span>{t("footer.columns.docs")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <Link
                   href="/help"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors mb-4"
                 >
-                  <span>Help</span>
+                  <span>{t("footer.columns.help")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
                 <Link
                   href="/community"
                   className="group flex items-center gap-2 text-foreground/70 hover:text-primary transition-colors"
                 >
-                  <span>Community</span>
+                  <span>{t("footer.columns.community")}</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                 </Link>
               </div>
@@ -173,20 +175,20 @@ export function Footer() {
               {/* Copyright & Legal */}
               <div className="text-right">
                 <p className="text-xs text-foreground/40 mb-2 uppercase tracking-wider font-semibold">
-                  All rights reserved.
+                  {t("footer.rights")}
                 </p>
                 <p className="text-xs text-foreground/50 mb-3">
                   © 2026 RAILWAY HEALTH INC DBA COFORGE.
                 </p>
                 <div className="flex flex-wrap gap-4 text-xs">
                   <Link href="/terms" className="text-foreground/50 hover:text-primary transition-colors">
-                    Terms of Service
+                    {t("footer.legal.terms")}
                   </Link>
                   <Link href="/privacy" className="text-foreground/50 hover:text-primary transition-colors">
-                    Privacy Policy
+                    {t("footer.legal.privacy")}
                   </Link>
                   <Link href="/cookies" className="text-foreground/50 hover:text-primary transition-colors">
-                    Cookies
+                    {t("footer.legal.cookies")}
                   </Link>
                 </div>
               </div>
@@ -197,4 +199,3 @@ export function Footer() {
     </footer>
   );
 }
-

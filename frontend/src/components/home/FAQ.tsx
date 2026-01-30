@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface FAQItemProps {
     question: string;
@@ -43,51 +44,46 @@ function FAQItem({ question, answer, isOpen, onClick }: FAQItemProps) {
     );
 }
 
-const faqs = [
-    {
-        question: "What is CoForge?",
-        answer:
-            "CoForge is a decentralized platform that gives junior and intermediate developers real, proven experience by working on actual projects with teams. It's not just learning—it's verified engineering experience.",
-    },
-    {
-        question: "How does the mentorship work?",
-        answer:
-            "Our AI-powered system connects you with experienced mentors based on your skills and goals. You'll receive code reviews, guidance, and career advice from developers who've been where you are.",
-    },
-    {
-        question: "Is CoForge free?",
-        answer:
-            "We offer a free tier for individual developers to get started. Premium plans unlock advanced features like unlimited projects, priority mentorship, and team collaboration tools.",
-    },
-    {
-        question: "How is experience verified?",
-        answer:
-            "Every project contribution is tracked via GitHub integration. Your PRs, code reviews, and completed tasks are automatically verified and added to your immutable profile—proof employers can trust.",
-    },
-    {
-        question: "Can I work with a team?",
-        answer:
-            "Absolutely! CoForge is built for team collaboration. Join existing teams or create your own. Work in real sprint cycles, manage tasks on Kanban boards, and build together.",
-    },
-    {
-        question: "What technologies can I learn?",
-        answer:
-            "Our projects span the full stack: React, Next.js, Node.js, Python, Django, PostgreSQL, MongoDB, AWS, Docker, and more. Pick projects that match your learning goals.",
-    },
-];
-
 export function FAQ() {
     const [openIndex, setOpenIndex] = useState<number | null>(0);
+    const { t } = useLanguage();
+
+    const faqs = [
+        {
+            question: t("faq.q1.q"),
+            answer: t("faq.q1.a"),
+        },
+        {
+            question: t("faq.q2.q"),
+            answer: t("faq.q2.a"),
+        },
+        {
+            question: t("faq.q3.q"),
+            answer: t("faq.q3.a"),
+        },
+        {
+            question: t("faq.q4.q"),
+            answer: t("faq.q4.a"),
+        },
+        {
+            question: t("faq.q5.q"),
+            answer: t("faq.q5.a"),
+        },
+        {
+            question: t("faq.q6.q"),
+            answer: t("faq.q6.a"),
+        },
+    ];
 
     return (
         <section id="faq" className="w-full py-32 px-6 relative">
             <div className="max-w-[1200px] mx-auto">
                 <div className="text-center mb-16">
                     <h2 className="text-5xl md:text-6xl font-black mb-6 tracking-tighter">
-                        Frequently Asked Questions
+                        {t("faq.title")}
                     </h2>
                     <p className="text-xl text-foreground/60 max-w-2xl mx-auto">
-                        Everything you need to know about building real experience on CoForge
+                        {t("faq.subtitle")}
                     </p>
                 </div>
 

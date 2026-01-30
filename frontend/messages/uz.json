@@ -5,7 +5,10 @@
         "journey": "Yo'llanma",
         "pricing": "Narxlar",
         "faq": "Savol-Javob",
-        "signIn": "Kirish"
+        "signIn": "Kirish",
+        "dashboard": "Boshqaruv",
+        "hub": "Loyihalar",
+        "profile": "Profil"
     },
     "hero": {
         "buildReal": "Haqiqiy Tajriba",
@@ -34,5 +37,118 @@
     },
     "common": {
         "learnMore": "Batafsil"
+    },
+    "testimonials": {
+        "tag": "Muvaffaqiyat Hikoyalari",
+        "title": "Buni Uddalagan Dasturchilar",
+        "subtitle": "Haqiqiy dasturchilar. Haqiqiy tajriba. Haqiqiy karyera.",
+        "sarah": {
+            "role": "Kichik Dasturchi → Dasturiy Muhandis @ Google",
+            "quote": "CoForge menga boshqa joyda ololmagan haqiqiy dunyo tajribasini berdi. 6 oy ichida menda Google'ga ishga kirishga yordam bergan portfolio paydo bo'ldi."
+        },
+        "marcus": {
+            "role": "Mustaqil O'rganuvchi → Full-Stack Muhandis",
+            "quote": "Mentorlik va haqiqiy loyihalar karyeramni o'zgartirdi. Men darsliklardan haqiqiy jamoalar bilan production ilovalar yaratishga o'tdim."
+        },
+        "priya": {
+            "role": "Bootcamp Bitiruvchisi → Yetakchi Muhandis @ Stripe",
+            "quote": "CoForge bootcamp qoldirgan tajriba bo'shlig'ini to'ldirdi. Profilimdagi tasdiqlangan hissalar intervyularni ancha osonlashtirdi."
+        }
+    },
+    "pricing": {
+        "tag": "Oddiy Narxlar",
+        "title": "Rejangizni Tanlang",
+        "subtitle": "Bepul boshlang, o'sishingizga qarab kengaytiring. Yashirin to'lovlar yo'q.",
+        "mostPopular": "ENG MASHHUR",
+        "trial": "Barcha rejalar 14 kunlik bepul sinov muddatini o'z ichiga oladi. Karta talab qilinmaydi.",
+        "free": {
+            "name": "Bepul",
+            "description": "Boshlash uchun ajoyib",
+            "cta": "Boshlash"
+        },
+        "pro": {
+            "name": "Pro",
+            "description": "Jiddiy dasturchilar uchun",
+            "cta": "Pro-ga O'tish"
+        },
+        "team": {
+            "name": "Jamoa",
+            "description": "Muhandislik jamoalari uchun",
+            "cta": "Sotuv Bo'limi"
+        },
+        "features": {
+            "activeProject": "1 ta faol loyiha",
+            "basicReview": "Asosiy kod tahlili",
+            "community": "Hamjamiyat yordami",
+            "github": "GitHub integratsiyasi",
+            "unlimited": "Cheksiz loyihalar",
+            "aiReview": "AI asosidagi kod tahlili",
+            "priority": "Ustuvor yordam",
+            "gitlab": "GitHub + GitLab integratsiyasi",
+            "mentorship": "1-ga-1 Mentorlik (oyiga 2 soat)",
+            "collab": "Jamoaviy ishlash (5 kishigacha)",
+            "analytics": "Kengaytirilgan tahlillar",
+            "allPro": "Pro dagi barcha narsalar",
+            "unlimitedTeam": "Cheksiz jamoa a'zolari",
+            "dedicated": "Birlashtirilgan mentor",
+            "sprint": "Maxsus sprint rejalashtirish",
+            "teamDashboard": "Jamoa tahlil paneli",
+            "matching": "Loyihalarni ustuvor tanlash",
+            "whiteLabel": "White-label opsiyasi"
+        }
+    },
+    "faq": {
+        "title": "Ko'p So'raladigan Savollar",
+        "subtitle": "CoForge da haqiqiy tajriba orttirish haqida bilishingiz kerak bo'lgan barcha narsalar",
+        "q1": {
+            "q": "CoForge nima?",
+            "a": "CoForge - bu kichik va o'rta darajadagi dasturchilarga jamoalar bilan haqiqiy loyihalarda ishlash orqali tasdiqlangan tajriba beradigan markazlashtirilmagan platforma. Bu shunchaki o'rganish emas — bu tasdiqlangan muhandislik tajribasi."
+        },
+        "q2": {
+            "q": "Mentorlik qanday ishlaydi?",
+            "a": "Bizning AI tizimimiz sizni ko'nikmalaringiz va maqsadlaringizga asoslanib tajribali mentorlar bilan bog'laydi. Siz kod tahlillari, yo'l-yo'riq va siz bo'lgan joydan o'tgan dasturchilardan karyera maslahatlarini olasiz."
+        },
+        "q3": {
+            "q": "CoForge bepulmi?",
+            "a": "Biz individual dasturchilar uchun bepul tarifni taklif qilamiz. Premium rejalar cheksiz loyihalar, ustuvor mentorlik va jamoaviy ishlash vositalari kabi ilg'or imkoniyatlarni ochadi."
+        },
+        "q4": {
+            "q": "Tajriba qanday tasdiqlanadi?",
+            "a": "Har bir loyiha hissasi GitHub integratsiyasi orqali kuzatib boriladi. Sizning PRlaringiz, kod tahlillaringiz va bajarilgan vazifalaringiz avtomatik ravishda tasdiqlanadi va o'zgarmas profilingizga qo'shiladi — ish beruvchilar ishonishi mumkin bo'lgan dalil."
+        },
+        "q5": {
+            "q": "Jamoa bilan ishlay olamanmi?",
+            "a": "Albatta! CoForge jamoaviy hamkorlik uchun qurilgan. Mavjud jamoalarga qo'shiling yoki o'zingiznikini yarating. Haqiqiy sprint tsikllarida ishlang, Kanban taxtalarida vazifalarni boshqaring va birga quring."
+        },
+        "q6": {
+            "q": "Qaysi texnologiyalarni o'rganishim mumkin?",
+            "a": "Bizning loyihalarimiz to'liq stackni qamrab oladi: React, Next.js, Node.js, Python, Django, PostgreSQL, MongoDB, AWS, Docker va boshqalar. O'rganish maqsadlaringizga mos loyihalarni tanlang."
+        }
+    },
+    "cta": {
+        "title": "Elitaga Qo'shiling.",
+        "subtitle": "Yolg'iz qurishni to'xtating. Bugun minglab yuqori o'sishga ega dasturchilarga qo'shiling.",
+        "button": "Ariza Topshirish"
+    },
+    "footer": {
+        "tagline": "Haqiqatdan ham hisobga olinadigan tajriba.",
+        "description": "Haqiqiy loyihalar. Haqiqiy jamoalar. Haqiqiy karyera o'sishi. Kelajagiga jiddiy qaraydigan dasturchilar uchun qurilgan.",
+        "rights": "Barcha huquqlar himoyalangan.",
+        "columns": {
+            "vision": "Maqsad",
+            "pricing": "Narxlar",
+            "dashboard": "Boshqaruv",
+            "about": "Biz Haqimizda",
+            "careers": "Karyera",
+            "blog": "Blog",
+            "docs": "Hujjatlar",
+            "help": "Yordam",
+            "community": "Hamjamiyat"
+        },
+        "legal": {
+            "terms": "Foydalanish Shartlari",
+            "privacy": "Maxfiylik Siyosati",
+            "cookies": "Cookies"
+        }
     }
 }
