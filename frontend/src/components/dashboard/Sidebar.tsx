@@ -11,8 +11,11 @@ import {
     CheckSquare,
     LogOut,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Menu,
+    X
 } from "lucide-react";
+import * as React from "react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { motion } from "framer-motion";
@@ -25,23 +28,40 @@ const sidebarItems = [
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+    collapsed: boolean;
+    setCollapsed: (collapsed: boolean) => void;
+    mobileOpen?: boolean;
+    setMobileOpen?: (open: boolean) => void;
+}
+
+export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: SidebarProps) {
     const pathname = usePathname();
     const { logout } = useAuth();
-    const [collapsed, setCollapsed] = useState(false);
+
+    // Close mobile menu when navigating
+    React.useEffect(() => {
+        if (setMobileOpen) setMobileOpen(false);
+    }, [pathname, setMobileOpen]);
 
     return (
         <motion.aside
             initial={false}
-            animate={{ width: collapsed ? "5rem" : "16rem" }}
+            animate={{
+                width: collapsed ? "5rem" : "16rem",
+                x: mobileOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 768 ? -300 : 0)
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className={cn(
-                "fixed left-0 top-0 h-screen bg-background border-r border-foreground/5 z-40 hidden md:flex flex-col transition-all duration-300",
-                "glass-panel rounded-none border-y-0 border-l-0" // Using global glass style
+                "fixed left-0 top-0 h-screen border-r border-foreground/5 z-50 flex flex-col transition-all duration-300",
+                "glass-panel rounded-none border-y-0 border-l-0",
+                !mobileOpen && "hidden md:flex",
+                mobileOpen && "flex w-[16rem]! translate-x-0! shadow-2xl"
             )}
         >
             {/* Sidebar Header */}
             <div className="h-16 flex items-center justify-between px-4 border-b border-foreground/5">
-                {!collapsed && (
+                {(!collapsed || mobileOpen) && (
                     <Link href="/" className="flex items-center gap-2 font-bold text-lg tracking-tight">
                         <div className="w-8 h-8 rounded-lg bg-foreground text-background flex items-center justify-center">
                             <Code2 className="w-5 h-5" />
@@ -91,12 +111,13 @@ export function Sidebar() {
                 <button
                     onClick={logout}
                     className={cn(
-                        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-red-500/10 hover:text-red-500 text-foreground/60 transition-colors",
+                        "flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-red-500/10 hover:text-red-500 text-foreground/60 transition-all duration-300 overflow-hidden relative group",
                         collapsed && "justify-center px-0"
                     )}
                 >
-                    <LogOut className="w-5 h-5" />
-                    {!collapsed && <span className="font-medium">Sign Out</span>}
+                    <div className="absolute inset-0 bg-red-500/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                    <LogOut className="w-5 h-5 relative z-10" />
+                    {!collapsed && <span className="font-bold relative z-10 text-sm tracking-tight">Sign Out</span>}
                 </button>
             </div>
         </motion.aside>

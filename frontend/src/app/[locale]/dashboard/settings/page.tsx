@@ -20,6 +20,7 @@ import {
     Eye,
     EyeOff
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -34,6 +35,7 @@ export default function SettingsPage() {
     const [activeTab, setActiveTab] = useState("profile");
     const [showPassword, setShowPassword] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const { theme, setTheme } = useTheme();
 
     // Mock Save Function
     const handleSave = () => {
@@ -199,32 +201,81 @@ export default function SettingsPage() {
                                 <div className="space-y-10">
                                     <div className="pb-8 border-b border-foreground/5">
                                         <h2 className="text-2xl font-black tracking-tight mb-2">App Preferences</h2>
-                                        <p className="text-sm text-foreground/50 font-medium">Customize your workspace visual experience.</p>
+                                        <p className="text-sm text-foreground/50 font-medium tracking-tight uppercase">Visual Experience & Theme Selection</p>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="p-6 rounded-3xl border-2 border-primary bg-primary/5 flex flex-col items-center gap-4 text-center cursor-pointer group">
-                                            <div className="p-5 bg-primary/10 rounded-full group-hover:scale-110 transition-transform">
-                                                <Moon className="w-10 h-10 text-primary" />
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {/* Dark Mode */}
+                                        <button
+                                            onClick={() => setTheme("dark")}
+                                            className={cn(
+                                                "p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 text-center group relative overflow-hidden",
+                                                theme === "dark"
+                                                    ? "border-primary bg-primary/5 shadow-xl"
+                                                    : "border-foreground/5 bg-foreground/[0.02] hover:border-foreground/10 opacity-60 hover:opacity-100"
+                                            )}
+                                        >
+                                            <div className="p-5 bg-background rounded-2xl group-hover:scale-110 transition-transform shadow-lg relative z-10">
+                                                <Moon className={cn("w-10 h-10", theme === "dark" ? "text-primary" : "text-foreground/40")} />
                                             </div>
-                                            <div>
+                                            <div className="relative z-10">
                                                 <h4 className="font-black text-lg">Space Obsidian</h4>
-                                                <p className="text-sm font-medium opacity-50">Deep dark mode with neon accents</p>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mt-1">Dark Mode</p>
                                             </div>
-                                            <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
-                                                <ShieldCheck className="w-4 h-4 text-white" />
+                                            {theme === "dark" && (
+                                                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                                    <ShieldCheck className="w-4 h-4 text-white" />
+                                                </div>
+                                            )}
+                                        </button>
+
+                                        {/* Light Mode */}
+                                        <button
+                                            onClick={() => setTheme("light")}
+                                            className={cn(
+                                                "p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 text-center group relative overflow-hidden",
+                                                theme === "light"
+                                                    ? "border-primary bg-primary/5 shadow-xl"
+                                                    : "border-foreground/5 bg-foreground/[0.02] hover:border-foreground/10 opacity-60 hover:opacity-100"
+                                            )}
+                                        >
+                                            <div className="p-5 bg-background rounded-2xl group-hover:scale-110 transition-transform shadow-lg relative z-10">
+                                                <Sun className={cn("w-10 h-10", theme === "light" ? "text-orange-500" : "text-foreground/40")} />
                                             </div>
-                                        </div>
-                                        <div className="p-6 rounded-3xl border-2 border-foreground/5 bg-foreground/[0.02] flex flex-col items-center gap-4 text-center cursor-pointer hover:border-foreground/10 transition-all group opacity-60">
-                                            <div className="p-5 bg-foreground/[0.05] rounded-full group-hover:scale-110 transition-transform">
-                                                <Sun className="w-10 h-10" />
-                                            </div>
-                                            <div>
+                                            <div className="relative z-10">
                                                 <h4 className="font-black text-lg">Pure Light</h4>
-                                                <p className="text-sm font-medium opacity-50">Clean, crisp white aesthetic</p>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mt-1">Light Mode</p>
                                             </div>
-                                            <div className="w-6 h-6 rounded-full border-2 border-foreground/10" />
-                                        </div>
+                                            {theme === "light" && (
+                                                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                                    <ShieldCheck className="w-4 h-4 text-white" />
+                                                </div>
+                                            )}
+                                        </button>
+
+                                        {/* System Theme */}
+                                        <button
+                                            onClick={() => setTheme("system")}
+                                            className={cn(
+                                                "p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-4 text-center group relative overflow-hidden",
+                                                theme === "system"
+                                                    ? "border-primary bg-primary/5 shadow-xl"
+                                                    : "border-foreground/5 bg-foreground/[0.02] hover:border-foreground/10 opacity-60 hover:opacity-100"
+                                            )}
+                                        >
+                                            <div className="p-5 bg-background rounded-2xl group-hover:scale-110 transition-transform shadow-lg relative z-10">
+                                                <Globe className={cn("w-10 h-10", theme === "system" ? "text-primary" : "text-foreground/40")} />
+                                            </div>
+                                            <div className="relative z-10">
+                                                <h4 className="font-black text-lg">Dynamic System</h4>
+                                                <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mt-1">Auto Sync</p>
+                                            </div>
+                                            {theme === "system" && (
+                                                <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                                    <ShieldCheck className="w-4 h-4 text-white" />
+                                                </div>
+                                            )}
+                                        </button>
                                     </div>
                                 </div>
                             )}

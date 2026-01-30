@@ -1,35 +1,52 @@
 @import "tailwindcss";
 
+html {
+  background-color: var(--background);
+}
+
 :root {
-  /* Base - Clean High Contrast */
-  --background: #ffffff;
-  --foreground: #09090b;
-  /* Pure black is too harsh, soften slightly */
-  --primary: #2563eb;
+  /* New Professional Palette - Light Mode */
+  --background: #f5f3ed;
+  /* Cream */
+  --foreground: #1a1d29;
+  /* Dark Navy */
+  --primary: #0d9488;
+  /* Vibrant Teal */
+  --secondary: #6b8e7f;
+  /* Sage Gray */
+  --accent: #c5d3d1;
+  /* Light Gray */
 
   /* Glassmorphism System */
-  --glass-bg: rgba(255, 255, 255, 0.6);
-  --glass-border: rgba(0, 0, 0, 0.08);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(245, 243, 237, 0.7);
+  --glass-border: rgba(13, 148, 136, 0.15);
+  --glass-shadow: 0 4px 30px rgba(13, 148, 136, 0.1);
 
   /* Depth & Accents */
-  --shimmer-color: rgba(0, 0, 0, 0.05);
-  --card-hover: rgba(0, 0, 0, 0.03);
+  --shimmer-color: rgba(13, 148, 136, 0.08);
+  --card-hover: rgba(13, 148, 136, 0.05);
 }
 
 .dark {
-  --background: #000000;
-  /* OLED Black */
-  --foreground: #ffffff;
-  --primary: #3b82f6;
+  /* Professional Dark Palette */
+  --background: #1a1d29;
+  /* Dark Navy */
+  --foreground: #f5f3ed;
+  /* Cream */
+  --primary: #0d9488;
+  /* Vibrant Teal */
+  --secondary: #6b8e7f;
+  /* Sage Gray */
+  --accent: #c5d3d1;
+  /* Light Gray */
 
   /* Dark Glass */
-  --glass-bg: rgba(20, 20, 20, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(26, 29, 41, 0.7);
+  --glass-border: rgba(13, 148, 136, 0.2);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
 
-  --shimmer-color: rgba(255, 255, 255, 0.05);
-  --card-hover: rgba(255, 255, 255, 0.05);
+  --shimmer-color: rgba(13, 148, 136, 0.1);
+  --card-hover: rgba(13, 148, 136, 0.08);
 }
 
 @theme {
@@ -44,116 +61,65 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: transparent;
   color: var(--foreground);
-  font-family: system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
   position: relative;
-  /* Subtle Dot Pattern */
-  background-image: radial-gradient(var(--glass-border) 1px, transparent 1px);
-  background-size: 32px 32px;
-  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
-/* Ultra Smooth Minimalist Background Animation */
+/* Base mesh system - Subtle but premium */
 body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(var(--glass-border) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  background-attachment: fixed;
+  opacity: 0.8;
+}
+
+body::after {
   content: "";
   position: fixed;
   top: -25%;
   left: -25%;
   width: 150%;
   height: 150%;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
-
-  /* Smooth Mesh Gradient - Light Mode */
+  /* New Palette: Teal -> Sage -> Navy accents */
   background:
-    radial-gradient(ellipse at 10% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-    radial-gradient(ellipse at 90% 30%, rgba(147, 51, 234, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 30% 60%, rgba(59, 130, 246, 0.04) 0%, transparent 40%);
-
-  animation: meshFlow 40s ease-in-out infinite;
-  will-change: transform;
+    radial-gradient(circle at 15% 25%, rgba(13, 148, 136, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(107, 142, 127, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(197, 211, 209, 0.08) 0%, transparent 45%);
+  filter: blur(50px);
+  animation: slowFloat 40s ease-in-out infinite alternate;
 }
 
-/* Floating Accent Layer */
-body::after {
-  content: "";
-  position: fixed;
-  top: -20%;
-  left: -20%;
-  width: 140%;
-  height: 140%;
-  z-index: -1;
-  pointer-events: none;
-  opacity: 0.3;
-
-  background:
-    radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 30%),
-    radial-gradient(circle at 80% 60%, rgba(147, 51, 234, 0.1) 0%, transparent 30%),
-    radial-gradient(circle at 60% 20%, rgba(236, 72, 153, 0.08) 0%, transparent 30%);
-
-  filter: blur(80px);
-  animation: floatingSoft 50s ease-in-out infinite alternate;
-  will-change: transform;
-}
-
-/* Dark mode adjustments - More vibrant */
-.dark body::before {
-  background:
-    radial-gradient(ellipse at 10% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-    radial-gradient(ellipse at 90% 30%, rgba(147, 51, 234, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
-    radial-gradient(ellipse at 30% 60%, rgba(59, 130, 246, 0.08) 0%, transparent 40%);
-}
-
-.dark body::after {
-  opacity: 0.5;
-  background:
-    radial-gradient(circle at 20% 40%, rgba(59, 130, 246, 0.2) 0%, transparent 30%),
-    radial-gradient(circle at 80% 60%, rgba(147, 51, 234, 0.18) 0%, transparent 30%),
-    radial-gradient(circle at 60% 20%, rgba(236, 72, 153, 0.15) 0%, transparent 30%);
-}
-
-/* Ultra Smooth Mesh Animation */
-@keyframes meshFlow {
-
-  0%,
-  100% {
+/* Extra mesh for light mode to give more character */
+@keyframes slowFloat {
+  0% {
     transform: translate(0, 0) scale(1) rotate(0deg);
   }
 
-  25% {
-    transform: translate(3%, -4%) scale(1.05) rotate(1deg);
-  }
-
   50% {
-    transform: translate(-2%, 2%) scale(0.98) rotate(-0.5deg);
-  }
-
-  75% {
-    transform: translate(4%, 3%) scale(1.03) rotate(0.8deg);
-  }
-}
-
-/* Soft Floating Animation */
-@keyframes floatingSoft {
-  0% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-  }
-
-  33% {
-    transform: translate(-3%, 4%) rotate(2deg) scale(1.05);
-  }
-
-  66% {
-    transform: translate(4%, -3%) rotate(-1.5deg) scale(0.97);
+    transform: translate(2%, 2%) scale(1.02) rotate(1deg);
   }
 
   100% {
-    transform: translate(-2%, 2%) rotate(1deg) scale(1.02);
+    transform: translate(-1%, -1%) scale(0.98) rotate(-1deg);
   }
+}
+
+.dark body::after {
+  background:
+    radial-gradient(circle at 15% 25%, rgba(13, 148, 136, 0.25) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(107, 142, 127, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(26, 29, 41, 0.3) 0%, transparent 45%);
 }
 
 /* Utilities for Premium Feel */
@@ -169,7 +135,7 @@ body::after {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(to right, var(--foreground), var(--foreground), var(--primary));
+  background-image: linear-gradient(to right, var(--foreground), #0d9488, #6b8e7f);
 }
 
 /* Base Headings */
@@ -277,4 +243,134 @@ h4,
 
 .animate-slide-up {
   animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Wave animation for liquid fill effect - water-like motion */
+@keyframes wave {
+  0% {
+    border-radius: 45% 55% 50% 50% / 50% 45% 55% 50%;
+  }
+
+  25% {
+    border-radius: 50% 50% 45% 55% / 55% 50% 50% 45%;
+  }
+
+  50% {
+    border-radius: 55% 45% 50% 50% / 50% 55% 45% 50%;
+  }
+
+  75% {
+    border-radius: 50% 50% 55% 45% / 45% 50% 50% 55%;
+  }
+
+  100% {
+    border-radius: 45% 55% 50% 50% / 50% 45% 55% 50%;
+  }
+}
+
+/* Ripple animation for second card - pulsing wave effect */
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    border-radius: 48% 52% 50% 50% / 50% 48% 52% 50%;
+  }
+
+  33% {
+    transform: scale(1.02);
+    border-radius: 52% 48% 52% 48% / 48% 52% 48% 52%;
+  }
+
+  66% {
+    transform: scale(0.98);
+    border-radius: 48% 52% 48% 52% / 52% 48% 52% 48%;
+  }
+
+  100% {
+    transform: scale(1);
+    border-radius: 48% 52% 50% 50% / 50% 48% 52% 50%;
+  }
+}
+
+/* Pulse animation for progress bar */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+
+/* Vertical wave animation - wider wave motion */
+@keyframes verticalWave {
+
+  0%,
+  100% {
+    border-radius: 40% 60% 50% 50% / 60% 40% 60% 40%;
+  }
+
+  25% {
+    border-radius: 60% 40% 60% 40% / 50% 60% 40% 60%;
+  }
+
+  50% {
+    border-radius: 50% 50% 40% 60% / 40% 60% 50% 50%;
+  }
+
+  75% {
+    border-radius: 40% 60% 50% 50% / 60% 50% 50% 40%;
+  }
+}
+
+/* Glow animation for wave indicator */
+@keyframes glow {
+
+  0%,
+  100% {
+    opacity: 0.7;
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+  }
+}
+
+/* Horizontal wave animation - for right edge wave motion */
+@keyframes horizontalWave {
+
+  0%,
+  100% {
+    border-radius: 50% 40% 60% 50% / 50% 50% 50% 50%;
+  }
+
+  25% {
+    border-radius: 50% 60% 40% 50% / 50% 50% 50% 50%;
+  }
+
+  50% {
+    border-radius: 50% 50% 50% 40% / 60% 40% 60% 40%;
+  }
+
+  75% {
+    border-radius: 50% 40% 60% 50% / 40% 60% 40% 60%;
+  }
+}
+
+/* Slide right animation - subtle horizontal shift */
+@keyframes slideRight {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(2px);
+  }
 }

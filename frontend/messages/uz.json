@@ -1,0 +1,38 @@
+{
+    "nav": {
+        "vision": "Maqsad",
+        "engine": "Tizim",
+        "journey": "Yo'llanma",
+        "pricing": "Narxlar",
+        "faq": "Savol-Javob",
+        "signIn": "Kirish"
+    },
+    "hero": {
+        "buildReal": "Haqiqiy Tajriba",
+        "experience": "Yarating",
+        "verified": "Tasdiqlangan",
+        "description": "Rezyumeingizga soxta loyihalarni qo'shishni to'xtating. AI nazorati ostida jamoalarda ishlab chiqish darajasidagi ilovalar yarating va tasdiqlanadigan sertifikatlarni oling.",
+        "startJourney": "Yo'lni Boshlang",
+        "seeHowItWorks": "Qanday Ishlashini Ko'ring"
+    },
+    "stats": {
+        "developers": "Dasturchilar",
+        "projects": "Loyihalar",
+        "teams": "Jamoalar",
+        "success": "Muvaffaqiyat"
+    },
+    "paradox": {
+        "title": "",
+        "titleHighlight": "Paradoks.",
+        "subtitle": "Ish beruvchilar tajriba talab qiladi.",
+        "description": "Kichik dasturchilar tajriba ololmaydilar birinchi ishga qabul qilinmasdan. Biz bu bo'shliqni AI nazoratidagi jamoa muhiti orqali to'ldiramiz.",
+        "realityCheck": "Haqiqat Tekshiruvi",
+        "struggleForRole": "Ish uchun kurash",
+        "firstJob": "Birinchi Ish",
+        "avgTimeToHire": "O'rtacha Ish Topish Vaqti",
+        "juniorDevs": "Kichik Dasturchilar"
+    },
+    "common": {
+        "learnMore": "Batafsil"
+    }
+}

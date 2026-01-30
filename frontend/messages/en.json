@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "vision": "Vision",
+    "engine": "Engine",
+    "journey": "Journey",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "signIn": "Sign In"
+  },
+  "hero": {
+    "buildReal": "Build Real",
+    "experience": "Experience",
+    "verified": "Verified",
+    "description": "Stop adding phantom projects to your resume. Build production-grade applications in AI-mentored teams and earn verifiable credentials.",
+    "startJourney": "Start Your Journey",
+    "seeHowItWorks": "See How It Works"
+  },
+  "stats": {
+    "developers": "Developers",
+    "projects": "Projects",
+    "teams": "Teams",
+    "success": "Success"
+  },
+  "paradox": {
+    "title": "The",
+    "titleHighlight": "Paradox.",
+    "subtitle": "Employers demand experience.",
+    "description": "Junior developers can't get it without that first hire. We bridge that gap using AI-mentored team environments.",
+    "realityCheck": "Reality Check",
+    "struggleForRole": "Struggle for role",
+    "firstJob": "First Job",
+    "avgTimeToHire": "Avg Time to Hire",
+    "juniorDevs": "Junior Devs"
+  },
+  "common": {
+    "learnMore": "Learn More"
+  }
+}
