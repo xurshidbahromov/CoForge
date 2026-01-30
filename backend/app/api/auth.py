@@ -5,14 +5,13 @@ from fastapi import APIRouter, Depends, Request, Response, HTTPException, status
 from sqlmodel import Session, select
 from datetime import datetime, timedelta
 import jwt
+import bcrypt  # Native bcrypt usage
 
 from ..core.database import get_async_session
 from ..models.user import User
-from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # ----------------------------------------------------------------------
 # Schemas
@@ -31,7 +30,7 @@ class UserLogin(BaseModel):
 # ----------------------------------------------------------------------
 GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "")
 GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "")
-JWT_SECRET = os.getenv("JWT_SECRET", "dev‑secret‑key")
+JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-key")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_MINUTES = 60 * 24 * 30   # 30 days
 
@@ -49,6 +48,12 @@ def decode_jwt_token(token: str) -> int:
         return int(payload["sub"])
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 # ----------------------------------------------------------------------
 # Local Auth Routes
@@ -70,11 +75,11 @@ async def register(user_data: UserRegister, response: Response):
             raise HTTPException(status_code=400, detail="Username already taken")
 
         # Create user
-        hashed_password = pwd_context.hash(user_data.password)
+        hashed_pw = hash_password(user_data.password)
         db_user = User(
             username=user_data.username,
             email=user_data.email,
-            hashed_password=hashed_password
+            hashed_password=hashed_pw
         )
         session.add(db_user)
         await session.commit()
@@ -100,7 +105,7 @@ async def login_email(credentials: UserLogin, response: Response):
         if not user or not user.hashed_password:
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
-        if not pwd_context.verify(credentials.password, user.hashed_password):
+        if not verify_password(credentials.password, user.hashed_password):
             raise HTTPException(status_code=401, detail="Invalid email or password")
             
         token = create_jwt_token(user.id)
@@ -192,7 +197,7 @@ async def callback(code: str = None, state: str = None):
 @router.get("/me")
 async def me(access_token: str = Cookie(None)):
     """
-    Return the logged‑in user's profile.
+    Return the logged-in user's profile.
     """
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -211,7 +216,7 @@ async def update_me(
     access_token: str = Cookie(None)
 ):
     """
-    Update the logged‑in user's profile (stack, level, goal).
+    Update the logged-in user's profile (stack, level, goal).
     """
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -223,8 +228,7 @@ async def update_me(
         if not db_user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        # Update fields – stack is expected as a shared string or comma‑separated for now
-        # or we update the model to support JSON if needed
+        # Update fields
         if "stack" in user_update:
             db_user.stack = ",".join(user_update["stack"]) if isinstance(user_update["stack"], list) else user_update["stack"]
         if "level" in user_update:

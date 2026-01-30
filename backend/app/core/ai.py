@@ -2,12 +2,26 @@ import os
 import json
 from openai import AsyncOpenAI
 
-client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    # Handle missing API key gracefully for development
+    client = None
+    print("WARNING: OPENAI_API_KEY not found. AI features will stay in dummy mode.")
+else:
+    client = AsyncOpenAI(api_key=api_key)
 
 async def generate_project_idea(stack: str, level: str, goal: str):
     """
     Generate a project idea using OpenAI based on user preferences.
     """
+    if not client:
+        return {
+            "title": "Example Project (No API Key)",
+            "description": "Please set OPENAI_API_KEY significantly to get real AI-generated projects. For now, here is a placeholder.",
+            "stack_details": "Next.js, FastAPI, PostgreSQL",
+            "difficulty": "beginner"
+        }
+
     prompt = f"""
     Suggest a full-stack project for a {level} developer.
     The primary tech stack should be: {stack}.
@@ -35,6 +49,12 @@ async def break_down_tasks(title: str, description: str, stack: str):
     """
     Break a project into 5-7 actionable tasks.
     """
+    if not client:
+        return [
+            {"title": "Setup Project", "description": "Initialize repo and dependencies (Dummy Task)", "order": 1},
+            {"title": "Build UI", "description": "Create frontend components (Dummy Task)", "order": 2}
+        ]
+
     prompt = f"""
     Break the following project into 5-7 actionable tasks for a developer.
     Project Title: {title}

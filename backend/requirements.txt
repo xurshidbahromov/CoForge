@@ -6,3 +6,5 @@ httpx
 pyjwt
 openai
 python-dotenv
+aiosqlite
+passlib[bcrypt]
