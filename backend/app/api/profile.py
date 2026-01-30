@@ -1,20 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException, Cookie
 from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 from ..core.database import get_async_session
 from ..models.user import User
 from ..models.project import Project
 from ..models.task import Task
+from ..api.auth import decode_jwt_token
 
 router = APIRouter()
 
-from ..api.auth import decode_jwt_token
-from fastapi import Cookie
-
 @router.get("/me")
-async def get_my_profile(
-    access_token: str = Cookie(None),
-    session=Depends(get_async_session)
-):
+async def get_my_profile(access_token: str = Cookie(None)):
     """
     Returns the full profile data for the authenticated user.
     """
@@ -22,29 +18,41 @@ async def get_my_profile(
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     user_id = decode_jwt_token(access_token)
-    stmt = select(User).where(User.id == user_id)
-    result = await session.execute(stmt)
-    user = result.scalar_one_or_none()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+    
+    async with get_async_session() as session:
+        stmt = select(User).where(User.id == user_id)
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    proj_stmt = select(Project).where(Project.owner_id == user_id)
-    projects = (await session.execute(proj_stmt)).scalars().all()
+        proj_stmt = select(Project).where(Project.owner_id == user_id)
+        projects = (await session.execute(proj_stmt)).scalars().all()
 
-    profile_projects = []
-    total_tasks_done = 0
-    for proj in projects:
-        task_stmt = select(Task).where(Task.project_id == proj.id)
-        tasks = (await session.execute(task_stmt)).scalars().all()
-        done_count = len([t for t in tasks if t.status == "done"])
-        total_tasks_done += done_count
-        profile_projects.append({
-            "id": proj.id,
-            "title": proj.title,
-            "stack": proj.stack,
-            "type": proj.type,
-            "tasks_count": len(tasks),
-            "tasks_done": done_count
-        })
+        profile_projects = []
+        total_tasks_done = 0
+        for proj in projects:
+            task_stmt = select(Task).where(Task.project_id == proj.id)
+            tasks = (await session.execute(task_stmt)).scalars().all()
+            done_count = len([t for t in tasks if t.status == "done"])
+            total_tasks_done += done_count
+            profile_projects.append({
+                "id": proj.id,
+                "title": proj.title,
+                "stack": proj.stack,
+                "type": proj.type,
+                "tasks_count": len(tasks),
+                "tasks_done": done_count
+            })
 
-    }
+        return {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "avatar_url": user.avatar_url,
+            "stack": user.stack,
+            "level": user.level,
+            "goal": user.goal,
+            "projects": profile_projects,
+            "total_tasks_done": total_tasks_done
+        }
