@@ -7,10 +7,11 @@ export interface User {
   username: string;
   email?: string;
   avatar_url?: string;
-  stack?: string[];
-  experienceLevel?: 'beginner' | 'junior' | 'confident_junior';
-  goal?: 'experience' | 'portfolio' | 'job_prep';
+  stack?: string;
+  level?: string;
+  goal?: string;
 }
+
 
 interface AuthState {
   user: User | null;

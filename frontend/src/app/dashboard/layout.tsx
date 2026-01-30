@@ -2,8 +2,10 @@
 
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
-import { useState } from "react";
+import { OnboardingModal } from "@/components/OnboardingModal";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth";
 
 export default function DashboardLayout({
     children,
@@ -12,9 +14,28 @@ export default function DashboardLayout({
 }) {
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const { user, checkAuth } = useAuth();
+
+    useEffect(() => {
+        // Check if user needs onboarding (no stack set)
+        if (user && !user.stack) {
+            setShowOnboarding(true);
+        }
+    }, [user]);
+
+    const handleOnboardingComplete = () => {
+        setShowOnboarding(false);
+        checkAuth(); // Refresh user data
+    };
 
     return (
         <div className="min-h-screen text-foreground flex overflow-hidden">
+            {/* Onboarding Modal */}
+            {showOnboarding && (
+                <OnboardingModal onComplete={handleOnboardingComplete} />
+            )}
+
             {/* Sidebar - Fixed Left (Desktop) / Mobile Drawer */}
             <Sidebar
                 collapsed={isSidebarCollapsed}
