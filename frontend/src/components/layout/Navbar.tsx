@@ -14,6 +14,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -138,7 +139,8 @@ export function Navbar() {
                 </Link>
               )}
 
-              <div className="pl-3 border-l border-foreground/10 ml-1">
+              <div className="pl-3 border-l border-foreground/10 ml-1 flex items-center gap-1">
+                <LanguageSwitcher />
                 <ThemeToggle />
               </div>
 

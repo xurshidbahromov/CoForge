@@ -1,13 +1,13 @@
 "use client";
 
-import { Github, Zap, ArrowRight, Code2, Users, Trophy, GitPullRequest, Search, BookOpen, Activity } from "lucide-react";
+import { Github, Zap, Users, Trophy, GitPullRequest, Search, BookOpen, Activity } from "lucide-react";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { VisionTerminal, Marquee, TiltCard } from "@/components/home/InteractiveElements";
+import { motion } from "framer-motion";
+import { VisionTerminal, Marquee } from "@/components/home/InteractiveElements";
 import { FAQ } from "@/components/home/FAQ";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Pricing } from "@/components/home/Pricing";
-import { useRef } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const features = [
     { icon: Zap, title: "AI-Powered Projects", description: "Get personalized project ideas based on your stack and experience level.", span: "col-span-1 md:col-span-2" },
@@ -19,6 +19,8 @@ const features = [
 ];
 
 export default function Home() {
+    const { t } = useLanguage();
+
     return (
         <main className="flex flex-col min-h-screen w-full overflow-x-hidden">
 
@@ -45,8 +47,8 @@ export default function Home() {
                         className="mb-8"
                     >
                         <h1 className="text-6xl md:text-8xl font-black mb-8 leading-[0.9] tracking-tighter">
-                            Experience <br />
-                            <span className="text-gradient italic relative">Verified.</span>
+                            {t("hero.experience")} <br />
+                            <span className="text-gradient italic relative">{t("hero.verified")}.</span>
                         </h1>
 
                         <motion.div
@@ -65,8 +67,7 @@ export default function Home() {
                         transition={{ duration: 0.7, delay: 0.3 }}
                         className="text-xl md:text-2xl text-foreground/60 max-w-xl mx-auto mb-12 font-medium leading-relaxed mt-12"
                     >
-                        CoForge provides developers with real engineering history.
-                        Build in production-grade teams, verified by AI.
+                        {t("hero.description")}
                     </motion.p>
 
                     <motion.div
@@ -78,11 +79,11 @@ export default function Home() {
                         <Link href="/login" className="bg-foreground text-background px-8 py-4 rounded-2xl font-bold hover:scale-105 transition-transform flex items-center gap-2 shadow-xl shadow-foreground/20 overflow-hidden relative group">
                             <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                             <Github className="w-5 h-5" />
-                            Start Building
+                            {t("hero.startJourney")}
                         </Link>
                         <Link href="#engine" className="px-8 py-4 border border-foreground/10 rounded-2xl font-bold hover:bg-foreground/5 transition-colors backdrop-blur-sm overflow-hidden relative group">
                             <div className="absolute inset-0 bg-foreground/5 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                            See How It Works
+                            {t("hero.seeHowItWorks")}
                         </Link>
                     </motion.div>
                 </div>
@@ -92,10 +93,10 @@ export default function Home() {
             <section className="w-full border-y border-foreground/5">
                 <div className="max-w-[1200px] mx-auto px-4 grid grid-cols-2 md:grid-cols-4 divide-x divide-foreground/5">
                     {[
-                        { label: "Developers", value: "10K+" },
-                        { label: "Projects", value: "5K+" },
-                        { label: "Teams", value: "500+" },
-                        { label: "Success", value: "95%" }
+                        { label: t("stats.developers"), value: "10K+" },
+                        { label: t("stats.projects"), value: "5K+" },
+                        { label: t("stats.teams"), value: "500+" },
+                        { label: t("stats.success"), value: "95%" }
                     ].map((stat, i) => (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
@@ -112,7 +113,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* 3. PARADOX SECTION */}
+            {/* 3. PARADOX SECTION - FANCY VERSION & TRANSLATED */}
             <section className="w-full py-32 px-6 relative">
                 <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                     <motion.div
@@ -122,12 +123,12 @@ export default function Home() {
                         className="flex flex-col gap-8"
                     >
                         <h2 className="text-5xl md:text-6xl font-black leading-none tracking-tight">
-                            The <br /><span className="text-primary opacity-40">Paradox</span>
+                            {t("paradox.title")} <br /><span className="text-primary opacity-40">{t("paradox.titleHighlight")}</span>
                         </h2>
                         <div className="space-y-6">
-                            <p className="text-2xl font-bold text-foreground leading-tight">Employers demand experience.</p>
+                            <p className="text-2xl font-bold text-foreground leading-tight">{t("paradox.subtitle")}</p>
                             <p className="text-xl opacity-60 leading-relaxed">
-                                Junior developers can't get it without that first hire. We bridge that gap using AI-mentored team environments.
+                                {t("paradox.description")}
                             </p>
                         </div>
                     </motion.div>
@@ -138,35 +139,57 @@ export default function Home() {
                         viewport={{ once: true }}
                         className="p-8 md:p-12 glass-panel rounded-[2rem]"
                     >
-                        <h3 className="text-xs font-black uppercase tracking-[0.25em] opacity-40 mb-8">Reality Check</h3>
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center p-5 bg-background/50 rounded-xl border border-foreground/5">
-                                <div>
-                                    <div className="font-bold text-lg">Struggle for role</div>
-                                    <div className="text-[10px] uppercase font-bold opacity-40 mt-1">First Job</div>
+                        <h3 className="text-xs font-black uppercase tracking-[0.25em] opacity-40 mb-8">{t("paradox.realityCheck")}</h3>
+                        <div className="space-y-6">
+                            {/* Card 1: Struggle for role */}
+                            <div className="group p-5 bg-background/50 rounded-2xl border border-foreground/5 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors duration-500" />
+                                <div className="relative z-10 flex justify-between items-end mb-2">
+                                    <div>
+                                        <div className="font-bold text-lg">{t("paradox.struggleForRole")}</div>
+                                        <div className="text-[10px] uppercase font-bold opacity-40 mt-1">{t("paradox.firstJob")}</div>
+                                    </div>
+                                    <span className="text-4xl font-black text-red-500">73%</span>
                                 </div>
-                                <span className="text-3xl font-black">73%</span>
+                                {/* Progress Bar */}
+                                <div className="h-4 w-full bg-foreground/5 rounded-full overflow-hidden relative">
+                                    <div className="absolute inset-y-0 left-0 w-[73%] bg-red-500 rounded-full animate-horizontal-wave" />
+                                </div>
                             </div>
-                            <div className="flex justify-between items-center p-5 bg-background/50 rounded-xl border border-foreground/5">
-                                <div>
-                                    <div className="font-bold text-lg">Avg Time to Hire</div>
-                                    <div className="text-[10px] uppercase font-bold opacity-40 mt-1">Junior Devs</div>
+
+                            {/* Card 2: Avg Time to Hire */}
+                            <div className="group p-5 bg-background/50 rounded-2xl border border-foreground/5 relative overflow-hidden">
+                                <div className="absolute inset-0 bg-orange-500/5 group-hover:bg-orange-500/10 transition-colors duration-500" />
+                                <div className="relative z-10 flex justify-between items-end mb-2">
+                                    <div>
+                                        <div className="font-bold text-lg">{t("paradox.avgTimeToHire")}</div>
+                                        <div className="text-[10px] uppercase font-bold opacity-40 mt-1">{t("paradox.juniorDevs")}</div>
+                                    </div>
+                                    <span className="text-4xl font-black text-orange-500">8mo</span>
                                 </div>
-                                <span className="text-3xl font-black">8mo</span>
+                                {/* Segmented Bar */}
+                                <div className="flex gap-1 h-4 w-full">
+                                    {[...Array(8)].map((_, i) => (
+                                        <div key={i} className="h-full flex-1 bg-orange-500 rounded-sm animate-slide-right" style={{ animationDelay: `${i * 0.1}s` }} />
+                                    ))}
+                                    {[...Array(4)].map((_, i) => (
+                                        <div key={i + 8} className="h-full flex-1 bg-foreground/5 rounded-sm" />
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </motion.div>
                 </div>
             </section>
 
-            {/* 4. ENGINE SECTION (Bento Grid) */}
+            {/* 4. ENGINE SECTION (Bento Grid) - Keeping static for now or generic trans */}
             <section id="engine" className="w-full py-40 text-foreground relative overflow-hidden">
-
+                {/* ... (Kept similar to minimize changes, can be translated later) ... */}
                 <div className="max-w-[1200px] mx-auto px-6 relative z-10">
                     <div className="mb-24 text-center md:text-left">
                         <h2 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 relative inline-block">
-                            The Engine
-                            <span className="absolute top-14 -right-4 text-primary animate-pulse rounded-full w-2 h-2 bg-primary"></span>
+                            {t("nav.engine")}
+                            <span className="absolute -top-6 -right-6 text-primary animate-pulse">.</span>
                         </h2>
                         <p className="text-xl text-foreground/60 max-w-xl font-medium">
                             Every tool defined to transform your career. Proven methodologies.
@@ -197,10 +220,11 @@ export default function Home() {
                 </div>
             </section>
 
+            {/* ... Continuing with simplified sections ... */}
             {/* 5. JOURNEY SECTION */}
             <section id="journey" className="w-full py-40 px-6 text-foreground relative">
                 <div className="max-w-[1200px] mx-auto">
-                    <h2 className="text-5xl md:text-7xl font-black text-center mb-32 tracking-tighter">Your Journey</h2>
+                    <h2 className="text-5xl md:text-7xl font-black text-center mb-32 tracking-tighter">{t("nav.journey")}</h2>
                     <div className="grid md:grid-cols-3 gap-12 relative">
                         {/* Connecting Line (Desktop) - Adjusted for medium circles */}
                         <div className="hidden md:block absolute top-16 left-[15%] right-[15%] h-[1px] bg-foreground/5" />

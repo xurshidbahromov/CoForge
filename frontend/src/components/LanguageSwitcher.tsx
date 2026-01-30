@@ -1,94 +1,56 @@
-'use client';
+"use client";
+import { Globe, Check } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
-import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-
-const languages = [
-    { code: 'en', name: 'English', flag: '🇬🇧' },
-    { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-    { code: 'uz', name: 'O\'zbek', flag: '🇺🇿' }
-];
-
-export default function LanguageSwitcher() {
-    const router = useRouter();
-    const pathname = usePathname();
+export function LanguageSwitcher() {
     const [isOpen, setIsOpen] = useState(false);
-    const [currentLocale, setCurrentLocale] = useState('en');
+    const { language, setLanguage } = useLanguage();
 
-    useEffect(() => {
-        // Extract locale from pathname
-        const locale = pathname.split('/')[1];
-        if (['en', 'ru', 'uz'].includes(locale)) {
-            setCurrentLocale(locale);
-        }
-    }, [pathname]);
-
-    const switchLanguage = (locale: string) => {
-        // Remove current locale from path and add new one
-        const segments = pathname.split('/').filter(Boolean);
-        const newPath = segments[0] && ['en', 'ru', 'uz'].includes(segments[0])
-            ? `/${locale}/${segments.slice(1).join('/')}`
-            : `/${locale}${pathname}`;
-
-        router.push(newPath);
-        setIsOpen(false);
-    };
-
-    const currentLang = languages.find(lang => lang.code === currentLocale) || languages[0];
+    const languages = [
+        { code: "en", label: "English", flag: "🇬🇧" },
+        { code: "ru", label: "Русский", flag: "🇷🇺" },
+        { code: "uz", label: "O'zbek", flag: "🇺🇿" },
+    ];
 
     return (
         <div className="relative">
-            {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl bg-background/50 border border-foreground/10 hover:border-foreground/20 transition-all duration-200"
+                className="p-2 hover:bg-foreground/5 rounded-lg transition-colors flex items-center gap-2 group"
             >
-                <span className="text-lg">{currentLang.flag}</span>
-                <span className="text-sm font-medium hidden sm:inline">{currentLang.code.toUpperCase()}</span>
-                <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
-                    fill="none"
-                    strokeWidth="2"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path d="M19 9l-7 7-7-7" />
-                </svg>
+                <Globe className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                <span className="text-xs font-bold uppercase hidden sm:inline-block">{language}</span>
             </button>
 
-            {/* Dropdown Menu */}
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-48 glass-panel rounded-xl border border-foreground/10 overflow-hidden z-50"
-                    >
-                        {languages.map((lang) => (
+            {isOpen && (
+                <>
+                    <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setIsOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 w-40 bg-background/95 backdrop-blur-xl border border-foreground/10 rounded-xl shadow-xl overflow-hidden z-50 p-1 animate-in fade-in zoom-in-95 duration-200">
+                        {languages.map((l) => (
                             <button
-                                key={lang.code}
-                                onClick={() => switchLanguage(lang.code)}
-                                className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-foreground/5 transition-colors ${currentLocale === lang.code ? 'bg-primary/10' : ''
-                                    }`}
-                            >
-                                <span className="text-xl">{lang.flag}</span>
-                                <div className="flex-1 text-left">
-                                    <div className="text-sm font-medium">{lang.name}</div>
-                                    <div className="text-xs opacity-50">{lang.code.toUpperCase()}</div>
-                                </div>
-                                {currentLocale === lang.code && (
-                                    <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                    </svg>
+                                key={l.code}
+                                onClick={() => {
+                                    setLanguage(l.code as "en" | "ru" | "uz");
+                                    setIsOpen(false);
+                                }}
+                                className={cn(
+                                    "w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium hover:bg-foreground/5 rounded-lg transition-colors text-left",
+                                    language === l.code && "bg-foreground/5 text-primary"
                                 )}
+                            >
+                                <span className="text-lg">{l.flag}</span>
+                                <span className="flex-1">{l.label}</span>
+                                {language === l.code && <Check className="w-3.5 h-3.5" />}
                             </button>
                         ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    </div>
+                </>
+            )}
         </div>
     );
 }
