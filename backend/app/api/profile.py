@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Cookie
-from sqlmodel import select
+from sqlmodel import select, func
 from sqlmodel.ext.asyncio.session import AsyncSession
 from ..core.database import get_async_session
 from ..models.user import User
@@ -30,12 +30,23 @@ async def get_my_profile(access_token: str = Cookie(None)):
         projects = (await session.execute(proj_stmt)).scalars().all()
 
         profile_projects = []
-        total_tasks_done = 0
+        total_tasks = 0
+        total_done = 0
+        total_in_progress = 0
+        total_todo = 0
+        
         for proj in projects:
             task_stmt = select(Task).where(Task.project_id == proj.id)
             tasks = (await session.execute(task_stmt)).scalars().all()
             done_count = len([t for t in tasks if t.status == "done"])
-            total_tasks_done += done_count
+            in_progress_count = len([t for t in tasks if t.status == "in_progress"])
+            todo_count = len([t for t in tasks if t.status == "todo"])
+            
+            total_tasks += len(tasks)
+            total_done += done_count
+            total_in_progress += in_progress_count
+            total_todo += todo_count
+            
             profile_projects.append({
                 "id": proj.id,
                 "title": proj.title,
@@ -54,5 +65,11 @@ async def get_my_profile(access_token: str = Cookie(None)):
             "level": user.level,
             "goal": user.goal,
             "projects": profile_projects,
-            "total_tasks_done": total_tasks_done
+            "stats": {
+                "projects_count": len(projects),
+                "total_tasks": total_tasks,
+                "tasks_done": total_done,
+                "tasks_in_progress": total_in_progress,
+                "tasks_todo": total_todo
+            }
         }

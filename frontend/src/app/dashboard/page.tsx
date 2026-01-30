@@ -1,40 +1,61 @@
 "use client";
 
 import { useAuth } from "@/lib/auth";
-import { useProjects, useTasks, Project } from "@/hooks/useProjects";
+import { useProjects, useTasks, useStats, Project } from "@/hooks/useProjects";
+import { AnimatedCounter } from "@/components/AnimatedCounter";
+import { DashboardSkeleton } from "@/components/Skeleton";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Flame, Trophy, Code2, GitPullRequest, ArrowUpRight, Sparkles, Plus, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Trophy, Code2, GitPullRequest, ArrowUpRight, Sparkles, Plus, Loader2, ListTodo, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { toast } from "sonner";
 
 export default function DashboardPage() {
     const { user } = useAuth();
     const { projects, isLoading, isGenerating, generateProject } = useProjects();
+    const { stats, refetch: refetchStats } = useStats();
     const [activeProject, setActiveProject] = useState<Project | null>(null);
-    const { tasks } = useTasks(activeProject?.id || projects[0]?.id || null);
 
     const currentProject = activeProject || projects[0];
+    const { tasks, generateTasks, isLoading: tasksLoading } = useTasks(currentProject?.id || null);
+
     const completedTasks = tasks.filter(t => t.status === "done").length;
     const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
 
     const handleGenerateProject = async () => {
         try {
-            const newProject = await generateProject();
-            setActiveProject(newProject);
+            const result = await generateProject();
+            setActiveProject(result.project);
+            refetchStats();
+            toast.success(`Project "${result.project.title}" created!`, {
+                description: `${result.tasks?.length || 0} tasks auto-generated`
+            });
         } catch (error) {
             console.error("Failed to generate project:", error);
+            toast.error("Failed to generate project", {
+                description: "Please try again later"
+            });
         }
     };
 
-    // Stats based on real data
-    const stats = [
-        { label: "Projects", value: projects.length.toString().padStart(2, '0'), icon: Code2, color: "text-primary", bg: "bg-primary/5" },
-        { label: "Tasks Done", value: completedTasks.toString(), icon: Trophy, color: "text-yellow-500", bg: "bg-yellow-500/5" },
-        { label: "In Progress", value: tasks.filter(t => t.status === "in_progress").length.toString(), icon: GitPullRequest, color: "text-purple-500", bg: "bg-purple-500/5" },
-        { label: "Pending", value: tasks.filter(t => t.status === "todo").length.toString(), icon: ArrowUpRight, color: "text-orange-500", bg: "bg-orange-500/5" }
+
+
+    // Stats from profile API
+    const statsData = [
+        { label: "Projects", value: stats.projects_count, icon: Code2, color: "text-primary", bg: "bg-primary/5" },
+        { label: "Completed", value: stats.tasks_done, icon: CheckCircle2, color: "text-green-500", bg: "bg-green-500/5" },
+        { label: "In Progress", value: stats.tasks_in_progress, icon: GitPullRequest, color: "text-purple-500", bg: "bg-purple-500/5" },
+        { label: "Pending", value: stats.tasks_todo, icon: ListTodo, color: "text-orange-500", bg: "bg-orange-500/5" }
     ];
 
+    // Show skeleton while loading
+    if (isLoading) {
+        return <DashboardSkeleton />;
+    }
+
     return (
+
         <div className="space-y-10">
             {/* 1. Welcome Section */}
             <motion.div
@@ -73,9 +94,9 @@ export default function DashboardPage() {
                 </button>
             </motion.div>
 
-            {/* 2. Stats Grid */}
+            {/* 2. Stats Grid with Animated Counters */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {stats.map((stat, i) => (
+                {statsData.map((stat, i) => (
                     <motion.div
                         key={stat.label}
                         initial={{ opacity: 0, y: 20 }}
@@ -90,7 +111,18 @@ export default function DashboardPage() {
                             </div>
                             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/20 group-hover:text-foreground/40 transition-colors">{stat.label}</span>
                         </div>
-                        <div className="text-4xl font-black tracking-tighter relative z-10 group-hover:scale-[1.02] transition-transform origin-left">{stat.value}</div>
+                        <div className="text-4xl font-black tracking-tighter relative z-10 group-hover:scale-[1.02] transition-transform origin-left">
+                            <AnimatedCounter value={stat.value} duration={0.8} />
+                        </div>
+                        {/* Progress bar under stats */}
+                        <div className="mt-4 h-1 bg-foreground/5 rounded-full overflow-hidden">
+                            <motion.div
+                                className={`h-full ${stat.bg.replace('/5', '')} opacity-50`}
+                                initial={{ width: 0 }}
+                                animate={{ width: stat.value > 0 ? `${Math.min(stat.value * 10, 100)}%` : '0%' }}
+                                transition={{ delay: i * 0.1 + 0.5, duration: 0.8 }}
+                            />
+                        </div>
                     </motion.div>
                 ))}
             </div>
@@ -174,30 +206,61 @@ export default function DashboardPage() {
                                     <span className="text-[10px] font-black uppercase text-background/30 tracking-widest mb-1">Tasks</span>
                                     <span className="text-xl font-black tracking-tight">{completedTasks}<span className="text-background/30">/{tasks.length}</span></span>
                                 </div>
+                                {/* Progress Circle */}
+                                <div className="ml-auto">
+                                    <svg className="w-16 h-16 transform -rotate-90">
+                                        <circle cx="32" cy="32" r="28" className="fill-none stroke-background/10 stroke-[4]" />
+                                        <motion.circle
+                                            cx="32"
+                                            cy="32"
+                                            r="28"
+                                            className="fill-none stroke-primary stroke-[4]"
+                                            strokeLinecap="round"
+                                            initial={{ strokeDasharray: "0 176" }}
+                                            animate={{ strokeDasharray: `${progress * 1.76} 176` }}
+                                            transition={{ duration: 1, delay: 0.5 }}
+                                        />
+                                    </svg>
+                                </div>
                             </div>
 
-                            <button className="bg-background text-foreground px-8 py-4 rounded-2xl font-black text-sm flex items-center gap-3 hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-black/20 overflow-hidden relative group/btn">
-                                <div className="absolute inset-0 bg-foreground/5 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                                <span className="relative z-10">View Tasks</span>
-                                <ArrowRight className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
-                            </button>
+                            <div className="flex gap-4">
+                                <Link
+                                    href={`/dashboard/projects/${currentProject.id}`}
+                                    className="bg-background text-foreground px-8 py-4 rounded-2xl font-black text-sm flex items-center gap-3 hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-black/20 overflow-hidden relative group/btn"
+                                >
+                                    <div className="absolute inset-0 bg-foreground/5 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                                    <span className="relative z-10">View Tasks</span>
+                                    <ArrowRight className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
+                                </Link>
+
+                                {tasks.length === 0 && (
+                                    <button
+                                        onClick={() => generateTasks()}
+                                        className="bg-primary/20 text-primary px-6 py-4 rounded-2xl font-black text-sm flex items-center gap-2 hover:bg-primary/30 transition-all"
+                                    >
+                                        <Sparkles className="w-4 h-4" />
+                                        Generate Tasks
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </motion.div>
 
                     {/* 4. Other Projects List */}
                     <div className="flex flex-col gap-6">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 px-4">All Projects</h3>
-                        <div className="space-y-4">
-                            {projects.slice(0, 5).map((project, i) => (
+                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                            {projects.map((project, i) => (
                                 <motion.div
                                     key={project.id}
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3 + (i * 0.1) }}
+                                    transition={{ delay: 0.3 + (i * 0.05) }}
                                     onClick={() => setActiveProject(project)}
                                     className={cn(
                                         "p-6 rounded-[2rem] border transition-all duration-300 cursor-pointer group flex items-center justify-between",
-                                        currentProject.id === project.id
+                                        currentProject?.id === project.id
                                             ? "border-primary/30 bg-primary/5"
                                             : "border-foreground/[0.03] bg-foreground/[0.01] hover:bg-foreground/[0.03]"
                                     )}
@@ -206,11 +269,11 @@ export default function DashboardPage() {
                                         <div className="flex items-center gap-3 mb-2">
                                             <div className={cn(
                                                 "w-1.5 h-1.5 rounded-full",
-                                                currentProject.id === project.id ? "bg-primary" : "bg-foreground/20"
+                                                currentProject?.id === project.id ? "bg-primary" : "bg-foreground/20"
                                             )} />
                                             <span className={cn(
                                                 "text-[10px] font-black tracking-widest uppercase",
-                                                currentProject.id === project.id ? "text-primary" : "text-foreground/40"
+                                                currentProject?.id === project.id ? "text-primary" : "text-foreground/40"
                                             )}>{project.type}</span>
                                         </div>
                                         <div className="font-black tracking-tight group-hover:text-primary transition-colors text-lg">{project.title}</div>
@@ -226,7 +289,11 @@ export default function DashboardPage() {
                                 disabled={isGenerating}
                                 className="w-full p-6 rounded-[2rem] border-2 border-dashed border-foreground/10 hover:border-primary/30 transition-all duration-300 flex items-center justify-center gap-2 text-foreground/40 hover:text-primary"
                             >
-                                <Plus className="w-5 h-5" />
+                                {isGenerating ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    <Plus className="w-5 h-5" />
+                                )}
                                 <span className="font-bold text-sm">Generate New</span>
                             </button>
                         </div>

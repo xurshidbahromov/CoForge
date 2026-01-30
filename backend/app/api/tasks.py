@@ -11,8 +11,22 @@ from ..api.auth import decode_jwt_token
 router = APIRouter()
 
 @router.get("/{project_id}", response_model=List[Task])
-async def list_tasks(project_id: int):
+async def list_tasks(project_id: int, access_token: str = Cookie(None)):
+    """List tasks for a project (only if user owns the project)."""
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
     async with get_async_session() as session:
+        # Verify project ownership
+        proj_stmt = select(Project).where(Project.id == project_id, Project.owner_id == user_id)
+        proj_res = await session.execute(proj_stmt)
+        project = proj_res.scalar_one_or_none()
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
         stmt = select(Task).where(Task.project_id == project_id).order_by(Task.order)
         result = await session.execute(stmt)
         return result.scalars().all()
@@ -62,13 +76,26 @@ async def generate_tasks(project_id: int, access_token: str = Cookie(None)):
         return db_tasks
 
 @router.patch("/{task_id}", response_model=Task)
-async def update_task(task_id: int, task_update: dict):
+async def update_task(task_id: int, task_update: dict, access_token: str = Cookie(None)):
+    """Update a task status."""
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
     async with get_async_session() as session:
         stmt = select(Task).where(Task.id == task_id)
         result = await session.execute(stmt)
         db_task = result.scalar_one_or_none()
+        
         if not db_task:
             raise HTTPException(status_code=404, detail="Task not found")
+        
+        # Verify project ownership
+        proj_stmt = select(Project).where(Project.id == db_task.project_id, Project.owner_id == user_id)
+        proj_res = await session.execute(proj_stmt)
+        if not proj_res.scalar_one_or_none():
+            raise HTTPException(status_code=403, detail="Not authorized")
         
         for key, value in task_update.items():
             if hasattr(db_task, key):
@@ -78,3 +105,28 @@ async def update_task(task_id: int, task_update: dict):
         await session.commit()
         await session.refresh(db_task)
         return db_task
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_task(task_id: int, access_token: str = Cookie(None)):
+    """Delete a task."""
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        stmt = select(Task).where(Task.id == task_id)
+        result = await session.execute(stmt)
+        db_task = result.scalar_one_or_none()
+        
+        if not db_task:
+            raise HTTPException(status_code=404, detail="Task not found")
+        
+        # Verify project ownership
+        proj_stmt = select(Project).where(Project.id == db_task.project_id, Project.owner_id == user_id)
+        proj_res = await session.execute(proj_stmt)
+        if not proj_res.scalar_one_or_none():
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        await session.delete(db_task)
+        await session.commit()
