@@ -8,3 +8,5 @@ python-dotenv
 aiosqlite
 passlib[bcrypt]
 groq
+aiosqlite
+email-validator
