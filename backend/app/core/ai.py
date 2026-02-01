@@ -100,3 +100,46 @@ async def break_down_tasks(title: str, description: str, stack: str):
     
     result = json.loads(content.strip())
     return result.get("tasks", [])
+
+async def generate_task_guide(task_title: str, task_description: str, stack: str):
+    """
+    Generate a detailed step-by-step implementation guide for a specific task.
+    """
+    if not client:
+        return "## Guide not available\n(AI service is offline or GROQ_API_KEY is missing)"
+    
+    prompt = f"""
+    Create a detailed, step-by-step implementation guide for a junior developer for the following task.
+    The guide must be practical and actionable.
+    
+    Context:
+    - Tech Stack: {stack}
+    - Task: {task_title}
+    - Details: {task_description}
+    
+    Response Structure (Markdown):
+    1. **Objective**: Simple explanation of what we are building.
+    2. **Prerequisites**: Any libraries to install (with npm/pip commands).
+    3. **Step-by-Step Implementation**:
+       - Specific instructions.
+       - Code snippets (e.g., File: `src/components/MyComponent.tsx`).
+       - Explain *why* we are doing this.
+    4. **Testing & Verification**: How to check if it works.
+    
+    Tone: Encouraging, clear, and beginner-friendly.
+    """
+    
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "You are an expert friendly senior developer mentoring a junior. You provide clear, copy-pasteable code examples and specific instructions."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            max_tokens=1500
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"AI Generation Error: {e}")
+        return "## Error Generating Guide\nCould not generate the guide at this time. Please try again later."

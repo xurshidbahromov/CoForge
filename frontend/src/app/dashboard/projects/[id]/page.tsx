@@ -2,30 +2,19 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
-import { motion, AnimatePresence, Reorder } from "framer-motion";
-import { ArrowLeft, Sparkles, CheckCircle2, Clock, ListTodo, Loader2, GripVertical, Trash2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Sparkles, CheckCircle2, Clock, ListTodo, Loader2, GripVertical, Trash2, Pencil } from "lucide-react";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { toast } from "sonner";
 import { KanbanSkeleton } from "@/components/Skeleton";
 import { DeleteConfirmModal } from "@/components/DeleteModal";
-
-interface Project {
-    id: number;
-    title: string;
-    description: string;
-    stack: string;
-    type: string;
-}
-
-interface Task {
-    id: number;
-    title: string;
-    description: string;
-    status: string;
-    order: number;
-}
+import { EditProjectModal } from "@/components/EditProjectModal";
+import { Project, useTasks, Task } from "@/hooks/useProjects";
+import { TaskCard } from "@/components/TaskCard";
+import { EditTaskModal } from "@/components/EditTaskModal";
+import { TaskDetailModal } from "@/components/TaskDetailModal";
 
 const statusConfig = {
     todo: { label: "To Do", icon: ListTodo, color: "text-orange-500", bg: "bg-orange-500/10" },
@@ -39,10 +28,30 @@ export default function ProjectDetailPage() {
     const projectId = Number(params.id);
 
     const [project, setProject] = useState<Project | null>(null);
-    const [tasks, setTasks] = useState<Task[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isGeneratingTasks, setIsGeneratingTasks] = useState(false);
+    const [isLoadingProject, setIsLoadingProject] = useState(true);
+
+    // Project Modals
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+
+    // Task Modals & State
+    const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+    const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+    const [showDeleteTaskModal, setShowDeleteTaskModal] = useState(false);
+    const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+
+    // Use hooks
+    const {
+        tasks,
+        generateTasks,
+        updateTask,
+        deleteTask,
+        isLoading: isTasksLoading,
+        isGenerating: isGeneratingTasks,
+        refetch: refetchTasks
+    } = useTasks(isNaN(projectId) ? null : projectId);
 
     const handleDelete = async () => {
         try {
@@ -52,69 +61,85 @@ export default function ProjectDetailPage() {
         } catch (err) {
             console.error("Failed to delete project:", err);
             toast.error("Failed to delete project");
-            throw err;
         }
     };
 
-    const fetchData = useCallback(async () => {
+    const handleUpdate = async (id: number, data: Partial<Project>) => {
         try {
-            setIsLoading(true);
-            const [projRes, tasksRes] = await Promise.all([
-                api.get(`/projects/${projectId}`),
-                api.get(`/tasks/${projectId}`)
-            ]);
-            setProject(projRes.data);
-            setTasks(tasksRes.data);
+            const response = await api.patch(`/projects/${id}`, data);
+            setProject(response.data);
+            toast.success("Project updated successfully");
+        } catch (err) {
+            console.error("Failed to update project:", err);
+            toast.error("Failed to update project");
+        }
+    };
+
+    const fetchProject = useCallback(async () => {
+        if (isNaN(projectId)) return;
+        try {
+            setIsLoadingProject(true);
+            const res = await api.get(`/projects/${projectId}`);
+            setProject(res.data);
         } catch (err) {
             console.error("Failed to fetch project:", err);
         } finally {
-            setIsLoading(false);
+            setIsLoadingProject(false);
         }
     }, [projectId]);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        fetchProject();
+    }, [fetchProject]);
 
-    const updateTaskStatus = async (taskId: number, newStatus: string) => {
-        const task = tasks.find(t => t.id === taskId);
+    // Task Handlers
+    const handleTaskUpdate = async (id: number, data: Partial<Task>) => {
         try {
-            await api.patch(`/tasks/${taskId}`, { status: newStatus });
-            setTasks(prev => prev.map(t =>
-                t.id === taskId ? { ...t, status: newStatus } : t
-            ));
-            const statusLabels = { todo: "To Do", in_progress: "In Progress", done: "Done" };
-            toast.success(`Task moved to ${statusLabels[newStatus as keyof typeof statusLabels]}`);
-        } catch (err) {
-            console.error("Failed to update task:", err);
+            await updateTask(id, data);
+            toast.success("Task updated");
+            setShowEditTaskModal(false);
+            setTaskToEdit(null);
+        } catch (error) {
             toast.error("Failed to update task");
         }
     };
 
-
-    const generateTasks = async () => {
+    const handleTaskDelete = async () => {
+        if (!taskToDelete) return;
         try {
-            setIsGeneratingTasks(true);
-            const res = await api.post(`/tasks/${projectId}/generate`);
-            setTasks(res.data);
-            toast.success(`${res.data.length} tasks generated!`);
-        } catch (err) {
-            console.error("Failed to generate tasks:", err);
-            toast.error("Failed to generate tasks");
-        } finally {
-            setIsGeneratingTasks(false);
+            await deleteTask(taskToDelete.id);
+            toast.success("Task deleted");
+            setTaskToDelete(null);
+            setShowDeleteTaskModal(false);
+        } catch (error) {
+            toast.error("Failed to delete task");
         }
     };
 
+    const handleStatusChange = async (taskId: number, status: string) => {
+        try {
+            await updateTask(taskId, { status });
+        } catch (error) {
+            toast.error("Failed to update status");
+        }
+    };
+
+    const handleGenerateTasks = async () => {
+        try {
+            await generateTasks();
+            toast.success("Tasks generated successfully!");
+        } catch (error) {
+            // Error handled in hook
+        }
+    }
 
     const todoTasks = tasks.filter(t => t.status === "todo");
     const inProgressTasks = tasks.filter(t => t.status === "in_progress");
     const doneTasks = tasks.filter(t => t.status === "done");
 
-    if (isLoading) {
+    if (isLoadingProject || (isTasksLoading && tasks.length === 0)) {
         return <KanbanSkeleton />;
     }
-
 
     if (!project) {
         return (
@@ -153,7 +178,7 @@ export default function ProjectDetailPage() {
                 <div className="flex items-center gap-3">
                     {tasks.length === 0 && (
                         <button
-                            onClick={generateTasks}
+                            onClick={handleGenerateTasks}
                             disabled={isGeneratingTasks}
                             className="flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm bg-primary text-white hover:scale-105 active:scale-95 transition-all"
                         >
@@ -166,6 +191,13 @@ export default function ProjectDetailPage() {
                         </button>
                     )}
                     <button
+                        onClick={() => setShowEditModal(true)}
+                        className="p-3 rounded-2xl font-bold text-sm border border-foreground/10 text-foreground hover:bg-foreground/5 hover:scale-105 active:scale-95 transition-all"
+                        title="Edit Project"
+                    >
+                        <Pencil className="w-5 h-5" />
+                    </button>
+                    <button
                         onClick={() => setShowDeleteModal(true)}
                         className="p-3 rounded-2xl font-bold text-sm border border-red-500/20 text-red-500 hover:bg-red-500/10 hover:scale-105 active:scale-95 transition-all"
                         title="Delete Project"
@@ -175,6 +207,13 @@ export default function ProjectDetailPage() {
                 </div>
             </div>
 
+            {/* Edit Project Modal */}
+            <EditProjectModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSave={handleUpdate}
+                project={project}
+            />
 
             {/* Kanban Board */}
             <div className="grid md:grid-cols-3 gap-6">
@@ -193,7 +232,19 @@ export default function ProjectDetailPage() {
                                 <TaskCard
                                     key={task.id}
                                     task={task}
-                                    onStatusChange={updateTaskStatus}
+                                    onStatusChange={handleStatusChange}
+                                    onEdit={(t) => {
+                                        setTaskToEdit(t);
+                                        setShowEditTaskModal(true);
+                                    }}
+                                    onDelete={(t) => {
+                                        setTaskToDelete(t);
+                                        setShowDeleteTaskModal(true);
+                                    }}
+                                    onView={(t) => {
+                                        setSelectedTask(t);
+                                        setShowDetailModal(true);
+                                    }}
                                 />
                             ))}
                         </AnimatePresence>
@@ -215,7 +266,19 @@ export default function ProjectDetailPage() {
                                 <TaskCard
                                     key={task.id}
                                     task={task}
-                                    onStatusChange={updateTaskStatus}
+                                    onStatusChange={handleStatusChange}
+                                    onEdit={(t) => {
+                                        setTaskToEdit(t);
+                                        setShowEditTaskModal(true);
+                                    }}
+                                    onDelete={(t) => {
+                                        setTaskToDelete(t);
+                                        setShowDeleteTaskModal(true);
+                                    }}
+                                    onView={(t) => {
+                                        setSelectedTask(t);
+                                        setShowDetailModal(true);
+                                    }}
                                 />
                             ))}
                         </AnimatePresence>
@@ -237,7 +300,19 @@ export default function ProjectDetailPage() {
                                 <TaskCard
                                     key={task.id}
                                     task={task}
-                                    onStatusChange={updateTaskStatus}
+                                    onStatusChange={handleStatusChange}
+                                    onEdit={(t) => {
+                                        setTaskToEdit(t);
+                                        setShowEditTaskModal(true);
+                                    }}
+                                    onDelete={(t) => {
+                                        setTaskToDelete(t);
+                                        setShowDeleteTaskModal(true);
+                                    }}
+                                    onView={(t) => {
+                                        setSelectedTask(t);
+                                        setShowDetailModal(true);
+                                    }}
                                 />
                             ))}
                         </AnimatePresence>
@@ -245,7 +320,7 @@ export default function ProjectDetailPage() {
                 </div>
             </div>
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Project Modal */}
             <DeleteConfirmModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
@@ -254,72 +329,36 @@ export default function ProjectDetailPage() {
                 description="Are you sure you want to delete this project?"
                 itemName={project.title}
             />
+
+            {/* Delete Task Modal */}
+            <DeleteConfirmModal
+                isOpen={showDeleteTaskModal}
+                onClose={() => setShowDeleteTaskModal(false)}
+                onConfirm={handleTaskDelete}
+                title="Delete Task"
+                description="Are you sure you want to delete this task?"
+                itemName={taskToDelete?.title}
+            />
+
+            {/* Edit Task Modal */}
+            {taskToEdit && (
+                <EditTaskModal
+                    isOpen={showEditTaskModal}
+                    onClose={() => setShowEditTaskModal(false)}
+                    onSave={handleTaskUpdate}
+                    task={taskToEdit}
+                />
+            )}
+
+            {/* Task Detail Modal */}
+            {selectedTask && (
+                <TaskDetailModal
+                    isOpen={showDetailModal}
+                    onClose={() => setShowDetailModal(false)}
+                    task={selectedTask}
+                    onStatusChange={handleStatusChange}
+                />
+            )}
         </div>
-    );
-
-}
-
-interface TaskCardProps {
-    task: Task;
-    onStatusChange: (taskId: number, status: string) => void;
-}
-
-function TaskCard({ task, onStatusChange }: TaskCardProps) {
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    const nextStatus = {
-        todo: "in_progress",
-        in_progress: "done",
-        done: "todo"
-    };
-
-    return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="p-4 rounded-xl bg-background border border-foreground/5 hover:border-foreground/10 transition-all group cursor-pointer"
-            onClick={() => setIsExpanded(!isExpanded)}
-        >
-            <div className="flex items-start gap-3">
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onStatusChange(task.id, nextStatus[task.status as keyof typeof nextStatus]);
-                    }}
-                    className={cn(
-                        "mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all hover:scale-110",
-                        task.status === "done"
-                            ? "border-green-500 bg-green-500"
-                            : task.status === "in_progress"
-                                ? "border-purple-500"
-                                : "border-foreground/20"
-                    )}
-                >
-                    {task.status === "done" && <CheckCircle2 className="w-3 h-3 text-white" />}
-                </button>
-                <div className="flex-1">
-                    <h4 className={cn(
-                        "font-bold text-sm transition-colors",
-                        task.status === "done" && "line-through text-foreground/40"
-                    )}>
-                        {task.title}
-                    </h4>
-                    <AnimatePresence>
-                        {isExpanded && (
-                            <motion.p
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="text-xs text-foreground/40 mt-2"
-                            >
-                                {task.description}
-                            </motion.p>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-        </motion.div>
     );
 }

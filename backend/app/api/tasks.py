@@ -5,7 +5,7 @@ from typing import List
 from ..core.database import get_async_session
 from ..models.task import Task
 from ..models.project import Project
-from ..core.ai import break_down_tasks
+from ..core.ai import break_down_tasks, generate_task_guide
 from ..api.auth import decode_jwt_token
 
 router = APIRouter()
@@ -130,3 +130,45 @@ async def delete_task(task_id: int, access_token: str = Cookie(None)):
         
         await session.delete(db_task)
         await session.commit()
+
+@router.post("/{task_id}/guide", response_model=dict)
+async def get_task_guide(task_id: int, force: bool = False, access_token: str = Cookie(None)):
+    """Generate or retrieve a detailed guide for a task."""
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        # Get task
+        stmt = select(Task).where(Task.id == task_id)
+        result = await session.execute(stmt)
+        task = result.scalar_one_or_none()
+        
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+            
+        # Verify ownership
+        proj_stmt = select(Project).where(Project.id == task.project_id, Project.owner_id == user_id)
+        proj_res = await session.execute(proj_stmt)
+        project = proj_res.scalar_one_or_none()
+        
+        if not project:
+             raise HTTPException(status_code=403, detail="Not authorized")
+
+        # Return existing content if available and not forced
+        if task.content and not force:
+            return {"content": task.content}
+            
+        # Generate new guide
+        guide = await generate_task_guide(
+            task_title=task.title,
+            task_description=task.description,
+            stack=project.stack
+        )
+        
+        task.content = guide
+        session.add(task)
+        await session.commit()
+        
+        return {"content": guide}

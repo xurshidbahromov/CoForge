@@ -18,6 +18,7 @@ export interface Task {
     description: string;
     status: string;
     order: number;
+    content?: string;
 }
 
 export interface Stats {
@@ -75,6 +76,17 @@ export function useProjects() {
         }
     }, []);
 
+    const updateProject = useCallback(async (projectId: number, data: Partial<Project>) => {
+        try {
+            const response = await api.patch(`/projects/${projectId}`, data);
+            setProjects(prev => prev.map(p => p.id === projectId ? response.data : p));
+            return response.data;
+        } catch (err) {
+            console.error('Failed to update project:', err);
+            throw err;
+        }
+    }, []);
+
     useEffect(() => {
         fetchProjects();
     }, [fetchProjects]);
@@ -86,6 +98,7 @@ export function useProjects() {
         error,
         generateProject,
         deleteProject,
+        updateProject,
         refetch: fetchProjects,
     };
 }
@@ -122,13 +135,23 @@ export function useTasks(projectId: number | null) {
         }
     }, [projectId]);
 
-    const updateTaskStatus = useCallback(async (taskId: number, status: string) => {
+    const updateTask = useCallback(async (taskId: number, data: Partial<Task>) => {
         try {
-            const response = await api.patch(`/tasks/${taskId}`, { status });
+            const response = await api.patch(`/tasks/${taskId}`, data);
             setTasks(prev => prev.map(t => t.id === taskId ? response.data : t));
             return response.data;
         } catch (err) {
             console.error('Failed to update task:', err);
+            throw err;
+        }
+    }, []);
+
+    const deleteTask = useCallback(async (taskId: number) => {
+        try {
+            await api.delete(`/tasks/${taskId}`);
+            setTasks(prev => prev.filter(t => t.id !== taskId));
+        } catch (err) {
+            console.error('Failed to delete task:', err);
             throw err;
         }
     }, []);
@@ -141,7 +164,8 @@ export function useTasks(projectId: number | null) {
         tasks,
         isLoading,
         generateTasks,
-        updateTaskStatus,
+        updateTask,
+        deleteTask,
         refetch: fetchTasks
     };
 }

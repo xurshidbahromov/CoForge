@@ -169,3 +169,34 @@ async def delete_project(project_id: int, access_token: str = Cookie(None)):
         
         await session.delete(project)
         await session.commit()
+
+from pydantic import BaseModel
+class ProjectUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    stack: str | None = None
+
+@router.patch("/{project_id}", response_model=Project)
+async def update_project(project_id: int, project_update: ProjectUpdate, access_token: str = Cookie(None)):
+    """Update a project."""
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        stmt = select(Project).where(Project.id == project_id, Project.owner_id == user_id)
+        result = await session.execute(stmt)
+        project = result.scalar_one_or_none()
+        
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        update_data = project_update.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(project, key, value)
+            
+        session.add(project)
+        await session.commit()
+        await session.refresh(project)
+        return project

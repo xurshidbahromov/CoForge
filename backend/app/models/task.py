@@ -12,3 +12,4 @@ class Task(SQLModel, table=True):
     order: int = 0
     created_at: datetime = Field(default_factory=datetime.utcnow)
     pr_url: Optional[str] = None
+    content: Optional[str] = Field(default=None, description="Detailed AI guide for the task")
