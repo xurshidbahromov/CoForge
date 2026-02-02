@@ -1,13 +1,15 @@
 "use client";
 
-import { Github, Zap, Users, Trophy, GitPullRequest, Search, BookOpen, Activity } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Github, Zap, Users, Trophy, GitPullRequest, Search, BookOpen, Activity, ArrowRight, CheckCircle2, Code2, Rocket, Globe, ShieldCheck, X, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { VisionTerminal, Marquee } from "@/components/home/InteractiveElements";
 import { FAQ } from "@/components/home/FAQ";
 import { Testimonials } from "@/components/home/Testimonials";
 import { Pricing } from "@/components/home/Pricing";
 import { useLanguage } from "@/context/LanguageContext";
+import { Navbar } from "@/components/layout/Navbar";
 
 const features = [
     { icon: Zap, title: "AI-Powered Projects", description: "Get personalized project ideas based on your stack and experience level.", span: "col-span-1 md:col-span-2" },
@@ -20,6 +22,7 @@ const features = [
 
 export default function Home() {
     const { t } = useLanguage();
+    const [activeCard, setActiveCard] = useState<string | null>(null);
 
     return (
         <main className="flex flex-col min-h-screen w-full overflow-x-hidden">
@@ -141,46 +144,126 @@ export default function Home() {
                     >
                         <h3 className="text-xs font-black uppercase tracking-[0.25em] opacity-40 mb-8">{t("paradox.realityCheck")}</h3>
                         <div className="space-y-6">
-                            {/* Card 1: Struggle for role */}
-                            <div className="group p-5 bg-background/50 rounded-2xl border border-foreground/5 relative overflow-hidden">
-                                <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors duration-500" />
-                                <div className="relative z-10 flex justify-between items-end mb-2">
+
+                            {/* Card 1: Struggle for role (CLICKABLE) */}
+                            <motion.div
+                                onClick={() => setActiveCard('paradox')}
+                                className="group p-5 bg-background/50 rounded-2xl border border-foreground/5 relative overflow-hidden cursor-pointer hover:border-rose-500/30 transition-all"
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors duration-500" />
+                                <div className="relative z-10 mb-4 flex justify-between items-center">
                                     <div>
-                                        <div className="font-bold text-lg">{t("paradox.struggleForRole")}</div>
+                                        <div className="font-bold text-lg group-hover:text-rose-500 transition-colors">{t("paradox.struggleForRole")}</div>
                                         <div className="text-[10px] uppercase font-bold opacity-40 mt-1">{t("paradox.firstJob")}</div>
                                     </div>
-                                    <span className="text-4xl font-black text-red-500">73%</span>
-                                </div>
-                                {/* Progress Bar */}
-                                <div className="h-4 w-full bg-foreground/5 rounded-full overflow-hidden relative">
-                                    <div className="absolute inset-y-0 left-0 w-[73%] bg-red-500 rounded-full animate-horizontal-wave" />
-                                </div>
-                            </div>
-
-                            {/* Card 2: Avg Time to Hire */}
-                            <div className="group p-5 bg-background/50 rounded-2xl border border-foreground/5 relative overflow-hidden">
-                                <div className="absolute inset-0 bg-orange-500/5 group-hover:bg-orange-500/10 transition-colors duration-500" />
-                                <div className="relative z-10 flex justify-between items-end mb-2">
-                                    <div>
-                                        <div className="font-bold text-lg">{t("paradox.avgTimeToHire")}</div>
-                                        <div className="text-[10px] uppercase font-bold opacity-40 mt-1">{t("paradox.juniorDevs")}</div>
+                                    <div className="p-2 bg-rose-500/10 rounded-full text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <Search className="w-4 h-4" />
                                     </div>
-                                    <span className="text-4xl font-black text-orange-500">8mo</span>
                                 </div>
-                                {/* Segmented Bar */}
-                                <div className="flex gap-1 h-4 w-full">
-                                    {[...Array(8)].map((_, i) => (
-                                        <div key={i} className="h-full flex-1 bg-orange-500 rounded-sm animate-slide-right" style={{ animationDelay: `${i * 0.1}s` }} />
-                                    ))}
-                                    {[...Array(4)].map((_, i) => (
-                                        <div key={i + 8} className="h-full flex-1 bg-foreground/5 rounded-sm" />
-                                    ))}
+                                {/* Thicker Progress Bar with Internal Text */}
+                                <div className="h-14 w-full bg-foreground/5 rounded-full p-1.5 relative backdrop-blur-sm">
+                                    <div
+                                        className="h-full bg-rose-600 rounded-full relative flex items-center justify-end px-4 shadow-lg shadow-rose-600/20 transition-all duration-1000 ease-out"
+                                        style={{ width: '73%' }}
+                                    >
+                                        <span className="text-xl font-black text-white tracking-tight">73%</span>
+                                    </div>
                                 </div>
-                            </div>
+                            </motion.div>
+
+
                         </div>
                     </motion.div>
                 </div>
             </section>
+
+            {/* EXPANDED MODAL FOR PARADOX */}
+            <AnimatePresence>
+                {activeCard === 'paradox' && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-xl"
+                        onClick={() => setActiveCard(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-background border border-foreground/10 rounded-[2rem] shadow-2xl max-w-4xl w-full overflow-hidden relative"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                onClick={() => setActiveCard(null)}
+                                className="absolute top-6 right-6 p-2 rounded-full hover:bg-foreground/5 transition-colors z-20"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2">
+                                {/* LEFT: THE PROBLEM */}
+                                <div className="p-12 border-b md:border-b-0 md:border-r border-foreground/10 flex flex-col items-center justify-center text-center bg-rose-500/5">
+                                    <h3 className="text-2xl font-black mb-2 text-rose-500 uppercase tracking-widest">{t("paradox.modal.cycle")}</h3>
+                                    <p className="text-foreground/60 font-medium mb-12 max-w-xs mx-auto">
+                                        {t("paradox.modal.explanation")}
+                                    </p>
+
+                                    {/* Cycle Visualization */}
+                                    <div className="relative w-64 h-64">
+                                        {/* Spinning Border */}
+                                        <motion.div
+                                            animate={{ rotate: 360 }}
+                                            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                                            className="absolute inset-0 border-2 border-dashed border-rose-500/30 rounded-full"
+                                        />
+
+                                        {/* Nodes */}
+                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background border border-rose-500 text-rose-500 px-4 py-2 rounded-full font-bold shadow-lg">
+                                            {t("paradox.modal.noJob")}
+                                        </div>
+                                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-background border border-rose-500 text-rose-500 px-4 py-2 rounded-full font-bold shadow-lg">
+                                            {t("paradox.modal.noExp")}
+                                        </div>
+
+                                        {/* Center Icon */}
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <RefreshCw className="w-12 h-12 text-rose-500 opacity-50" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* RIGHT: THE SOLUTION */}
+                                <div className="p-12 flex flex-col justify-center bg-primary/5">
+                                    <h3 className="text-2xl font-black mb-6 text-primary">{t("paradox.modal.solution")}</h3>
+                                    <p className="text-lg font-medium leading-relaxed mb-8">
+                                        {t("paradox.modal.solutionDesc")}
+                                    </p>
+
+                                    <ul className="space-y-4">
+                                        {[
+                                            t("auth.features.realTeams"),
+                                            t("auth.features.aiMentorship"),
+                                            t("auth.features.verifiedHistory")
+                                        ].map((item, i) => (
+                                            <li key={i} className="flex items-center gap-3 font-bold text-foreground/80">
+                                                <CheckCircle2 className="w-5 h-5 text-primary" />
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <Link href="/login" className="mt-10 inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-bold hover:bg-primary/90 transition-colors w-fit">
+                                        {t("hero.startJourney")} <ArrowRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* 4. ENGINE SECTION (Bento Grid) - Keeping static for now or generic trans */}
             <section id="engine" className="w-full py-40 text-foreground relative overflow-hidden">
@@ -192,14 +275,21 @@ export default function Home() {
                             <span className="absolute top-13 -right-6 text-primary animate-pulse rounded-full w-2 h-2 bg-primary"></span>
                         </h2>
                         <p className="text-xl text-foreground/60 max-w-xl font-medium">
-                            Every tool defined to transform your career. Proven methodologies.
+                            {t("engine.subtitle")}
                         </p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {features.map((feature, i) => (
+                        {[
+                            { icon: Zap, title: t("engine.features.projectIdeas.title"), description: t("engine.features.projectIdeas.desc"), span: "col-span-1 md:col-span-2" },
+                            { icon: Users, title: t("engine.features.teamWork.title"), description: t("engine.features.teamWork.desc"), span: "col-span-1" },
+                            { icon: Trophy, title: t("engine.features.proof.title"), description: t("engine.features.proof.desc"), span: "col-span-1" },
+                            { icon: GitPullRequest, title: t("engine.features.github.title"), description: t("engine.features.github.desc"), span: "col-span-1 md:col-span-2" },
+                            { icon: Search, title: t("engine.features.codeReview.title"), description: t("engine.features.codeReview.desc"), span: "col-span-1 md:col-span-2" },
+                            { icon: BookOpen, title: t("engine.features.learning.title"), description: t("engine.features.learning.desc"), span: "col-span-1" },
+                        ].map((feature, i) => (
                             <motion.div
-                                key={feature.title}
+                                key={i}
                                 initial={{ opacity: 0, y: 10 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
@@ -207,8 +297,9 @@ export default function Home() {
                                 whileHover={{ y: -5 }}
                                 className={`p-8 rounded-[2rem] glass-card border border-foreground/10 hover:border-primary/50 transition-all duration-300 group relative overflow-hidden ${feature.span || 'col-span-1'}`}
                             >
+                                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                                 <div className="relative z-10 h-full flex flex-col items-start text-left">
-                                    <div className="mb-6 p-3 rounded-xl bg-primary/10 text-primary">
+                                    <div className="mb-6 p-3 rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-lg group-hover:shadow-primary/30">
                                         <feature.icon className="w-6 h-6" />
                                     </div>
                                     <h3 className="text-xl font-bold mb-3">{feature.title}</h3>

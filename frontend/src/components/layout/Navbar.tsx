@@ -130,9 +130,10 @@ export function Navbar() {
                 <div className="flex items-center gap-3">
                   <Link
                     href="/login"
-                    className="px-5 py-2.5 text-xs font-bold bg-foreground text-background rounded-xl hover:scale-105 transition-transform"
+                    className="px-5 py-2.5 text-xs font-bold bg-foreground text-background rounded-xl hover:scale-105 transition-transform overflow-hidden relative group"
                   >
-                    {t("nav.signIn")}
+                    <div className="absolute inset-0 bg-white/20 dark:bg-black/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                    <span className="relative z-10">{t("nav.signIn")}</span>
                   </Link>
                 </div>
               )}

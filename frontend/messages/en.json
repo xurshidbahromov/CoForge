@@ -18,6 +18,48 @@
     "startJourney": "Start Journey",
     "seeHowItWorks": "See How It Works"
   },
+  "engine": {
+    "subtitle": "Every tool defined to transform your career. Proven methodologies.",
+    "realCode": {
+      "title": "Real Production Code",
+      "description": "Don't build to-do apps. Contribute to complex, scalable microservices architectures used by real users.",
+      "deploying": "Deploying to production..."
+    },
+    "collaboration": {
+      "title": "Team Collaboration",
+      "description": "Work in agile squads with roles like Frontend, Backend, and DevOps."
+    },
+    "verified": {
+      "title": "Verified Experience",
+      "description": "We verify every line of code you write and put it on the blockchain."
+    },
+    "features": {
+      "projectIdeas": {
+        "title": "AI-Powered Projects",
+        "desc": "Get personalized project ideas based on your stack and experience level."
+      },
+      "teamWork": {
+        "title": "Team Collaboration",
+        "desc": "Work with other developers in sprints. Build real teamwork skills."
+      },
+      "proof": {
+        "title": "Proof of Experience",
+        "desc": "Your profile becomes a verified portfolio. Show employers exactly what you've built."
+      },
+      "github": {
+        "title": "GitHub Integration",
+        "desc": "Seamless PR integration. Your contributions are automatically tracked and verified."
+      },
+      "codeReview": {
+        "title": "AI Code Review",
+        "desc": "Get instant feedback on your code. Learn best practices from an AI mentor."
+      },
+      "learning": {
+        "title": "Structured Learning",
+        "desc": "Skill recommendations tailored to your growth. Never feel lost about what to learn next."
+      }
+    }
+  },
   "stats": {
     "developers": "Developers",
     "projects": "Projects",
@@ -33,7 +75,16 @@
     "struggleForRole": "Struggle for role",
     "firstJob": "First Job",
     "avgTimeToHire": "Avg Time to Hire",
-    "juniorDevs": "Junior Devs"
+    "juniorDevs": "Junior Devs",
+    "modal": {
+      "title": "The Junior Developer's Dilemma",
+      "cycle": "The Vicious Cycle",
+      "noJob": "No Job",
+      "noExp": "No Experience",
+      "explanation": "You cannot get hired without experience, but you cannot get experience without being hired.",
+      "solution": "How CoForge Breaks It",
+      "solutionDesc": "We provide the environment, team, and projects. You allow yourself to gain experience without waiting for a hiring manager."
+    }
   },
   "common": {
     "learnMore": "Learn More"
@@ -168,6 +219,29 @@
     "verifiedHistory": "Professional Engineering History Verified",
     "secure": "Secure Access",
     "ai": "AI Verification",
-    "ledger": "Immutable Ledger"
+    "ledger": "Immutable Ledger",
+    "branding": {
+      "subtitle": "Join the ecosystem where verified code contributions become your immutable career history.",
+      "copyright": "© 2024 CoForge Inc."
+    },
+    "features": {
+      "realTeams": "Real Team Environments",
+      "aiMentorship": "AI-Powered Mentorship",
+      "verifiedHistory": "Verified Commit History"
+    },
+    "google": "Continue with Google",
+    "placeholders": {
+      "username": "Palonchiyer Pistonchi",
+      "email": "name@example.com",
+      "password": "••••••••"
+    },
+    "actions": {
+      "signUp": "Sign Up",
+      "signIn": "Sign In",
+      "forgotPassword": "Forgot password?",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "help": "Help"
+    }
   }
 }

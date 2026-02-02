@@ -1,305 +1,199 @@
 "use client";
 
-import { useAuth } from "@/lib/auth";
-import { useProjects, useTasks, useStats, Project } from "@/hooks/useProjects";
-import { AnimatedCounter } from "@/components/AnimatedCounter";
-import { DashboardSkeleton } from "@/components/Skeleton";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Trophy, Code2, GitPullRequest, ArrowUpRight, Sparkles, Plus, Loader2, ListTodo, CheckCircle2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { toast } from "sonner";
+import { motion } from "framer-motion";
+import {
+    Zap,
+    ArrowRight,
+    CheckCircle2,
+    Play,
+    Sparkles,
+    Code2,
+    Hammer,
+    Trophy,
+    Flame
+} from "lucide-react";
 
-export default function DashboardPage() {
-    const { user } = useAuth();
-    const { projects, isLoading, isGenerating, generateProject } = useProjects();
-    const { stats, refetch: refetchStats } = useStats();
-    const [activeProject, setActiveProject] = useState<Project | null>(null);
-
-    const currentProject = activeProject || projects[0];
-    const { tasks, generateTasks, isLoading: tasksLoading } = useTasks(currentProject?.id || null);
-
-    const completedTasks = tasks.filter(t => t.status === "done").length;
-    const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
-
-    const handleGenerateProject = async () => {
-        try {
-            const result = await generateProject();
-            setActiveProject(result.project);
-            refetchStats();
-            toast.success(`Project "${result.project.title}" created!`, {
-                description: `${result.tasks?.length || 0} tasks auto-generated`
-            });
-        } catch (error) {
-            console.error("Failed to generate project:", error);
-            toast.error("Failed to generate project", {
-                description: "Please try again later"
-            });
-        }
-    };
-
-
-
-    // Stats from profile API
-    const statsData = [
-        { label: "Projects", value: stats.projects_count, icon: Code2, color: "text-primary", bg: "bg-primary/5" },
-        { label: "Completed", value: stats.tasks_done, icon: CheckCircle2, color: "text-green-500", bg: "bg-green-500/5" },
-        { label: "In Progress", value: stats.tasks_in_progress, icon: GitPullRequest, color: "text-purple-500", bg: "bg-purple-500/5" },
-        { label: "Pending", value: stats.tasks_todo, icon: ListTodo, color: "text-orange-500", bg: "bg-orange-500/5" }
-    ];
-
-    // Show skeleton while loading
-    if (isLoading) {
-        return <DashboardSkeleton />;
-    }
-
+export default function DashboardOverview() {
     return (
-
-        <div className="space-y-10">
+        <div className="space-y-8">
             {/* 1. Welcome Section */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col md:flex-row md:items-end justify-between gap-6"
-            >
-                <div>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tighter mb-3 leading-none">
-                        Welcome, <span className="text-primary italic">{user?.username || "Developer"}</span>
-                    </h1>
-                    <p className="text-foreground/40 font-bold uppercase tracking-[0.2em] text-[10px]">
-                        Stack: <span className="text-primary">{user?.stack || "Not set"}</span> / Level: <span className="text-green-500">{user?.level || "Beginner"}</span>
-                    </p>
-                </div>
-                <button
-                    onClick={handleGenerateProject}
-                    disabled={isGenerating}
-                    className={cn(
-                        "flex items-center gap-2 px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300",
-                        "bg-primary text-white hover:scale-105 active:scale-95 shadow-lg shadow-primary/20",
-                        isGenerating && "opacity-70 cursor-not-allowed"
-                    )}
-                >
-                    {isGenerating ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Generating...
-                        </>
-                    ) : (
-                        <>
-                            <Sparkles className="w-5 h-5" />
-                            Generate Project
-                        </>
-                    )}
-                </button>
-            </motion.div>
-
-            {/* 2. Stats Grid with Animated Counters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {statsData.map((stat, i) => (
-                    <motion.div
-                        key={stat.label}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1 }}
-                        className="p-8 glass-panel rounded-[2rem] border border-foreground/[0.03] hover:border-foreground/[0.08] transition-all duration-500 group relative overflow-hidden"
-                    >
-                        <div className={`absolute top-0 right-0 w-24 h-24 ${stat.bg} blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
-                        <div className="flex items-center justify-between mb-6 relative z-10">
-                            <div className={`${stat.bg} p-2.5 rounded-xl`}>
-                                <stat.icon className={`w-6 h-6 ${stat.color}`} />
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/20 group-hover:text-foreground/40 transition-colors">{stat.label}</span>
-                        </div>
-                        <div className="text-4xl font-black tracking-tighter relative z-10 group-hover:scale-[1.02] transition-transform origin-left">
-                            <AnimatedCounter value={stat.value} duration={0.8} />
-                        </div>
-                        {/* Progress bar under stats */}
-                        <div className="mt-4 h-1 bg-foreground/5 rounded-full overflow-hidden">
-                            <motion.div
-                                className={`h-full ${stat.bg.replace('/5', '')} opacity-50`}
-                                initial={{ width: 0 }}
-                                animate={{ width: stat.value > 0 ? `${Math.min(stat.value * 10, 100)}%` : '0%' }}
-                                transition={{ delay: i * 0.1 + 0.5, duration: 0.8 }}
-                            />
-                        </div>
-                    </motion.div>
-                ))}
+            <div>
+                <h2 className="text-3xl font-black mb-1">Welcome back, <span className="text-gradient">John!</span> 👋</h2>
+                <p className="text-foreground/60">Here is what's happening with your projects today.</p>
             </div>
 
-            {/* Loading State */}
-            {isLoading && (
-                <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                </div>
-            )}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {/* Empty State */}
-            {!isLoading && projects.length === 0 && (
+                {/* 2. Active Project Summary (Left - 2 Cols) */}
                 <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="flex flex-col items-center justify-center py-20 px-8 rounded-[2.5rem] border-2 border-dashed border-foreground/10 text-center"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="lg:col-span-2 glass-panel p-6 md:p-8 rounded-[2rem] relative overflow-hidden group border-primary/20"
                 >
-                    <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-                        <Sparkles className="w-10 h-10 text-primary" />
+                    <div className="absolute top-0 right-0 p-4 opacity-50">
+                        <Code2 className="w-24 h-24 text-primary/10 -rotate-12" />
                     </div>
-                    <h2 className="text-2xl font-black tracking-tighter mb-2">No Projects Yet</h2>
-                    <p className="text-foreground/40 mb-8 max-w-md">
-                        Let AI generate your first project based on your {user?.stack || "stack"} preferences and {user?.goal || "goals"}.
+
+                    <div className="flex items-center gap-3 mb-6">
+                        <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
+                            Active Project
+                        </span>
+                        <span className="px-3 py-1 rounded-full bg-orange-500/10 text-orange-400 text-xs font-bold uppercase tracking-wider flex items-center gap-1">
+                            <Flame className="w-3 h-3" /> 5 Day Streak
+                        </span>
+                    </div>
+
+                    <h3 className="text-2xl font-bold mb-2">E-Commerce Microservices API</h3>
+                    <p className="text-foreground/60 mb-8 max-w-md">Building a scalable backend with Golang, gRPC, and PostgreSQL.</p>
+
+                    <div className="flex flex-wrap gap-2 mb-8">
+                        {["Golang", "PostgreSQL", "Docker", "gRPC"].map(tech => (
+                            <span key={tech} className="px-3 py-1.5 bg-white/5 border border-white/5 rounded-lg text-sm font-mono text-foreground/70">
+                                {tech}
+                            </span>
+                        ))}
+                    </div>
+
+                    <div className="space-y-2 mb-8">
+                        <div className="flex justify-between text-sm font-bold">
+                            <span>Progress</span>
+                            <span>45%</span>
+                        </div>
+                        <div className="h-2 w-full bg-foreground/10 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary w-[45%] rounded-full shadow-[0_0_15px_rgba(20,184,166,0.5)]" />
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <button className="glass-button px-6 py-3 text-sm flex items-center gap-2 group/btn relative overflow-hidden">
+                            <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                            <Play className="w-4 h-4 fill-primary relative z-10" />
+                            <span className="relative z-10">Continue Building</span>
+                        </button>
+                        <button className="px-6 py-3 text-sm font-bold text-foreground/60 hover:text-foreground transition-colors">
+                            View Details
+                        </button>
+                    </div>
+                </motion.div>
+
+                {/* 3. AI Mentor Tips (Right - 1 Col) */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="glass-panel p-6 md:p-8 rounded-[2rem] bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20 relative"
+                >
+                    <div className="flex items-center gap-2 mb-6 text-indigo-400 font-bold uppercase tracking-widest text-xs">
+                        <Sparkles className="w-4 h-4" />
+                        AI Mentor Tip
+                    </div>
+
+                    <p className="text-lg font-medium leading-relaxed mb-6">
+                        "I noticed you're struggling with <span className="text-white font-bold bg-indigo-500/20 px-1 rounded">gRPC</span> protobuffers. Want me to generate a simple example for your User service?"
                     </p>
-                    <button
-                        onClick={handleGenerateProject}
-                        disabled={isGenerating}
-                        className="flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-sm bg-primary text-white hover:scale-105 active:scale-95 transition-all duration-300 shadow-xl shadow-primary/20"
-                    >
-                        {isGenerating ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                            <Sparkles className="w-5 h-5" />
-                        )}
-                        Generate My First Project
+
+                    <button className="w-full py-3 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-bold shadow-lg shadow-indigo-500/25 transition-all">
+                        Yes, show me example
                     </button>
                 </motion.div>
-            )}
+            </div>
 
-            {/* Active Project */}
-            {!isLoading && currentProject && (
-                <div className="grid lg:grid-cols-3 gap-8">
-                    {/* 3. Active Project (Large) */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="lg:col-span-2 p-10 md:p-12 rounded-[2.5rem] bg-foreground text-background relative overflow-hidden shadow-2xl shadow-foreground/10 group"
-                    >
-                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none group-hover:bg-primary/30 transition-all duration-1000" />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                        <div className="relative z-10">
-                            <div className="inline-flex items-center gap-2 px-3 py-1 bg-background/10 rounded-lg text-[10px] font-black uppercase tracking-[0.2em] mb-8">
-                                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                                Active Project • {currentProject.type}
-                            </div>
-                            <h2 className="text-3xl md:text-4xl font-black mb-4 tracking-tighter leading-tight">
-                                {currentProject.title}
-                            </h2>
-                            <p className="text-background/50 mb-6 max-w-md font-bold text-sm leading-relaxed">
-                                {currentProject.description}
-                            </p>
-
-                            {/* Stack Tags */}
-                            <div className="flex flex-wrap gap-2 mb-8">
-                                {currentProject.stack.split(',').map((tech, i) => (
-                                    <span key={i} className="px-3 py-1 bg-background/10 rounded-lg text-xs font-bold">
-                                        {tech.trim()}
-                                    </span>
-                                ))}
-                            </div>
-
-                            <div className="flex flex-wrap items-center gap-8 mb-10">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase text-background/30 tracking-widest mb-1">Progress</span>
-                                    <span className="text-xl font-black tracking-tight">{progress}<span className="text-primary opacity-60">%</span></span>
+                {/* 4. Today's Focus (Left - 1 Col) */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="glass-card p-6 rounded-3xl"
+                >
+                    <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-yellow-400" />
+                        Today's Focus
+                    </h3>
+                    <div className="space-y-3">
+                        {[
+                            { text: "Implement JWT Middleware", done: true },
+                            { text: "Define proto files for Order Service", done: false },
+                            { text: "Fix failing Docker build", done: false },
+                        ].map((task, i) => (
+                            <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group cursor-pointer">
+                                <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${task.done ? 'bg-primary border-primary' : 'border-foreground/30 group-hover:border-primary'}`}>
+                                    {task.done && <CheckCircle2 className="w-3.5 h-3.5 text-black" />}
                                 </div>
-                                <div className="h-10 w-px bg-background/10 hidden sm:block" />
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase text-background/30 tracking-widest mb-1">Tasks</span>
-                                    <span className="text-xl font-black tracking-tight">{completedTasks}<span className="text-background/30">/{tasks.length}</span></span>
-                                </div>
-                                {/* Progress Circle */}
-                                <div className="ml-auto">
-                                    <svg className="w-16 h-16 transform -rotate-90">
-                                        <circle cx="32" cy="32" r="28" className="fill-none stroke-background/10 stroke-[4]" />
-                                        <motion.circle
-                                            cx="32"
-                                            cy="32"
-                                            r="28"
-                                            className="fill-none stroke-primary stroke-[4]"
-                                            strokeLinecap="round"
-                                            initial={{ strokeDasharray: "0 176" }}
-                                            animate={{ strokeDasharray: `${progress * 1.76} 176` }}
-                                            transition={{ duration: 1, delay: 0.5 }}
-                                        />
-                                    </svg>
-                                </div>
+                                <span className={task.done ? 'line-through text-foreground/40' : 'text-foreground/80'}>{task.text}</span>
                             </div>
+                        ))}
+                        <button className="w-full py-3 mt-2 border border-dashed border-foreground/10 rounded-xl text-sm font-medium text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all">
+                            + Add Task
+                        </button>
+                    </div>
+                </motion.div>
 
-                            <div className="flex gap-4">
-                                <Link
-                                    href={`/dashboard/projects/${currentProject.id}`}
-                                    className="bg-background text-foreground px-8 py-4 rounded-2xl font-black text-sm flex items-center gap-3 hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl shadow-black/20 overflow-hidden relative group/btn"
-                                >
-                                    <div className="absolute inset-0 bg-foreground/5 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700 ease-in-out" />
-                                    <span className="relative z-10">View Tasks</span>
-                                    <ArrowRight className="w-4 h-4 relative z-10 group-hover/btn:translate-x-1 transition-transform" />
-                                </Link>
-
-                                {tasks.length === 0 && (
-                                    <button
-                                        onClick={() => generateTasks()}
-                                        className="bg-primary/20 text-primary px-6 py-4 rounded-2xl font-black text-sm flex items-center gap-2 hover:bg-primary/30 transition-all"
-                                    >
-                                        <Sparkles className="w-4 h-4" />
-                                        Generate Tasks
-                                    </button>
-                                )}
+                {/* 5. Progress Snapshot (Middle - 1 Col) */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="glass-card p-6 rounded-3xl"
+                >
+                    <h3 className="font-bold text-lg mb-6 flex items-center gap-2">
+                        <Trophy className="w-5 h-5 text-orange-400" />
+                        Weekly Goals
+                    </h3>
+                    <div className="space-y-6">
+                        <div>
+                            <div className="flex justify-between text-xs font-bold mb-2 text-foreground/60">
+                                <span>Commits</span>
+                                <span>12 / 20</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-orange-400 w-[60%] rounded-full" />
                             </div>
                         </div>
-                    </motion.div>
-
-                    {/* 4. Other Projects List */}
-                    <div className="flex flex-col gap-6">
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 px-4">All Projects</h3>
-                        <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
-                            {projects.map((project, i) => (
-                                <motion.div
-                                    key={project.id}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3 + (i * 0.05) }}
-                                    onClick={() => setActiveProject(project)}
-                                    className={cn(
-                                        "p-6 rounded-[2rem] border transition-all duration-300 cursor-pointer group flex items-center justify-between",
-                                        currentProject?.id === project.id
-                                            ? "border-primary/30 bg-primary/5"
-                                            : "border-foreground/[0.03] bg-foreground/[0.01] hover:bg-foreground/[0.03]"
-                                    )}
-                                >
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className={cn(
-                                                "w-1.5 h-1.5 rounded-full",
-                                                currentProject?.id === project.id ? "bg-primary" : "bg-foreground/20"
-                                            )} />
-                                            <span className={cn(
-                                                "text-[10px] font-black tracking-widest uppercase",
-                                                currentProject?.id === project.id ? "text-primary" : "text-foreground/40"
-                                            )}>{project.type}</span>
-                                        </div>
-                                        <div className="font-black tracking-tight group-hover:text-primary transition-colors text-lg">{project.title}</div>
-                                        <div className="text-[10px] font-bold opacity-30 mt-1 uppercase tracking-tighter">{project.stack.split(',')[0]}</div>
-                                    </div>
-                                    <ArrowUpRight className="w-5 h-5 text-foreground/10 group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                                </motion.div>
-                            ))}
-
-                            {/* Add New Project Button */}
-                            <button
-                                onClick={handleGenerateProject}
-                                disabled={isGenerating}
-                                className="w-full p-6 rounded-[2rem] border-2 border-dashed border-foreground/10 hover:border-primary/30 transition-all duration-300 flex items-center justify-center gap-2 text-foreground/40 hover:text-primary"
-                            >
-                                {isGenerating ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                    <Plus className="w-5 h-5" />
-                                )}
-                                <span className="font-bold text-sm">Generate New</span>
-                            </button>
+                        <div>
+                            <div className="flex justify-between text-xs font-bold mb-2 text-foreground/60">
+                                <span>Code Reviews</span>
+                                <span>2 / 5</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-blue-400 w-[40%] rounded-full" />
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-xs font-bold mb-2 text-foreground/60">
+                                <span>Hours Coding</span>
+                                <span>8 / 15h</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-foreground/5 rounded-full overflow-hidden">
+                                <div className="h-full bg-purple-400 w-[53%] rounded-full" />
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                </motion.div>
+
+                {/* 6. Quick Actions (Right - 1 Col) */}
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="glass-card p-6 rounded-3xl flex flex-col justify-center gap-4"
+                >
+                    <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+                        <Hammer className="w-5 h-5 text-primary" />
+                        Quick Actions
+                    </h3>
+                    <button className="w-full py-4 px-4 bg-white/5 hover:bg-white/10 rounded-xl text-left border border-white/5 hover:border-primary/50 transition-all group">
+                        <div className="font-bold mb-1 group-hover:text-primary transition-colors">Start New Project</div>
+                        <div className="text-xs text-foreground/50">Generate ideas with AI</div>
+                    </button>
+                    <button className="w-full py-4 px-4 bg-white/5 hover:bg-white/10 rounded-xl text-left border border-white/5 hover:border-primary/50 transition-all group">
+                        <div className="font-bold mb-1 group-hover:text-primary transition-colors">Find a Mentor</div>
+                        <div className="text-xs text-foreground/50">Get help from seniors</div>
+                    </button>
+                </motion.div>
+
+            </div>
         </div>
     );
 }

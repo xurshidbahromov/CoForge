@@ -1,258 +1,129 @@
 "use client";
 
+import { motion } from "framer-motion";
+import { Sparkles, Users, Search, Filter, Rocket, Database, Globe, Smartphone, ArrowRight, Star } from "lucide-react";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    Search,
-    Filter,
-    Users,
-    Code2,
-    Zap,
-    Trophy,
-    ArrowRight,
-    Monitor,
-    Database,
-    Terminal
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
-// Mock Data
-const PROJECTS = [
-    {
-        id: 1,
-        title: "E-Commerce API Service",
-        description: "Build a high-performance RESTful API for a modern e-commerce platform using FastAPI and Redis.",
-        stack: ["Python", "FastAPI", "Redis", "PostgreSQL"],
-        difficulty: "Intermediate",
-        teamSize: 4,
-        currentMembers: 2,
-        xp: 1200,
-        category: "Backend",
-    },
-    {
-        id: 2,
-        title: "SaaS Dashboard UI",
-        description: "Design and implement a responsive administration dashboard with real-time data visualization.",
-        stack: ["React", "TypeScript", "TailwindCSS", "Framer Motion"],
-        difficulty: "Beginner",
-        teamSize: 3,
-        currentMembers: 1,
-        xp: 800,
-        category: "Frontend",
-    },
-    {
-        id: 3,
-        title: "AI Image Processor",
-        description: "Integrate OpenAI's DALL-E API into a collaborative tool for designers with version control.",
-        stack: ["Node.js", "OpenAI", "AWS S3", "Next.js"],
-        difficulty: "Advanced",
-        teamSize: 5,
-        currentMembers: 3,
-        xp: 2500,
-        category: "Fullstack",
-    },
-    {
-        id: 4,
-        title: "Blockchain Explorer",
-        description: "Develop a web-based tool to monitor real-time transactions on a private Ethereum network.",
-        stack: ["Solidity", "Go", "Vue.js", "Docker"],
-        difficulty: "Advanced",
-        teamSize: 6,
-        currentMembers: 5,
-        xp: 3500,
-        category: "Web3",
-    },
-    {
-        id: 5,
-        title: "Task Management CLI",
-        description: "A developer-focused command line interface for managing local project workflows.",
-        stack: ["Rust", "Clap", "SQLite"],
-        difficulty: "Intermediate",
-        teamSize: 2,
-        currentMembers: 1,
-        xp: 1500,
-        category: "Tools",
-    },
-    {
-        id: 6,
-        title: "Chat Application Meta",
-        description: "Real-time communication platform with end-to-end encryption and file sharing capabilities.",
-        stack: ["Socket.io", "Express", "React", "MongoDB"],
-        difficulty: "Intermediate",
-        teamSize: 4,
-        currentMembers: 2,
-        xp: 1800,
-        category: "Fullstack",
-    }
+const projectIdeas = [
+    { title: "AI Medical Consultant", stack: ["Python", "FastAPI", "OpenAI"], difficulty: "Hard", description: "Build a HIPPA-compliant chatbot for preliminary diagnosis." },
+    { title: "Crypto Arbitrage Bot", stack: ["Rust", "Actix", "Redis"], difficulty: "Extreme", description: "High-frequency trading bot across 3 major exchanges." },
+    { title: "Real-time Collab Whiteboard", stack: ["React", "Socket.io", "Node.js"], difficulty: "Medium", description: "Miro clone with real-time cursors and drawing." },
 ];
 
-const CATEGORIES = ["All", "Frontend", "Backend", "Fullstack", "Web3", "Tools"];
+const communityProjects = [
+    { title: "Defi Lending Protocol", author: "Sarah Connor", stars: 124, roles: ["Frontend", "Solidity"] },
+    { title: "EcoTrack Mobile App", author: "GreenTeam", stars: 89, roles: ["React Native"] },
+    { title: "Distributed File Storage", author: "PiedPiper", stars: 256, roles: ["Go", "DevOps"] },
+    { title: "Social CRM", author: "SalesForceLite", stars: 45, roles: ["Vue", "Laravel"] },
+    { title: "VR Museum Tour", author: "MetaVerseExplorer", stars: 210, roles: ["Unity", "C#"] },
+    { title: "IoT Home Automation", author: "SmartHomeLabs", stars: 150, roles: ["C++", "Python"] },
+];
 
-export default function ProjectHubPage() {
-    const [filter, setFilter] = useState("All");
-    const [searchQuery, setSearchQuery] = useState("");
-
-    const filteredProjects = PROJECTS.filter(p => {
-        const matchesCategory = filter === "All" || p.category === filter;
-        const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            p.stack.some(s => s.toLowerCase().includes(searchQuery.toLowerCase()));
-        return matchesCategory && matchesSearch;
-    });
+export default function ProjectHub() {
+    const [activeFilter, setActiveFilter] = useState("All");
 
     return (
-        <div className="space-y-8 pb-12">
-            {/* Header & Search Section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter mb-2">Project Hub</h1>
-                    <p className="text-foreground/60 font-medium">Browse and join real-world engineering projects.</p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row items-center gap-3">
-                    <div className="relative w-full sm:w-80 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/30 group-focus-within:text-primary transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Search stack, title..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full h-12 pl-12 pr-4 rounded-xl bg-foreground/[0.03] border border-foreground/5 focus:border-primary/50 outline-none transition-all font-medium"
-                        />
-                    </div>
-                    <button className="h-12 px-4 rounded-xl border border-foreground/5 bg-foreground/[0.02] flex items-center gap-2 hover:bg-foreground/[0.05] transition-colors">
-                        <Filter className="w-4 h-4" />
-                        <span className="text-sm font-bold">More</span>
-                    </button>
-                </div>
+        <div className="space-y-12">
+            <div>
+                <h2 className="text-3xl font-black mb-2">Project Hub</h2>
+                <p className="text-foreground/60">Discover your next breakthrough. Build solo or find a team.</p>
             </div>
 
-            {/* Category Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                {CATEGORIES.map(cat => (
-                    <button
-                        key={cat}
-                        onClick={() => setFilter(cat)}
-                        className={cn(
-                            "px-6 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap",
-                            filter === cat
-                                ? "bg-foreground text-background shadow-lg scale-105"
-                                : "bg-foreground/[0.03] text-foreground/40 hover:text-foreground hover:bg-foreground/[0.06]"
-                        )}
-                    >
-                        {cat}
-                    </button>
-                ))}
-            </div>
-
-            {/* Projects Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <AnimatePresence mode="popLayout">
-                    {filteredProjects.map((project, i) => (
+            {/* 1. AI Generated Ideas */}
+            <section>
+                <div className="flex items-center gap-2 mb-6 text-primary font-bold uppercase tracking-widest text-xs">
+                    <Sparkles className="w-4 h-4" />
+                    Curated for you by AI
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {projectIdeas.map((idea, i) => (
                         <motion.div
-                            key={project.id}
-                            layout
+                            key={i}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.9 }}
-                            transition={{ delay: i * 0.05 }}
-                            className="glass-panel group p-1 flex flex-col rounded-[2.5rem] bg-white/50 dark:bg-white/5 border border-foreground/5 hover:border-primary/20 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden"
+                            transition={{ delay: i * 0.1 }}
+                            className="glass-card p-6 rounded-3xl group hover:border-primary/50 transition-all cursor-pointer relative overflow-hidden"
                         >
-                            <div className="p-7 flex-1 flex flex-col">
-                                {/* Card Top */}
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className={cn(
-                                        "w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg",
-                                        project.category === "Backend" ? "bg-blue-500/10 text-blue-500" :
-                                            project.category === "Frontend" ? "bg-orange-500/10 text-orange-500" :
-                                                project.category === "Fullstack" ? "bg-purple-500/10 text-purple-500" :
-                                                    "bg-green-500/10 text-green-500"
-                                    )}>
-                                        {project.category === "Backend" ? <Database className="w-6 h-6" /> :
-                                            project.category === "Frontend" ? <Monitor className="w-6 h-6" /> :
-                                                <Terminal className="w-6 h-6" />}
-                                    </div>
-                                    <div className="px-3 py-1 bg-foreground/[0.03] rounded-lg text-[10px] font-black uppercase tracking-tighter opacity-40">
-                                        {project.difficulty}
-                                    </div>
+                            <div className="absolute top-0 right-0 p-3">
+                                <span className="text-[10px] font-bold uppercase border border-white/10 px-2 py-1 rounded bg-white/5">{idea.difficulty}</span>
+                            </div>
+                            <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{idea.title}</h3>
+                            <p className="text-sm text-foreground/60 mb-6">{idea.description}</p>
+
+                            <div className="flex flex-wrap gap-2 mb-6">
+                                {idea.stack.map(tech => (
+                                    <span key={tech} className="text-xs px-2 py-1 rounded bg-white/5 border border-white/5 font-mono opacity-70">
+                                        {tech}
+                                    </span>
+                                ))}
+                            </div>
+
+                            <button className="w-full py-2 rounded-lg bg-primary/10 text-primary font-bold text-sm hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2 relative overflow-hidden group">
+                                <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
+                                <div className="relative z-10 flex items-center gap-2"><Rocket className="w-4 h-4" /> Start Project</div>
+                            </button>
+                        </motion.div>
+                    ))}
+                </div>
+            </section>
+
+            {/* 2. Community Projects */}
+            <section>
+                <div className="flex justify-between items-end mb-6">
+                    <div className="flex items-center gap-2 text-foreground font-bold uppercase tracking-widest text-xs opacity-70">
+                        <Users className="w-4 h-4" />
+                        Community Projects
+                    </div>
+
+                    {/* Filters */}
+                    <div className="flex gap-2">
+                        {["All", "Frontend", "Backend", "Mobile", "Web3"].map(filter => (
+                            <button
+                                key={filter}
+                                onClick={() => setActiveFilter(filter)}
+                                className={`px-4 py-2 rounded-full text-xs font-bold transition-all ${activeFilter === filter ? 'bg-foreground text-background' : 'bg-white/5 hover:bg-white/10'}`}
+                            >
+                                {filter}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {communityProjects.map((project, i) => (
+                        <motion.div
+                            key={i}
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            className="glass-panel p-5 rounded-2xl flex flex-col h-full border border-white/5 hover:border-white/10 transition-colors"
+                        >
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center font-bold text-sm">
+                                    {project.author[0]}
                                 </div>
-
-                                {/* Content */}
-                                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">
-                                    {project.title}
-                                </h3>
-                                <p className="text-sm text-foreground/60 leading-relaxed mb-6 flex-1">
-                                    {project.description}
-                                </p>
-
-                                {/* Stack */}
-                                <div className="flex flex-wrap gap-2 mb-8">
-                                    {project.stack.slice(0, 3).map(s => (
-                                        <span key={s} className="px-2.5 py-1 bg-foreground/[0.03] border border-foreground/5 rounded-md text-[10px] font-bold opacity-60">
-                                            {s}
-                                        </span>
-                                    ))}
-                                    {project.stack.length > 3 && (
-                                        <span className="px-2.5 py-1 text-[10px] font-bold opacity-30">+{project.stack.length - 3} more</span>
-                                    )}
-                                </div>
-
-                                {/* Footer */}
-                                <div className="pt-6 border-t border-foreground/5 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex -space-x-2">
-                                            {[...Array(project.currentMembers)].map((_, i) => (
-                                                <div key={i} className="w-7 h-7 rounded-full bg-foreground/[0.1] border-2 border-background flex items-center justify-center text-[8px] font-black shadow-sm">
-                                                    {String.fromCharCode(65 + i)}
-                                                </div>
-                                            ))}
-                                            {[...Array(project.teamSize - project.currentMembers)].map((_, i) => (
-                                                <div key={i} className="w-7 h-7 rounded-full bg-foreground/[0.02] border-2 border-background border-dashed flex items-center justify-center text-[10px] opacity-20 shadow-sm">
-                                                    +
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <span className="text-[10px] font-bold text-foreground/40">{project.currentMembers}/{project.teamSize} Slots</span>
-                                    </div>
-
-                                    <div className="flex items-center gap-1.5 text-primary">
-                                        <Trophy className="w-3.5 h-3.5" />
-                                        <span className="text-xs font-black">{project.xp} XP</span>
-                                    </div>
+                                <div className="flex items-center gap-1 text-xs font-medium text-yellow-400">
+                                    <Star className="w-3 h-3 fill-yellow-400" /> {project.stars}
                                 </div>
                             </div>
 
-                            {/* Hover Join Button Overlay (Optional subtle effect) */}
-                            <div className="p-2 pt-0 mt-auto">
-                                <button
-                                    onClick={() => toast.success(`Applied to ${project.title}!`, {
-                                        description: "The project lead has been notified of your interest.",
-                                    })}
-                                    className="w-full py-4 bg-primary text-white rounded-[1.8rem] font-bold flex items-center justify-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 shadow-xl shadow-primary/20"
-                                >
-                                    Apply to Project
-                                    <ArrowRight className="w-4 h-4" />
-                                </button>
+                            <h3 className="font-bold mb-1">{project.title}</h3>
+                            <div className="text-xs text-foreground/40 mb-4">by {project.author}</div>
+
+                            <div className="mt-auto">
+                                <div className="text-[10px] font-bold uppercase opacity-50 mb-2">Open Roles</div>
+                                <div className="flex gap-2">
+                                    {project.roles.map(role => (
+                                        <span key={role} className="text-xs px-2 py-1 rounded bg-rose-500/10 text-rose-400 font-medium">
+                                            {role}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         </motion.div>
                     ))}
-                </AnimatePresence>
-            </div>
-
-            {/* Empty State */}
-            {filteredProjects.length === 0 && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="py-24 text-center glass-panel rounded-[3rem] border border-dashed border-foreground/10"
-                >
-                    <div className="w-16 h-16 bg-foreground/[0.03] rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <Code2 className="w-8 h-8 text-foreground/20" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">No projects found</h3>
-                    <p className="text-foreground/40 max-w-xs mx-auto">Try adjusting your filters or search keywords to find other opportunities.</p>
-                </motion.div>
-            )}
+                </div>
+            </section>
         </div>
     );
 }

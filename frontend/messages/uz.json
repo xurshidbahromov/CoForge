@@ -18,6 +18,48 @@
         "startJourney": "Yo'lni Boshlang",
         "seeHowItWorks": "Qanday Ishlashini Ko'ring"
     },
+    "engine": {
+        "subtitle": "Karyerangizni o'zgartirish uchun belgilangan har bir vosita. Tasdiqlangan metodologiyalar.",
+        "realCode": {
+            "title": "Haqiqiy Production Kod",
+            "description": "Shunchaki to-do ilovalarni yaratmang. Haqiqiy foydalanuvchilar ishlatadigan murakkab, masshtablashuvchi mikroservis arxitekturalariga hissa qo'shing.",
+            "deploying": "Production-ga yuklanmoqda..."
+        },
+        "collaboration": {
+            "title": "Jamoaviy Hamkorlik",
+            "description": "Frontend, Backend va DevOps kabi rollar bilan agile guruhlarda ishlang."
+        },
+        "verified": {
+            "title": "Tasdiqlangan Tajriba",
+            "description": "Biz yozgan har bir kod qatoringizni tekshiramiz va blokcheynga joylashtiramiz."
+        },
+        "features": {
+            "projectIdeas": {
+                "title": "AI Asosidagi Loyihalar",
+                "desc": "Tajriba darajangiz va stekingizga moslashtirilgan shaxsiy loyiha g'oyalarini oling."
+            },
+            "teamWork": {
+                "title": "Jamoaviy Hamkorlik",
+                "desc": "Boshqa dasturchilar bilan sprintlarda ishlang. Haqiqiy jamoaviy ishlash ko'nikmalarini shakllantiring."
+            },
+            "proof": {
+                "title": "Tajriba Isboti",
+                "desc": "Profilingiz tasdiqlangan portfolioga aylanadi. Ish beruvchilarga aynan nima qurganingizni ko'rsating."
+            },
+            "github": {
+                "title": "GitHub Integratsiyasi",
+                "desc": "Uzluksiz PR integratsiyasi. Sizning hissalaringiz avtomatik ravishda kuzatiladi va tasdiqlanadi."
+            },
+            "codeReview": {
+                "title": "AI Kod Tahlili",
+                "desc": "Kodingiz bo'yicha darhol fikr oling. AI mentordan eng yaxshi amaliyotlarni o'rganing."
+            },
+            "learning": {
+                "title": "Tizimli O'rganish",
+                "desc": "Sizning o'sishingizga moslashtirilgan ko'nikma tavsiyalari. Keyingi nimani o'rganish haqida hech qachon ikkilanmang."
+            }
+        }
+    },
     "stats": {
         "developers": "Dasturchilar",
         "projects": "Loyihalar",
@@ -33,7 +75,16 @@
         "struggleForRole": "Ish uchun kurash",
         "firstJob": "Birinchi Ish",
         "avgTimeToHire": "O'rtacha Ish Topish Vaqti",
-        "juniorDevs": "Kichik Dasturchilar"
+        "juniorDevs": "Kichik Dasturchilar",
+        "modal": {
+            "title": "Kichik Dasturchi Muammosi",
+            "cycle": "Yovuz Sikl",
+            "noJob": "Ish Yo'q",
+            "noExp": "Tajriba Yo'q",
+            "explanation": "Ishga kirish uchun tajriba kerak, tajriba orttirish uchun esa ish kerak.",
+            "solution": "CoForge buni qanday hal qiladi",
+            "solutionDesc": "Biz muhit, jamoa va loyihalarni taqdim etamiz. Siz yollovchi menejerni kutmasdan tajriba orttirasiz."
+        }
     },
     "common": {
         "learnMore": "Batafsil"
@@ -168,6 +219,29 @@
         "verifiedHistory": "Professional Muhandislik Tarixi Tasdiqlangan",
         "secure": "Xavfsiz Kirish",
         "ai": "AI Tasdiqlash",
-        "ledger": "O'zgarmas Reestr"
+        "ledger": "O'zgarmas Reestr",
+        "branding": {
+            "subtitle": "Tasdiqlangan kod hissasi sizning o'zgarmas karyera tarixingizga aylangan ekotizimga qo'shiling.",
+            "copyright": "© 2024 CoForge Inc."
+        },
+        "features": {
+            "realTeams": "Haqiqiy Jamoa Muhitlari",
+            "aiMentorship": "AI Mentorlik",
+            "verifiedHistory": "Tasdiqlangan Commit Tarixi"
+        },
+        "google": "Google bilan davom etish",
+        "placeholders": {
+            "username": "Palonchiyer Pistonchi",
+            "email": "name@example.com",
+            "password": "••••••••"
+        },
+        "actions": {
+            "signUp": "Ro'yxatdan O'tish",
+            "signIn": "Kirish",
+            "forgotPassword": "Parolni unutdingizmi?",
+            "privacy": "Maxfiylik",
+            "terms": "Shartlar",
+            "help": "Yordam"
+        }
     }
 }
