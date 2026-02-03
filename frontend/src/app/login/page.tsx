@@ -40,21 +40,28 @@ export default function LoginPage() {
         setError(null);
 
         try {
+            let user;
             if (mode === "signup") {
                 const res = await api.post("/auth/register", formData);
-                login(res.data);
+                user = res.data;
                 toast.success(t("auth.welcomeBack") || "Account created successfully!");
             } else {
                 const res = await api.post("/auth/login/email", {
                     email: formData.email,
                     password: formData.password
                 });
-                login(res.data);
+                user = res.data;
                 toast.success(t("auth.welcomeBack") || "Welcome back!");
             }
 
-            // Redirect to dashboard
-            router.push("/dashboard");
+            login(user);
+
+            // Redirect based on onboarding status
+            if (!user.is_onboarding_completed) {
+                router.push("/onboarding");
+            } else {
+                router.push("/dashboard");
+            }
         } catch (err: any) {
             console.error(err);
             setError(

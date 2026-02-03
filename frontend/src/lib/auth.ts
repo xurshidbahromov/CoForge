@@ -10,6 +10,7 @@ export interface User {
   stack?: string;
   level?: string;
   goal?: string;
+  is_onboarding_completed?: boolean;
 }
 
 

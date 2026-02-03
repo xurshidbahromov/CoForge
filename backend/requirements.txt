@@ -10,3 +10,4 @@ passlib[bcrypt]
 groq
 aiosqlite
 email-validator
+greenlet

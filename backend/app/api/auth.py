@@ -91,7 +91,8 @@ async def register(user_data: UserRegister, response: Response):
             value=token,
             httponly=True,
             max_age=JWT_EXPIRE_MINUTES * 60,
-            samesite="lax"
+            samesite="lax",
+            secure=False
         )
         return db_user
 
@@ -114,7 +115,8 @@ async def login_email(credentials: UserLogin, response: Response):
             value=token,
             httponly=True,
             max_age=JWT_EXPIRE_MINUTES * 60,
-            samesite="lax"
+            samesite="lax",
+            secure=False
         )
         return user
 
