@@ -23,6 +23,177 @@ async def list_projects(access_token: str = Cookie(None)):
         result = await session.execute(stmt)
         return result.scalars().all()
 
+@router.get("/suggestions")
+async def get_project_suggestions(access_token: str | None = Cookie(default=None, alias="access_token")):
+    """
+    Get personalized project suggestions based on user profile.
+    Uses cached suggestions from DB if available, otherwise generates them.
+    """
+    from ..core.ai import generate_personalized_ideas
+    from ..models.suggestion import ProjectSuggestion
+    
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Check DB validation
+        stmt = select(ProjectSuggestion).where(ProjectSuggestion.user_id == user_id)
+        existing_suggestions = (await session.execute(stmt)).scalars().all()
+        
+        if existing_suggestions and len(existing_suggestions) >= 3:
+            # Return top 3
+            return [
+                {
+                    "id": s.id, 
+                    "title": s.title, 
+                    "description": s.description, 
+                    "stack": s.stack, 
+                    "difficulty": s.difficulty,
+                    "created_at": s.created_at
+                } 
+                for s in existing_suggestions[:3]
+            ]
+            
+        # If we have some but less than 3, keep them
+        current_titles = {s.title for s in existing_suggestions}
+        saved_ideas = list(existing_suggestions)
+
+        # Generate new to fill the gap
+        # Note: We ask for 3 (default) and filter, or we could update AI prompt to take 'count'
+        # For simplicity, we ask for 3 and pick the first ones that are unique
+        role = user.primary_role or "Fullstack Developer"
+        level = user.level or "Junior"
+        skills = user.skills or "React, Python, SQL"
+        
+        # Call AI
+        ideas = await generate_personalized_ideas(role, level, skills)
+        
+        # Save new unique ones to DB
+        count_needed = 3 - len(saved_ideas)
+        added_count = 0
+        
+        for idea in ideas:
+            if added_count >= count_needed:
+                break
+            if idea["title"] not in current_titles:
+                db_suggestion = ProjectSuggestion(
+                    user_id=user_id,
+                    title=idea["title"],
+                    description=idea["description"],
+                    stack=idea["stack"] if isinstance(idea["stack"], str) else ", ".join(idea["stack"]),
+                    difficulty=idea["difficulty"]
+                )
+                session.add(db_suggestion)
+                saved_ideas.append(db_suggestion)
+                current_titles.add(idea["title"])
+                added_count += 1
+            
+        await session.commit()
+        for s in saved_ideas:
+            await session.refresh(s)
+            
+        return [
+            {
+                "id": s.id, 
+                "title": s.title, 
+                "description": s.description, 
+                "stack": s.stack, 
+                "difficulty": s.difficulty,
+                "created_at": s.created_at
+            } 
+            for s in saved_ideas
+        ]
+
+@router.post("/suggestions/refresh")
+async def refresh_suggestions(access_token: str | None = Cookie(default=None, alias="access_token")):
+    """
+    Force regenerate suggestions (clears old ones).
+    """
+    from ..core.ai import generate_personalized_ideas
+    from ..models.suggestion import ProjectSuggestion
+    
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        # 1. Clear existing
+        stmt = select(ProjectSuggestion).where(ProjectSuggestion.user_id == user_id)
+        existing = (await session.execute(stmt)).scalars().all()
+        for s in existing:
+            await session.delete(s)
+            
+        # 2. Get User data
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        role = user.primary_role or "Fullstack Developer"
+        level = user.level or "Junior"
+        skills = user.skills or "React, Python, SQL"
+        
+        # 3. Generate New
+        ideas = await generate_personalized_ideas(role, level, skills)
+        
+        # 4. Save
+        saved_ideas = []
+        for idea in ideas:
+            db_suggestion = ProjectSuggestion(
+                user_id=user_id,
+                title=idea["title"],
+                description=idea["description"],
+                stack=idea["stack"] if isinstance(idea["stack"], str) else ", ".join(idea["stack"]),
+                difficulty=idea["difficulty"]
+            )
+            session.add(db_suggestion)
+            saved_ideas.append(db_suggestion)
+            
+        await session.commit()
+        for s in saved_ideas:
+            await session.refresh(s)
+            
+        return [
+            {
+                "id": s.id, 
+                "title": s.title, 
+                "description": s.description, 
+                "stack": s.stack, 
+                "difficulty": s.difficulty,
+                "created_at": s.created_at
+            } 
+            for s in saved_ideas
+        ]
+
+@router.delete("/suggestions/{suggestion_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_suggestion(suggestion_id: int, access_token: str | None = Cookie(default=None, alias="access_token")):
+    """
+    Remove a suggestion.
+    """
+    from ..models.suggestion import ProjectSuggestion
+    
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        suggestion = await session.get(ProjectSuggestion, suggestion_id)
+        if not suggestion:
+            raise HTTPException(status_code=404, detail="Suggestion not found")
+            
+        if suggestion.user_id != user_id:
+             raise HTTPException(status_code=403, detail="Not authorized")
+             
+        await session.delete(suggestion)
+        await session.commit()
+
 from pydantic import BaseModel
 
 class ProjectCreate(BaseModel):
@@ -555,41 +726,19 @@ async def list_my_teams(access_token: str = Cookie(None)):
 
 class BrainstormRequest(BaseModel):
     stack: str
+    level: str = "Junior"
 
-@router.post("/brainstorm", response_model=List[dict])
-async def brainstorm_project(request: BrainstormRequest, access_token: str | None = Cookie(default=None)):
+@router.post("/brainstorm")
+async def brainstorm_project(request: BrainstormRequest, access_token: str | None = Cookie(default=None, alias="access_token")):
     """
-    Brainstorm project ideas based on the provided stack.
+    Brainstorm project ideas based on the provided stack and level.
     """
     from ..core.ai import generate_brainstorm_ideas
     
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    ideas = await generate_brainstorm_ideas(request.stack)
+    ideas = await generate_brainstorm_ideas(request.stack, request.level)
     return ideas
 
-@router.get("/suggestions", response_model=List[dict])
-async def get_project_suggestions(access_token: str | None = Cookie(default=None)):
-    """
-    Get personalized project suggestions based on user profile.
-    """
-    from ..core.ai import generate_personalized_ideas
-    
-    if not access_token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    
-    user_id = decode_jwt_token(access_token)
-    
-    async with get_async_session() as session:
-        user = await session.get(User, user_id)
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-            
-        role = user.primary_role or "Fullstack Developer"
-        level = user.level or "Junior"
-        skills = user.skills or "React, Python, SQL"
-        
-        # Call AI
-        ideas = await generate_personalized_ideas(role, level, skills)
-        return ideas
+

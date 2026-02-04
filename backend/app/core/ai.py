@@ -157,9 +157,9 @@ async def generate_task_guide(task_title: str, task_description: str, stack: str
         print(f"AI Generation Error: {e}")
         return "## Error Generating Guide\nCould not generate the guide at this time. Please try again later."
 
-async def generate_brainstorm_ideas(stack: str):
+async def generate_brainstorm_ideas(stack: str, level: str = "Junior"):
     """
-    Generate 3 distinct project ideas based on the tech stack.
+    Generate 3 distinct project ideas based on the tech stack and difficulty level.
     """
     if not client:
         return [
@@ -167,32 +167,33 @@ async def generate_brainstorm_ideas(stack: str):
                 "title": "E-Commerce API (Dummy)",
                 "description": "A RESTful API for an online store with product management and cart functionality.",
                 "stack": stack,
-                "difficulty": "Intermediate"
+                "difficulty": level
             },
             {
                 "title": "Task Manager (Dummy)",
                 "description": "A simple task management app with CRUD operations.",
                 "stack": stack,
-                "difficulty": "Beginner"
+                "difficulty": level
             },
             {
                 "title": "Real-time Chat (Dummy)",
                 "description": "A chat application using WebSockets.",
                 "stack": stack,
-                "difficulty": "Advanced"
+                "difficulty": level
             }
         ]
 
     prompt = f"""
     The user wants to build a project using this tech stack: {stack}.
-    Generate 3 distinct, creative, and practical project ideas for them.
+    The desired difficulty level is: {level}.
+    Generate 3 distinct, creative, and practical project ideas appropriate for this level.
     
     Return the response as a JSON object with a field 'ideas' which is a list of objects.
     Each idea object must have:
     - title: Catchy project name
     - description: 1-2 sentence overview
     - stack: The tech stack (refine it if needed, e.g. add libraries)
-    - difficulty: Beginner, Intermediate, or Advanced
+    - difficulty: {level}
     
     Return ONLY valid JSON, no other text.
     """
