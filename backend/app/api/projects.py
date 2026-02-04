@@ -552,3 +552,44 @@ async def list_my_teams(access_token: str = Cookie(None)):
             })
 
         return results
+
+class BrainstormRequest(BaseModel):
+    stack: str
+
+@router.post("/brainstorm", response_model=List[dict])
+async def brainstorm_project(request: BrainstormRequest, access_token: str | None = Cookie(default=None)):
+    """
+    Brainstorm project ideas based on the provided stack.
+    """
+    from ..core.ai import generate_brainstorm_ideas
+    
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    ideas = await generate_brainstorm_ideas(request.stack)
+    return ideas
+
+@router.get("/suggestions", response_model=List[dict])
+async def get_project_suggestions(access_token: str | None = Cookie(default=None)):
+    """
+    Get personalized project suggestions based on user profile.
+    """
+    from ..core.ai import generate_personalized_ideas
+    
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        user = await session.get(User, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+            
+        role = user.primary_role or "Fullstack Developer"
+        level = user.level or "Junior"
+        skills = user.skills or "React, Python, SQL"
+        
+        # Call AI
+        ideas = await generate_personalized_ideas(role, level, skills)
+        return ideas

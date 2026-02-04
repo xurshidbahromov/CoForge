@@ -156,3 +156,130 @@ async def generate_task_guide(task_title: str, task_description: str, stack: str
     except Exception as e:
         print(f"AI Generation Error: {e}")
         return "## Error Generating Guide\nCould not generate the guide at this time. Please try again later."
+
+async def generate_brainstorm_ideas(stack: str):
+    """
+    Generate 3 distinct project ideas based on the tech stack.
+    """
+    if not client:
+        return [
+            {
+                "title": "E-Commerce API (Dummy)",
+                "description": "A RESTful API for an online store with product management and cart functionality.",
+                "stack": stack,
+                "difficulty": "Intermediate"
+            },
+            {
+                "title": "Task Manager (Dummy)",
+                "description": "A simple task management app with CRUD operations.",
+                "stack": stack,
+                "difficulty": "Beginner"
+            },
+            {
+                "title": "Real-time Chat (Dummy)",
+                "description": "A chat application using WebSockets.",
+                "stack": stack,
+                "difficulty": "Advanced"
+            }
+        ]
+
+    prompt = f"""
+    The user wants to build a project using this tech stack: {stack}.
+    Generate 3 distinct, creative, and practical project ideas for them.
+    
+    Return the response as a JSON object with a field 'ideas' which is a list of objects.
+    Each idea object must have:
+    - title: Catchy project name
+    - description: 1-2 sentence overview
+    - stack: The tech stack (refine it if needed, e.g. add libraries)
+    - difficulty: Beginner, Intermediate, or Advanced
+    
+    Return ONLY valid JSON, no other text.
+    """
+    
+    try:
+        response = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "You are a creative technical mentor. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.8,
+            max_tokens=800
+        )
+        
+        content = response.choices[0].message.content
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        
+        result = json.loads(content.strip())
+        return result.get("ideas", [])
+    except Exception as e:
+        print(f"Error brainstorming: {e}")
+        return []
+
+async def generate_personalized_ideas(role: str, level: str, skills: str):
+    """
+    Generate 3 distinct project ideas based on the user's profile.
+    """
+    if not client:
+        # Fallback if no API key
+        return [
+            {
+                "title": "Portfolio Website (Dummy)",
+                "description": "A personal portfolio to showcase your skills.",
+                "stack": skills or "HTML, CSS, JS",
+                "difficulty": "Beginner"
+            },
+            {
+                "title": "Blog Platform (Dummy)",
+                "description": "A platform to write and share articles.",
+                "stack": skills or "React, Node.js",
+                "difficulty": "Intermediate"
+            },
+            {
+                "title": "Bug Tracker (Dummy)",
+                "description": "A tool to track issue reporting for projects.",
+                "stack": skills or "Python, Django",
+                "difficulty": "Advanced"
+            }
+        ]
+
+    prompt = f"""
+    The user is a {level} {role} with the following skills: {skills}.
+    Generate 3 highly relevant, impressive project ideas that would strengthen their portfolio.
+    
+    Return the response as a JSON object with a field 'ideas' which is a list of objects.
+    Each idea object must have:
+    - title: Catchy project name
+    - description: 1-2 sentence overview
+    - stack: A specific tech stack using their skills (add complementary libs if needed)
+    - difficulty: Beginner, Intermediate, or Advanced
+    
+    Return ONLY valid JSON, no other text.
+    """
+    
+    try:
+        response = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "You are a career coach for software engineers. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+        
+        content = response.choices[0].message.content
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        
+        result = json.loads(content.strip())
+        return result.get("ideas", [])
+    except Exception as e:
+        print(f"Error generating suggestions: {e}")
+        return []

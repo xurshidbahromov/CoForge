@@ -13,7 +13,9 @@ import {
     Globe,
     ArrowRight,
     Star,
-    Loader2
+    Loader2,
+    X,
+    BrainCircuit
 } from "lucide-react";
 import Link from "next/link";
 import axios from "axios";
@@ -27,15 +29,19 @@ export default function ProjectHub() {
     const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [joiningId, setJoiningId] = useState<number | null>(null);
 
-    // Placeholder for AI Ideas (Curated)
-    const projectIdeas = [
-        { title: "AI Medical Consultant", stack: ["Python", "FastAPI", "OpenAI"], difficulty: "Hard", description: "Build a HIPPA-compliant chatbot for preliminary diagnosis." },
-        { title: "Crypto Arbitrage Bot", stack: ["Rust", "Actix", "Redis"], difficulty: "Extreme", description: "High-frequency trading bot across 3 major exchanges." },
-        { title: "Real-time Collab Whiteboard", stack: ["React", "Socket.io", "Node.js"], difficulty: "Medium", description: "Miro clone with real-time cursors and drawing." },
-    ];
+    // Suggestions State
+    const [suggestedIdeas, setSuggestedIdeas] = useState<any[]>([]);
+    const [suggestionsLoading, setSuggestionsLoading] = useState(true);
+
+    // Brainstorming State
+    const [isBrainstormOpen, setIsBrainstormOpen] = useState(false);
+    const [brainstormStep, setBrainstormStep] = useState<"input" | "loading" | "results">("input");
+    const [brainstormStack, setBrainstormStack] = useState("");
+    const [brainstormIdeas, setBrainstormIdeas] = useState<any[]>([]);
 
     useEffect(() => {
         fetchProjects();
+        fetchSuggestions();
     }, []);
 
     const fetchProjects = async () => {
@@ -56,6 +62,33 @@ export default function ProjectHub() {
         }
     };
 
+    const fetchSuggestions = async () => {
+        setSuggestionsLoading(true);
+        try {
+            // We can allow this to fail silently or show a small error state, but let's try-catch it
+            const response = await axios.get("http://localhost:8000/projects/suggestions", { withCredentials: true });
+            if (response.data && response.data.length > 0) {
+                setSuggestedIdeas(response.data);
+            } else {
+                // Fallback static data if AI fails or returns empty for some reason
+                setSuggestedIdeas([
+                    { title: "Portfolio Website", stack: "HTML, CSS, JS", difficulty: "Beginner", description: "A personal portfolio to showcase your skills." },
+                    { title: "Task Manager", stack: "React, LocalStorage", difficulty: "Intermediate", description: "A simple kanban board for managing tasks." },
+                    { title: "Weather App", stack: "React, OpenWeatherAPI", difficulty: "Beginner", description: "Fetch and display weather data for cities." },
+                ]);
+            }
+        } catch (error) {
+            console.error("Failed to fetch suggestions", error);
+            setSuggestedIdeas([
+                { title: "Portfolio Website", stack: "HTML, CSS, JS", difficulty: "Beginner", description: "A personal portfolio to showcase your skills." },
+                { title: "Task Manager", stack: "React, LocalStorage", difficulty: "Intermediate", description: "A simple kanban board for managing tasks." },
+                { title: "Weather App", stack: "React, OpenWeatherAPI", difficulty: "Beginner", description: "Fetch and display weather data for cities." },
+            ]);
+        } finally {
+            setSuggestionsLoading(false);
+        }
+    }
+
     const handleJoin = async (projectId: number) => {
         setJoiningId(projectId);
         try {
@@ -68,21 +101,57 @@ export default function ProjectHub() {
         }
     };
 
+    const handleBrainstorm = async () => {
+        if (!brainstormStack.trim()) {
+            toast.error("Please enter a tech stack!");
+            return;
+        }
+        setBrainstormStep("loading");
+        try {
+            const response = await axios.post("http://localhost:8000/projects/brainstorm", {
+                stack: brainstormStack
+            }, { withCredentials: true });
+            setBrainstormIdeas(response.data);
+            setBrainstormStep("results");
+        } catch (error) {
+            console.error("Brainstorm failed", error);
+            toast.error("Failed to generate ideas. Please try again.");
+            setBrainstormStep("input");
+        }
+    };
+
     return (
-        <div className="space-y-8 min-h-[80vh]">
+        <div className="space-y-8 min-h-[80vh] relative">
             <div>
                 <h2 className="text-3xl font-black mb-2 tracking-tight">Project Hub</h2>
                 <p className="text-foreground/60">Manage your forge or join another squad.</p>
             </div>
 
-            {/* 1. AI Generated Ideas (Restored) */}
-            <section>
-                <div className="flex items-center gap-2 mb-6 text-primary font-bold uppercase tracking-widest text-xs">
+            {/* 1. AI Generated Ideas Header */}
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 text-primary font-bold uppercase tracking-widest text-xs">
                     <Sparkles className="w-4 h-4" />
-                    Curated for you by AI
+                    Project Inspiration
                 </div>
+                <button
+                    onClick={() => { setIsBrainstormOpen(true); setBrainstormStep("input"); }}
+                    className="text-xs font-bold bg-white/5 hover:bg-primary/20 hover:text-primary px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 border border-white/5"
+                >
+                    <BrainCircuit className="w-3.5 h-3.5" />
+                    Brainstorm with AI
+                </button>
+            </div>
+
+            {/* Suggestions Section */}
+            {suggestionsLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-50 pointer-events-none">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="glass-card h-48 rounded-3xl border border-white/5 animate-pulse bg-white/5" />
+                    ))}
+                </div>
+            ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {projectIdeas.map((idea, i) => (
+                    {suggestedIdeas.map((idea, i) => (
                         <motion.div
                             key={i}
                             initial={{ opacity: 0, y: 20 }}
@@ -94,17 +163,17 @@ export default function ProjectHub() {
                                 <span className="text-[10px] font-bold uppercase border border-white/10 px-2 py-1 rounded bg-white/5">{idea.difficulty}</span>
                             </div>
                             <h3 className="font-bold text-lg mb-2 group-hover:text-primary transition-colors">{idea.title}</h3>
-                            <p className="text-sm text-foreground/60 mb-6 flex-1">{idea.description}</p>
+                            <p className="text-sm text-foreground/60 mb-6 flex-1 line-clamp-3">{idea.description}</p>
 
                             <div className="flex flex-wrap gap-2 mb-6">
-                                {idea.stack.map(tech => (
+                                {(Array.isArray(idea.stack) ? idea.stack : (idea.stack || "").split(',')).map((tech: string) => (
                                     <span key={tech} className="text-xs px-2 py-1 rounded bg-white/5 border border-white/5 font-mono opacity-70">
-                                        {tech}
+                                        {tech.trim()}
                                     </span>
                                 ))}
                             </div>
 
-                            <Link href={`/dashboard/projects/new?title=${encodeURIComponent(idea.title)}&stack=${encodeURIComponent(idea.stack.join(", "))}&description=${encodeURIComponent(idea.description)}`}>
+                            <Link href={`/dashboard/projects/new?title=${encodeURIComponent(idea.title)}&stack=${encodeURIComponent(Array.isArray(idea.stack) ? idea.stack.join(", ") : idea.stack)}&description=${encodeURIComponent(idea.description)}`}>
                                 <button className="w-full py-2 rounded-lg bg-primary/10 text-primary font-bold text-sm hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2 relative overflow-hidden group">
                                     <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out" />
                                     <div className="relative z-10 flex items-center gap-2"><Rocket className="w-4 h-4" /> Start Project</div>
@@ -113,7 +182,112 @@ export default function ProjectHub() {
                         </motion.div>
                     ))}
                 </div>
-            </section>
+            )}
+
+            {/* Brainstorm Modal Overlay */}
+            <AnimatePresence>
+                {isBrainstormOpen && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
+                        onClick={() => setIsBrainstormOpen(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.95, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.95, opacity: 0 }}
+                            className="glass-panel w-full max-w-2xl rounded-3xl shadow-2xl p-8 relative overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                onClick={() => setIsBrainstormOpen(false)}
+                                className="absolute top-4 right-4 p-2 hover:bg-foreground/5 rounded-full transition-colors order-1"
+                            >
+                                <X className="w-5 h-5 opacity-50" />
+                            </button>
+
+                            <div className="text-center mb-8">
+                                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                                    <BrainCircuit className="w-8 h-8 text-primary" />
+                                </div>
+                                <h3 className="text-2xl font-black mb-2">AI Project Architect</h3>
+                                <p className="text-foreground/60">Let's find the perfect project for your stack.</p>
+                            </div>
+
+                            {brainstormStep === "input" && (
+                                <div className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-bold opacity-70 mb-2">What tech stack do you want to use?</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g., Python, React, AWS"
+                                            value={brainstormStack}
+                                            onChange={(e) => setBrainstormStack(e.target.value)}
+                                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-colors placeholder:text-foreground/30"
+                                            autoFocus
+                                            onKeyDown={(e) => e.key === 'Enter' && handleBrainstorm()}
+                                        />
+                                        <p className="text-xs text-foreground/40 mt-2">Separate technologies with commas.</p>
+                                    </div>
+                                    <button
+                                        onClick={handleBrainstorm}
+                                        className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                                    >
+                                        <Sparkles className="w-5 h-5" /> Generate Ideas
+                                    </button>
+                                </div>
+                            )}
+
+                            {brainstormStep === "loading" && (
+                                <div className="text-center py-12 space-y-4">
+                                    <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
+                                    <p className="font-medium animate-pulse">Analyzing tech stack...</p>
+                                </div>
+                            )}
+
+                            {brainstormStep === "results" && (
+                                <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                                    {brainstormIdeas.map((idea, i) => (
+                                        <motion.div
+                                            key={i}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            transition={{ delay: i * 0.1 }}
+                                            className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-primary/30 transition-colors group flex flex-col md:flex-row gap-4 items-start md:items-center"
+                                        >
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-3 mb-1">
+                                                    <h4 className="font-bold text-lg">{idea.title}</h4>
+                                                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-white/10 text-foreground/60">{idea.difficulty}</span>
+                                                </div>
+                                                <p className="text-sm text-foreground/70 mb-2">{idea.description}</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {idea.stack.split(',').map((t: string) => (
+                                                        <span key={t} className="text-[10px] font-mono opacity-50 bg-black/5 dark:bg-black/20 px-1.5 py-0.5 rounded border border-white/5 dark:border-white/5">{t.trim()}</span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <Link href={`/dashboard/projects/new?title=${encodeURIComponent(idea.title)}&stack=${encodeURIComponent(idea.stack)}&description=${encodeURIComponent(idea.description)}`}>
+                                                <button className="px-4 py-2 bg-primary/10 text-primary font-bold rounded-lg text-sm hover:bg-primary hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+                                                    Start <ArrowRight className="w-4 h-4" />
+                                                </button>
+                                            </Link>
+                                        </motion.div>
+                                    ))}
+                                    <button
+                                        onClick={() => setBrainstormStep("input")}
+                                        className="w-full py-3 mt-4 text-sm font-bold opacity-50 hover:opacity-100 transition-opacity"
+                                    >
+                                        Try another stack
+                                    </button>
+                                </div>
+                            )}
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/5 pb-2 mt-8">
                 <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl">
