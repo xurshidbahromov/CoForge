@@ -8,8 +8,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const isDashboard = pathname?.startsWith("/dashboard");
     const isLogin = pathname?.startsWith("/login");
 
-    // Hide global Navbar/Footer on dashboard and login pages
-    const showNav = !isDashboard && !isLogin;
+    const isOnboarding = pathname?.startsWith("/onboarding");
+
+    // Hide global Navbar/Footer on dashboard, login, and onboarding pages
+    const showNav = !isDashboard && !isLogin && !isOnboarding;
 
     return (
         <>

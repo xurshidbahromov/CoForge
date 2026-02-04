@@ -1,11 +1,45 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
+import axios from "axios";
+import { toast } from "sonner";
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
+    const router = useRouter();
+    const [checking, setChecking] = useState(true);
+
+    useEffect(() => {
+        const checkStatus = async () => {
+            try {
+                // Check if user has completed onboarding
+                const { data } = await axios.get("http://localhost:8000/profile/me", { withCredentials: true });
+                if (!data.is_onboarding_completed) {
+                    toast.info("Please set up your profile first.");
+                    router.push("/onboarding");
+                }
+            } catch (error) {
+                // If 401, they probably aren't logged in, let middleware or individual pages handle it, 
+                // or redirect to login. For now, we assume they are logged in if they access dashboard.
+                // console.error("Auth check failed", error);
+            } finally {
+                setChecking(false);
+            }
+        };
+
+        checkStatus();
+    }, [router]);
+
+    if (checking) {
+        return <div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-pulse text-primary font-bold">Loading Workspace...</div></div>;
+    }
+
     return (
         <div className="min-h-screen text-foreground flex relative selection:bg-primary/20">
             {/* Sidebar */}

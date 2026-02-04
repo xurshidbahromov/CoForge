@@ -1,9 +1,73 @@
 "use client";
 
-import { Github, Globe, Linkedin, Mail, MapPin, Share2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Github, Globe, Linkedin, Mail, MapPin, Share2, Code, Database, Layout, Clock, User, Edit2 } from "lucide-react";
 import Image from "next/image";
+import axios from "axios";
+import { toast } from "sonner";
+import Link from "next/link";
+
+interface UserProfile {
+    username: string;
+    first_name: string;
+    last_name: string;
+    primary_role: string;
+    level: string;
+    bio: string;
+    city: string;
+    country: string;
+    skills: Record<string, string>;
+    social_links: Record<string, string>;
+    work_preferences: { mode: string };
+    is_onboarding_completed: boolean;
+}
 
 export default function ProfilePage() {
+    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                // Try fetching from backend
+                const response = await axios.get("http://localhost:8000/profile/me", { withCredentials: true });
+                setProfile(response.data);
+            } catch (error) {
+                console.error("Failed to fetch profile", error);
+                // Fallback to local storage for demo if backend fails or no cookie
+                const localData = localStorage.getItem("onboarding-storage");
+                if (localData) {
+                    const parsed = JSON.parse(localData);
+                    setProfile(parsed.state.data);
+                } else {
+                    toast.error("Could not load profile");
+                }
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleShare = () => {
+        if (!profile) return;
+        // Construct public URL (assuming /u/username structure for future)
+        // If username is missing, fallback to dashboard link or similar
+        const username = profile.username || "me";
+        const url = `${window.location.origin}/u/${username}`;
+        navigator.clipboard.writeText(url);
+        toast.success("Profile link copied to clipboard!");
+    };
+
+    if (loading) {
+        return <div className="p-8 text-center opacity-50">Loading profile...</div>;
+    }
+
+    if (!profile) {
+        return <div className="p-8 text-center">Profile not found. <Link href="/onboarding" className="text-primary underline">Complete Onboarding</Link></div>;
+    }
+
     return (
         <div className="space-y-8">
             {/* 1. Header Card */}
@@ -13,22 +77,60 @@ export default function ProfilePage() {
                 <div className="relative z-10 flex flex-col md:flex-row items-end md:items-center gap-6 mt-12 px-4">
                     <div className="w-32 h-32 rounded-full border-4 border-background bg-zinc-800 flex items-center justify-center text-3xl font-bold shadow-2xl relative group">
                         {/* Placeholder for Avatar */}
-                        <span>JS</span>
-                        <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs cursor-pointer">Edit</div>
+                        <span className="uppercase">{profile.first_name?.[0]}{profile.last_name?.[0]}</span>
+                        <Link href="/onboarding">
+                            <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-xs cursor-pointer text-white font-medium gap-1">
+                                <Edit2 className="w-3 h-3" /> Edit
+                            </div>
+                        </Link>
                     </div>
 
                     <div className="flex-1 mb-2">
-                        <h1 className="text-3xl font-black mb-1">John Smith</h1>
-                        <div className="text-foreground/60 font-medium flex items-center gap-4 text-sm">
-                            <span className="flex items-center gap-1"><Code className="w-4 h-4" /> Junior Backend Developer</span>
-                            <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> San Francisco, CA</span>
+                        <div className="flex items-center gap-4 mb-1">
+                            <h1 className="text-3xl font-black">{profile.first_name} {profile.last_name}</h1>
+                            <Link href="/onboarding" className="p-2 hover:bg-white/5 rounded-full text-foreground/40 hover:text-primary transition-colors">
+                                <Edit2 className="w-4 h-4" />
+                            </Link>
+                        </div>
+
+                        <div className="text-foreground/60 font-medium flex flex-wrap items-center gap-4 text-sm">
+                            <span className="flex items-center gap-1"><Code className="w-4 h-4" /> {profile.level ? (profile.level.charAt(0).toUpperCase() + profile.level.slice(1)) : ''} {profile.primary_role}</span>
+                            {(profile.city || profile.country) && (
+                                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {profile.city}, {profile.country}</span>
+                            )}
+                            {profile.work_preferences?.mode && (
+                                <span className="flex items-center gap-1 px-2 py-0.5 bg-primary/10 text-primary rounded text-xs uppercase font-bold tracking-wider">
+                                    {profile.work_preferences.mode}
+                                </span>
+                            )}
                         </div>
                     </div>
 
                     <div className="flex gap-3">
-                        <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"><Github className="w-5 h-5" /></button>
-                        <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors"><Linkedin className="w-5 h-5" /></button>
-                        <button className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                        {profile.social_links?.github && (
+                            <a
+                                href={profile.social_links.github.startsWith('http') ? profile.social_links.github : `https://${profile.social_links.github}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-foreground block"
+                            >
+                                <Github className="w-5 h-5" />
+                            </a>
+                        )}
+                        {profile.social_links?.linkedin && (
+                            <a
+                                href={profile.social_links.linkedin.startsWith('http') ? profile.social_links.linkedin : `https://${profile.social_links.linkedin}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors text-foreground block"
+                            >
+                                <Linkedin className="w-5 h-5" />
+                            </a>
+                        )}
+                        <button
+                            onClick={handleShare}
+                            className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20 flex items-center gap-2"
+                        >
                             <Share2 className="w-4 h-4" /> Share Profile
                         </button>
                     </div>
@@ -36,21 +138,24 @@ export default function ProfilePage() {
 
                 <div className="mt-8 px-4 max-w-3xl">
                     <h3 className="font-bold uppercase text-xs tracking-widest opacity-50 mb-2">About</h3>
-                    <p className="text-foreground/80 leading-relaxed">
-                        Passionate about building scalable backend systems. Currently mastering Go and Microservices architecture through CoForge. Looking for opportunities to work on high-load distributed systems.
+                    <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+                        {profile.bio || "No bio added yet."}
                     </p>
                 </div>
 
-                <div className="mt-8 px-4 flex gap-2">
-                    {["Go", "Python", "Docker", "Kubernetes", "PostgreSQL", "React"].map(skill => (
+                <div className="mt-8 px-4 flex flex-wrap gap-2">
+                    {profile.skills && Object.keys(profile.skills).map(skill => (
                         <span key={skill} className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-foreground/70">
                             {skill}
                         </span>
                     ))}
+                    {(!profile.skills || Object.keys(profile.skills).length === 0) && (
+                        <span className="text-sm opacity-50 italic">No skills selected</span>
+                    )}
                 </div>
             </div>
 
-            {/* 2. User Projects */}
+            {/* 2. User Projects (Static Placeholder) */}
             <div>
                 <h3 className="text-xl font-bold mb-6 px-2">Verified Projects</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -67,24 +172,8 @@ export default function ProfilePage() {
                             <span className="flex items-end gap-1"><Globe className="w-4 h-4" /> Live Demo</span>
                         </div>
                     </div>
-
-                    {/* Project 2 */}
-                    <div className="glass-card p-6 rounded-3xl group cursor-pointer hover:border-primary/30 transition-all opacity-80">
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400"><Layout className="w-6 h-6" /></div>
-                            <div className="px-2 py-1 bg-white/5 text-foreground/40 text-[10px] font-bold uppercase rounded border border-white/10">In Progress</div>
-                        </div>
-                        <h4 className="text-lg font-bold mb-2">Task Management SAAS</h4>
-                        <p className="text-sm text-foreground/60 mb-6">Real-time collaboration tool using WebSockets.</p>
-                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-500 w-[60%] rounded-full" />
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
     );
 }
-
-// Icons needed for this page
-import { Code, Database, Layout } from "lucide-react";
