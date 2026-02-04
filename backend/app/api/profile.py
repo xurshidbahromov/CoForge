@@ -96,7 +96,7 @@ async def get_my_profile(access_token: str = Cookie(None)):
         return {
             "id": user.id,
             "username": user.username,
-            "email": user.email,
+            "email": user.email, # Maybe keep private? User didn't specify privacy settings, but usually email is private. The "Me" endpoint returns it.
             "first_name": user.first_name,
             "last_name": user.last_name,
             "avatar_url": user.avatar_url,
@@ -119,6 +119,55 @@ async def get_my_profile(access_token: str = Cookie(None)):
                 "projects_count": len(projects),
                 "total_tasks": total_tasks,
                 "tasks_done": total_done
+            }
+        }
+
+@router.get("/{user_id}")
+async def get_user_profile(user_id: int):
+    """
+    Returns public profile data for a specific user.
+    """
+    async with get_async_session() as session:
+        stmt = select(User).where(User.id == user_id)
+        result = await session.execute(stmt)
+        user = result.scalar_one_or_none()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Get projects stats (public only maybe? For now all)
+        proj_stmt = select(Project).where(Project.owner_id == user_id)
+        projects = (await session.execute(proj_stmt)).scalars().all()
+
+        profile_projects = []
+        for proj in projects:
+            profile_projects.append({
+                "id": proj.id,
+                "title": proj.title,
+                "stack": proj.stack,
+                "type": proj.type
+            })
+
+        import json
+        def safe_json_load(json_str):
+            if not json_str: return {}
+            try: return json.loads(json_str)
+            except: return {}
+
+        return {
+            "id": user.id,
+            "username": user.username,
+            "avatar_url": user.avatar_url,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "bio": user.bio,
+            "country": user.country,
+            "primary_role": user.primary_role,
+            "level": user.level,
+            "skills": safe_json_load(user.skills),
+            "social_links": safe_json_load(user.social_links),
+            "stats": {
+                "projects_count": len(projects)
             }
         }
 

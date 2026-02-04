@@ -10,6 +10,7 @@ from ..models.project import Project
 from ..models.task import Task
 from ..models.join_request import JoinRequest
 from ..models.suggestion import ProjectSuggestion
+from ..models.chat import Channel, Message, Reaction
 
 # Default to SQLite for easy local dev
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///coforge.db")

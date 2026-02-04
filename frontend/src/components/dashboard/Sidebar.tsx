@@ -24,7 +24,7 @@ const menuItems = [
     { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
     { icon: Rocket, label: "Project Hub", href: "/dashboard/projects" },
     { icon: Users, label: "Teams", href: "/dashboard/teams" },
-    { icon: MessageSquare, label: "Global Chat", href: "/dashboard/chat" },
+    { icon: MessageSquare, label: "Global Chat", href: "/dashboard/community" },
     { icon: Bot, label: "AI Mentor", href: "/dashboard/mentor" },
     { icon: BarChart3, label: "Progress", href: "/dashboard/progress" },
     { icon: User, label: "Profile", href: "/dashboard/profile" },
