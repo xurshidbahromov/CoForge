@@ -217,21 +217,48 @@ async def update_project(project_id: int, project_update: ProjectUpdate, access_
         await session.refresh(project)
         return project
 
-@router.get("/community/all", response_model=List[Project])
+@router.get("/community/all", response_model=List[dict])
 async def list_community_projects(access_token: str = Cookie(None)):
     """
-    List all projects NOT owned by the current user (Community Projects).
+    List all projects NOT owned by the current user (Community Projects),
+    with member counts.
     """
+    from ..models.join_request import JoinRequest
+    
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     user_id = decode_jwt_token(access_token)
     
     async with get_async_session() as session:
-        # Fetch projects where owner_id != user_id
-        stmt = select(Project).where(Project.owner_id != user_id).order_by(Project.created_at.desc())
-        result = await session.execute(stmt)
-        return result.scalars().all()
+        # Fetch all projects (Community includes everyone's projects)
+        stmt = select(Project).where(Project.type != "solo").order_by(Project.created_at.desc())
+        projects = (await session.execute(stmt)).scalars().all()
+        
+        results = []
+        for project in projects:
+            # Count accepted members (Owner + Accepted Requests)
+            count_stmt = select(JoinRequest).where(
+                JoinRequest.project_id == project.id, 
+                JoinRequest.status == "accepted"
+            )
+            accepted_requests = (await session.execute(count_stmt)).scalars().all()
+            # Start with 1 (Owner) + accepted requests
+            members_count = 1 + len(accepted_requests)
+            
+            project_dict = {
+                "id": project.id,
+                "owner_id": project.owner_id,
+                "title": project.title,
+                "description": project.description,
+                "stack": project.stack,
+                "type": project.type,
+                "created_at": project.created_at,
+                "members_count": members_count
+            }
+            results.append(project_dict)
+            
+        return results
 
 @router.post("/{project_id}/join", status_code=status.HTTP_201_CREATED)
 async def join_project(project_id: int, access_token: str = Cookie(None)):
@@ -275,3 +302,149 @@ async def join_project(project_id: int, access_token: str = Cookie(None)):
         await session.commit()
         
         return {"status": "success", "message": "Join request sent"}
+
+@router.get("/{project_id}/members", response_model=List[dict])
+async def list_project_members(project_id: int, access_token: str = Cookie(None)):
+    """
+    List all accepted members of a project (including owner).
+    """
+    from ..models.join_request import JoinRequest
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # We don't strictly enforce that the requester is a member to view members, 
+    # but for privacy maybe we should? For now, let's allow it if they are logged in.
+    
+    async with get_async_session() as session:
+        project = await session.get(Project, project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+
+        # 1. Get Owner
+        owner = await session.get(User, project.owner_id)
+        
+        members = [{
+            "id": owner.id,
+            "username": owner.username,
+            "first_name": owner.first_name,
+            "last_name": owner.last_name,
+            "avatar_url": owner.avatar_url,
+            "role": "Owner",
+            "primary_role": owner.primary_role
+        }]
+
+        # 2. Get Accepted Join Requests
+        stmt = select(JoinRequest).where(
+            JoinRequest.project_id == project_id, 
+            JoinRequest.status == "accepted"
+        )
+        join_requests = (await session.execute(stmt)).scalars().all()
+
+        for req in join_requests:
+            user = await session.get(User, req.user_id)
+            if user:
+                 members.append({
+                    "id": user.id,
+                    "username": user.username,
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "avatar_url": user.avatar_url,
+                    "role": "Member",
+                    "primary_role": user.primary_role
+                })
+        
+        return members
+
+@router.get("/{project_id}/requests", response_model=List[dict])
+async def list_project_requests(project_id: int, access_token: str = Cookie(None)):
+    """
+    List pending join requests (Owner only).
+    """
+    from ..models.join_request import JoinRequest
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        project = await session.get(Project, project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+            
+        if project.owner_id != user_id:
+             raise HTTPException(status_code=403, detail="Only the project owner can view requests")
+
+        stmt = select(JoinRequest).where(
+            JoinRequest.project_id == project_id, 
+            JoinRequest.status == "pending"
+        )
+        requests = (await session.execute(stmt)).scalars().all()
+        
+        result = []
+        for req in requests:
+            user = await session.get(User, req.user_id)
+            if user:
+                result.append({
+                    "request_id": req.id,
+                    "user": {
+                        "id": user.id,
+                        "username": user.username,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "avatar_url": user.avatar_url,
+                        "primary_role": user.primary_role,
+                        "level": user.level
+                    },
+                    "created_at": req.created_at
+                })
+        
+        return result
+
+@router.post("/{project_id}/requests/{request_id}/{action}")
+async def handle_join_request(project_id: int, request_id: int, action: str, access_token: str = Cookie(None)):
+    """
+    Accept or reject a join request (Owner only).
+    Action must be 'accept' or 'reject'.
+    """
+    from ..models.join_request import JoinRequest
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    if action not in ["accept", "reject"]:
+        raise HTTPException(status_code=400, detail="Invalid action")
+
+    async with get_async_session() as session:
+        # Verify Project Ownership
+        project = await session.get(Project, project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+        
+        if project.owner_id != user_id:
+             raise HTTPException(status_code=403, detail="Only the project owner can manage requests")
+
+        # Get Request
+        req = await session.get(JoinRequest, request_id)
+        if not req:
+             raise HTTPException(status_code=404, detail="Request not found")
+             
+        if req.project_id != project_id:
+             raise HTTPException(status_code=400, detail="Request does not belong to this project")
+
+        if action == "accept":
+            req.status = "accepted"
+            # If this was a solo project, upgrade it to team?
+            if project.type == "solo":
+                project.type = "team"
+                session.add(project)
+        else:
+            req.status = "rejected"
+            
+        session.add(req)
+        await session.commit()
+        
+        return {"status": "success", "action": action}

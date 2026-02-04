@@ -24,6 +24,7 @@ export default function ProjectHub() {
     const [myProjects, setMyProjects] = useState([]);
     const [communityProjects, setCommunityProjects] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentUserId, setCurrentUserId] = useState<number | null>(null);
     const [joiningId, setJoiningId] = useState<number | null>(null);
 
     // Placeholder for AI Ideas (Curated)
@@ -40,12 +41,14 @@ export default function ProjectHub() {
     const fetchProjects = async () => {
         setLoading(true);
         try {
-            const [myRes, commRes] = await Promise.all([
+            const [myRes, commRes, userRes] = await Promise.all([
                 axios.get("http://localhost:8000/projects", { withCredentials: true }),
-                axios.get("http://localhost:8000/projects/community/all", { withCredentials: true })
+                axios.get("http://localhost:8000/projects/community/all", { withCredentials: true }),
+                axios.get("http://localhost:8000/profile/me", { withCredentials: true })
             ]);
             setMyProjects(myRes.data);
             setCommunityProjects(commRes.data);
+            setCurrentUserId(userRes.data.id);
         } catch (error) {
             console.error("Failed to fetch projects", error);
         } finally {
@@ -168,7 +171,7 @@ export default function ProjectHub() {
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {myProjects.map((project: any) => (
-                                            <div key={project.id} className="glass-card p-6 rounded-2xl group border border-white/5 hover:border-primary/50 transition-all cursor-pointer">
+                                            <div key={project.id} className="glass-card p-6 rounded-2xl group border border-white/5 hover:border-primary/50 transition-all cursor-pointer flex flex-col h-full">
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div className="px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
                                                         {project.type}
@@ -178,12 +181,20 @@ export default function ProjectHub() {
                                                 <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{project.title}</h3>
                                                 <p className="text-sm opacity-60 line-clamp-2 mb-6 h-10">{project.description}</p>
 
-                                                <div className="flex flex-wrap gap-2 mt-auto">
+                                                <div className="flex flex-wrap gap-2 mb-6">
                                                     {project.stack && project.stack.split(',').slice(0, 3).map((t: string) => (
                                                         <span key={t} className="text-[10px] px-2 py-1 rounded bg-white/5 border border-white/5 font-mono opacity-60">
                                                             {t.trim()}
                                                         </span>
                                                     ))}
+                                                </div>
+
+                                                <div className="mt-auto">
+                                                    <Link href={`/dashboard/projects/${project.id}`}>
+                                                        <button className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition-all flex items-center justify-center gap-2 hover:text-primary">
+                                                            Open Project <ArrowRight className="w-4 h-4" />
+                                                        </button>
+                                                    </Link>
                                                 </div>
                                             </div>
                                         ))}
@@ -210,8 +221,14 @@ export default function ProjectHub() {
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center font-bold text-sm">
                                                         ?
                                                     </div>
-                                                    <div className="px-2 py-1 rounded bg-purple-500/10 text-purple-400 text-[10px] font-bold uppercase tracking-wider">
-                                                        {project.type}
+                                                    <div className="flex gap-2">
+                                                        <div className="px-2 py-1 rounded bg-purple-500/10 text-purple-400 text-[10px] font-bold uppercase tracking-wider">
+                                                            {project.type}
+                                                        </div>
+                                                        <div className="px-2 py-1 rounded bg-white/5 text-foreground/60 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                                                            <Users className="w-3 h-3" />
+                                                            {project.members_count || 1}
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -227,17 +244,25 @@ export default function ProjectHub() {
                                                         ))}
                                                     </div>
 
-                                                    <button
-                                                        onClick={() => handleJoin(project.id)}
-                                                        disabled={joiningId === project.id}
-                                                        className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition-all flex items-center justify-center gap-2 hover:text-primary disabled:opacity-50"
-                                                    >
-                                                        {joiningId === project.id ? (
-                                                            <Loader2 className="w-4 h-4 animate-spin" />
-                                                        ) : (
-                                                            <>Request to Join <ArrowRight className="w-4 h-4" /></>
-                                                        )}
-                                                    </button>
+                                                    {currentUserId === project.owner_id ? (
+                                                        <Link href={`/dashboard/projects/${project.id}`}>
+                                                            <button className="w-full py-2.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-sm font-bold transition-all flex items-center justify-center gap-2 border border-purple-500/20">
+                                                                Manage My Project <ArrowRight className="w-4 h-4" />
+                                                            </button>
+                                                        </Link>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => handleJoin(project.id)}
+                                                            disabled={joiningId === project.id}
+                                                            className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-sm font-bold transition-all flex items-center justify-center gap-2 hover:text-primary disabled:opacity-50"
+                                                        >
+                                                            {joiningId === project.id ? (
+                                                                <Loader2 className="w-4 h-4 animate-spin" />
+                                                            ) : (
+                                                                <>Request to Join <ArrowRight className="w-4 h-4" /></>
+                                                            )}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))
