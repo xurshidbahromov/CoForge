@@ -13,3 +13,4 @@ class Task(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     pr_url: Optional[str] = None
     content: Optional[str] = Field(default=None, description="Detailed AI guide for the task")
+    assigned_to: Optional[int] = Field(default=None, foreign_key="user.id", description="User ID who is working on this task")

@@ -324,6 +324,18 @@ async def list_project_members(project_id: int, access_token: str = Cookie(None)
         # 1. Get Owner
         owner = await session.get(User, project.owner_id)
         
+        # Helper to get stats
+        from ..models.task import Task
+        async def get_stats(uid):
+            total_stmt = select(Task).where(Task.project_id == project_id, Task.assigned_to == uid)
+            all_tasks = (await session.execute(total_stmt)).scalars().all()
+            return {
+                "tasks_done": len([t for t in all_tasks if t.status == "done"]),
+                "tasks_active": len([t for t in all_tasks if t.status != "done"])
+            }
+
+        owner_stats = await get_stats(owner.id)
+
         members = [{
             "id": owner.id,
             "username": owner.username,
@@ -331,7 +343,10 @@ async def list_project_members(project_id: int, access_token: str = Cookie(None)
             "last_name": owner.last_name,
             "avatar_url": owner.avatar_url,
             "role": "Owner",
-            "primary_role": owner.primary_role
+            "primary_role": owner.primary_role,
+            "level": owner.level,
+            "skills": owner.skills,
+            "stats": owner_stats
         }]
 
         # 2. Get Accepted Join Requests
@@ -344,6 +359,7 @@ async def list_project_members(project_id: int, access_token: str = Cookie(None)
         for req in join_requests:
             user = await session.get(User, req.user_id)
             if user:
+                 user_stats = await get_stats(user.id)
                  members.append({
                     "id": user.id,
                     "username": user.username,
@@ -351,7 +367,10 @@ async def list_project_members(project_id: int, access_token: str = Cookie(None)
                     "last_name": user.last_name,
                     "avatar_url": user.avatar_url,
                     "role": "Member",
-                    "primary_role": user.primary_role
+                    "primary_role": user.primary_role,
+                    "level": user.level,
+                    "skills": user.skills,
+                    "stats": user_stats
                 })
         
         return members
@@ -388,6 +407,7 @@ async def list_project_requests(project_id: int, access_token: str = Cookie(None
             if user:
                 result.append({
                     "request_id": req.id,
+                    "message": req.message,
                     "user": {
                         "id": user.id,
                         "username": user.username,
@@ -395,7 +415,9 @@ async def list_project_requests(project_id: int, access_token: str = Cookie(None
                         "last_name": user.last_name,
                         "avatar_url": user.avatar_url,
                         "primary_role": user.primary_role,
-                        "level": user.level
+                        "level": user.level,
+                        "availability": user.weekly_availability,
+                        "skills": user.skills
                     },
                     "created_at": req.created_at
                 })
@@ -448,3 +470,85 @@ async def handle_join_request(project_id: int, request_id: int, action: str, acc
         await session.commit()
         
         return {"status": "success", "action": action}
+
+@router.get("/teams/mine", response_model=List[dict])
+async def list_my_teams(access_token: str = Cookie(None)):
+    """
+    List all 'team' projects the current user is part of (Owner OR Member).
+    """
+    from ..models.join_request import JoinRequest
+    from ..models.task import Task
+    from sqlalchemy import or_
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        # 1. Projects I own that are type='team'
+        stmt_owned = select(Project).where(
+            Project.owner_id == user_id, 
+            Project.type == "team"
+        )
+        owned_projects = (await session.execute(stmt_owned)).scalars().all()
+
+        # 2. Projects I have joined (status='accepted')
+        stmt_joined = select(Project).join(JoinRequest).where(
+            JoinRequest.user_id == user_id,
+            JoinRequest.status == "accepted"
+        )
+        joined_projects = (await session.execute(stmt_joined)).scalars().all()
+
+        # Combine and deduplicate (though logic shouldn't overlap usually, unless I joined my own project which is blocked)
+        all_projects = list({p.id: p for p in (owned_projects + joined_projects)}.values())
+        
+        results = []
+        for project in all_projects:
+            # Get Member Count
+            count_stmt = select(JoinRequest).where(
+                JoinRequest.project_id == project.id, 
+                JoinRequest.status == "accepted"
+            )
+            accepted_requests = (await session.execute(count_stmt)).scalars().all()
+            members_count = 1 + len(accepted_requests)
+
+            # Get User Role in this project
+            is_owner = (project.owner_id == user_id)
+            user_role_in_project = "Owner"
+            if not is_owner:
+                # Find the specific request to see if there's any specialized role info? 
+                # For now just 'Member' or fetch from User profile
+                 user_role_in_project = "Member"
+
+            # Get User's specific info for this project (e.g. assigned role if we had one in JoinRequest? No.)
+            # We'll use the User's primary_role from their profile for display
+            user = await session.get(User, user_id)
+            display_role = user.primary_role if user else "Member"
+
+            # Get some member avatars (for the circles)
+            # Owner
+            owner = await session.get(User, project.owner_id)
+            preview_members = [owner]
+            # Add up to 3 others
+            for req in accepted_requests[:3]:
+                m = await session.get(User, req.user_id)
+                if m: preview_members.append(m)
+            
+            # Deduplicate just in case
+            preview_members = list({u.id: u for u in preview_members}.values())
+
+            results.append({
+                "id": project.id,
+                "title": project.title,
+                "description": project.description,
+                "stack": project.stack,
+                "user_role": display_role if not is_owner else "Team Lead", # Mock logic for "Your Role"
+                "members_count": members_count,
+                "preview_members": [
+                    {"id": m.id, "username": m.username, "avatar_url": m.avatar_url} 
+                    for m in preview_members[:4]
+                ]
+            })
+
+        return results

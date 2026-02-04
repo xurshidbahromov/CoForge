@@ -293,68 +293,174 @@ export default function ProjectDetailPage() {
                         </div>
                     </div>
                 ) : (
-                    <div>
-                        <div className="mb-10">
-                            <h2 className="text-2xl font-bold flex items-center gap-3 mb-6">
-                                <Users className="w-6 h-6 text-primary" />
+                    <div className="space-y-12">
+                        {/* 1. Team Overview */}
+                        <div className="glass-panel p-8 rounded-2xl border-primary/20 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-3 opacity-10">
+                                <Users className="w-32 h-32 text-primary" />
+                            </div>
+
+                            <div className="relative z-10 flex flex-col md:flex-row gap-8 justify-between items-center">
+                                <div>
+                                    <h3 className="text-2xl font-black mb-2 flex items-center gap-2">
+                                        Team Overview <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full border border-primary/20">{members.length} Members</span>
+                                    </h3>
+                                    <p className="text-foreground/60 max-w-xl">
+                                        Together, you are building the future. Track contributions and manage your squad here.
+                                    </p>
+                                </div>
+                                <div className="flex gap-4">
+                                    <div className="text-center p-4 bg-white/5 rounded-xl border border-white/5">
+                                        <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-1">Open Roles</div>
+                                        <div className="text-2xl font-black">2</div>
+                                    </div>
+                                    <div className="text-center p-4 bg-white/5 rounded-xl border border-white/5">
+                                        <div className="text-xs font-bold uppercase tracking-widest opacity-50 mb-1">Total Tasks</div>
+                                        <div className="text-2xl font-black">{tasks.length}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 2. Team Members List */}
+                        <div>
+                            <h2 className="text-xl font-bold flex items-center gap-3 mb-6 opacity-80">
+                                <Users className="w-5 h-5 text-primary" />
                                 Active Squad
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {members.map((member) => (
-                                    <div key={member.id} className="glass-card p-6 rounded-2xl flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden">
-                                            {/* Avatar would go here */}
-                                            <div className="w-full h-full flex items-center justify-center font-bold text-lg bg-gradient-to-br from-primary to-purple-600">
-                                                {member.first_name[0]}
+                                    <div key={member.id} className="glass-card p-6 rounded-2xl flex flex-col justify-between group hover:border-primary/30 transition-all">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-full bg-white/10 overflow-hidden relative">
+                                                    {/* Avatar placeholder */}
+                                                    <div className="w-full h-full flex items-center justify-center font-bold text-lg bg-gradient-to-br from-primary to-purple-600">
+                                                        {member.first_name?.[0] || member.username[0]}
+                                                    </div>
+                                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black" />
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold flex items-center gap-2">
+                                                        {member.first_name} {member.last_name}
+                                                        {member.role === 'Owner' && <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded border border-yellow-500/20 uppercase">Lead</span>}
+                                                    </div>
+                                                    <div className="text-xs opacity-60 font-mono text-primary">{member.primary_role || "Contributor"}</div>
+                                                </div>
+                                            </div>
+
+                                            <button className="opacity-0 group-hover:opacity-100 p-2 hover:bg-white/10 rounded-lg transition-all">
+                                                <MoreVertical className="w-4 h-4 opacity-50" />
+                                            </button>
+                                        </div>
+
+                                        <div className="mb-6">
+                                            <div className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-2">Skills</div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {(() => {
+                                                    try {
+                                                        if (!member.skills) return <span className="text-xs opacity-30 italic">No skills listed</span>;
+                                                        const parsed = JSON.parse(member.skills);
+                                                        const skillsArray = Array.isArray(parsed) ? parsed : Object.keys(parsed);
+                                                        return skillsArray.slice(0, 3).map((s: string) => (
+                                                            <span key={s} className="px-2 py-1 rounded bg-white/5 border border-white/5 text-[10px] font-mono">
+                                                                {s}
+                                                            </span>
+                                                        ));
+                                                    } catch (e) {
+                                                        return <span className="text-xs opacity-30 italic">Invalid skills data</span>;
+                                                    }
+                                                })()}
                                             </div>
                                         </div>
-                                        <div>
-                                            <div className="font-bold flex items-center gap-2">
-                                                {member.first_name} {member.last_name}
-                                                {member.role === 'Owner' && <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded border border-yellow-500/20 uppercase">Owner</span>}
+
+                                        <div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">Completed</div>
+                                                <div className="font-mono font-bold text-green-400">{member.stats?.tasks_done || 0} Tasks</div>
                                             </div>
-                                            <div className="text-xs opacity-60 font-mono">{member.primary_role}</div>
+                                            <div>
+                                                <div className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-1">Active</div>
+                                                <div className="font-mono font-bold text-yellow-400">{member.stats?.tasks_active || 0} Tasks</div>
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Requests Section for Owner */}
+                        {/* 3. Requests Panel (Owner Only) */}
                         {isOwner && (
-                            <div>
+                            <div className="border-t border-white/10 pt-10">
                                 <h2 className="text-xl font-bold flex items-center gap-3 mb-6 opacity-80">
-                                    <CheckCircle2 className="w-5 h-5" />
-                                    Pending Requests
+                                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                                    Incoming Recruits
                                 </h2>
 
                                 <div className="space-y-4">
                                     {requests.length === 0 ? (
-                                        <p className="opacity-40 italic">No pending requests.</p>
+                                        <div className="text-center py-10 opacity-30 border border-dashed border-white/10 rounded-2xl">
+                                            <Users className="w-8 h-8 mx-auto mb-2" />
+                                            <p>No pending requests.</p>
+                                        </div>
                                     ) : (
                                         requests.map((req) => (
-                                            <div key={req.request_id} className="glass-panel p-4 rounded-xl flex items-center justify-between border-white/5">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold">
-                                                        {req.user.first_name[0]}
+                                            <div key={req.request_id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row gap-6 items-start md:items-center justify-between border-white/5 relative overflow-hidden">
+                                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-500" />
+
+                                                <div className="flex gap-6 items-start flex-1">
+                                                    <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center font-bold text-xl relative shrink-0">
+                                                        {req.user.first_name?.[0]}
+                                                        {/* Match Score Badge (Mocked for now) */}
+                                                        <div className="absolute -bottom-1 -right-1 bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/20">
+                                                            95% Match
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <div className="font-bold">{req.user.first_name} {req.user.last_name}</div>
-                                                        <div className="text-xs opacity-60">Level {req.user.level} {req.user.primary_role}</div>
+                                                    <div className="space-y-2">
+                                                        <div>
+                                                            <div className="font-bold text-lg flex items-center gap-2">
+                                                                {req.user.first_name} {req.user.last_name}
+                                                                <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded uppercase opacity-60">{req.user.level || "Rookie"}</span>
+                                                            </div>
+                                                            <div className="text-sm text-primary font-mono">{req.user.primary_role}</div>
+                                                        </div>
+
+                                                        {req.message && (
+                                                            <div className="bg-white/5 p-3 rounded-lg text-sm italic opacity-70 border-l-2 border-white/20">
+                                                                "{req.message}"
+                                                            </div>
+                                                        )}
+
+                                                        <div className="flex gap-4 text-xs opacity-50 font-mono">
+                                                            <div className="flex items-center gap-1">
+                                                                <Clock className="w-3 h-3" /> {req.user.availability || "10 hrs/week"}
+                                                            </div>
+                                                            <div className="flex items-center gap-1">
+                                                                <Code2 className="w-3 h-3" />
+                                                                {(() => {
+                                                                    try {
+                                                                        if (!req.user.skills) return 0;
+                                                                        const parsed = JSON.parse(req.user.skills);
+                                                                        return Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length;
+                                                                    } catch { return 0; }
+                                                                })()} Skills
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-2">
+
+                                                <div className="flex gap-3 w-full md:w-auto">
                                                     <button
                                                         onClick={() => handleRequestAction(req.request_id, "reject")}
-                                                        className="px-4 py-2 rounded-lg hover:bg-white/10 text-xs font-bold transition-colors"
+                                                        className="flex-1 md:flex-none px-6 py-3 rounded-xl hover:bg-white/10 text-sm font-bold transition-colors border border-transparent hover:border-white/10"
                                                     >
                                                         Decline
                                                     </button>
                                                     <button
                                                         onClick={() => handleRequestAction(req.request_id, "accept")}
-                                                        className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold transition-colors"
+                                                        className="flex-1 md:flex-none px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-sm font-bold transition-colors shadow-lg shadow-primary/20"
                                                     >
-                                                        Accept
+                                                        Accept Recruit
                                                     </button>
                                                 </div>
                                             </div>
