@@ -1,13 +1,13 @@
 import os
 import json
-from groq import Groq
+from groq import AsyncGroq
 
 api_key = os.getenv("GROQ_API_KEY")
 if not api_key:
     client = None
     print("WARNING: GROQ_API_KEY not found. AI features will be in dummy mode.")
 else:
-    client = Groq(api_key=api_key)
+    client = AsyncGroq(api_key=api_key)
     print("✅ Groq AI client initialized successfully!")
 
 async def generate_project_idea(stack: str, level: str, goal: str):
@@ -36,24 +36,33 @@ async def generate_project_idea(stack: str, level: str, goal: str):
     Return ONLY valid JSON, no other text.
     """
     
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": "You are an expert technical mentor who helps developers build real-world experience. Always respond with valid JSON only."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=500
-    )
-    
-    content = response.choices[0].message.content
-    # Clean up response if needed
-    if content.startswith("```"):
-        content = content.split("```")[1]
-        if content.startswith("json"):
-            content = content[4:]
-    
-    return json.loads(content.strip())
+    try:
+        response = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "You are an expert technical mentor who helps developers build real-world experience. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=500
+        )
+        
+        content = response.choices[0].message.content
+        # Clean up response if needed
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        
+        return json.loads(content.strip())
+    except Exception as e:
+        print(f"Error generating project: {e}")
+        return {
+            "title": "Error Generating Project",
+            "description": "Could not generate project. Please try again.",
+            "stack_details": stack,
+            "difficulty": "intermediate"
+        }
 
 async def break_down_tasks(title: str, description: str, stack: str):
     """
@@ -81,25 +90,29 @@ async def break_down_tasks(title: str, description: str, stack: str):
     Return ONLY valid JSON, no other text.
     """
     
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": "You are a senior project manager who breaks down complex features into manageable developer tasks. Always respond with valid JSON only."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.7,
-        max_tokens=800
-    )
-    
-    content = response.choices[0].message.content
-    # Clean up response if needed
-    if content.startswith("```"):
-        content = content.split("```")[1]
-        if content.startswith("json"):
-            content = content[4:]
-    
-    result = json.loads(content.strip())
-    return result.get("tasks", [])
+    try:
+        response = await client.chat.completions.create(
+            model="llama-3.3-70b-versatile",
+            messages=[
+                {"role": "system", "content": "You are a senior project manager who breaks down complex features into manageable developer tasks. Always respond with valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=800
+        )
+        
+        content = response.choices[0].message.content
+        # Clean up response if needed
+        if content.startswith("```"):
+            content = content.split("```")[1]
+            if content.startswith("json"):
+                content = content[4:]
+        
+        result = json.loads(content.strip())
+        return result.get("tasks", [])
+    except Exception as e:
+        print(f"Error generating tasks: {e}")
+        return []
 
 async def generate_task_guide(task_title: str, task_description: str, stack: str):
     """
@@ -121,16 +134,16 @@ async def generate_task_guide(task_title: str, task_description: str, stack: str
     1. **Objective**: Simple explanation of what we are building.
     2. **Prerequisites**: Any libraries to install (with npm/pip commands).
     3. **Step-by-Step Implementation**:
-       - Specific instructions.
-       - Code snippets (e.g., File: `src/components/MyComponent.tsx`).
-       - Explain *why* we are doing this.
+        - Specific instructions.
+        - Code snippets (e.g., File: `src/components/MyComponent.tsx`).
+        - Explain *why* we are doing this.
     4. **Testing & Verification**: How to check if it works.
     
     Tone: Encouraging, clear, and beginner-friendly.
     """
     
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are an expert friendly senior developer mentoring a junior. You provide clear, copy-pasteable code examples and specific instructions."},

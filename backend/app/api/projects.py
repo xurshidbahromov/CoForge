@@ -23,13 +23,29 @@ async def list_projects(access_token: str = Cookie(None)):
         result = await session.execute(stmt)
         return result.scalars().all()
 
+from pydantic import BaseModel
+
+class ProjectCreate(BaseModel):
+    title: str
+    description: str
+    stack: str
+    type: str = "solo"
+
 @router.post("/", response_model=Project, status_code=status.HTTP_201_CREATED)
-async def create_project(project: Project, access_token: str = Cookie(None)):
+async def create_project(project_in: ProjectCreate, access_token: str = Cookie(None)):
     if not access_token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     user_id = decode_jwt_token(access_token)
-    project.owner_id = user_id
+    
+    # Create DB model from input + owner_id
+    project = Project(
+        owner_id=user_id,
+        title=project_in.title,
+        description=project_in.description,
+        stack=project_in.stack,
+        type=project_in.type
+    )
     
     async with get_async_session() as session:
         session.add(project)
@@ -200,3 +216,62 @@ async def update_project(project_id: int, project_update: ProjectUpdate, access_
         await session.commit()
         await session.refresh(project)
         return project
+
+@router.get("/community/all", response_model=List[Project])
+async def list_community_projects(access_token: str = Cookie(None)):
+    """
+    List all projects NOT owned by the current user (Community Projects).
+    """
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        # Fetch projects where owner_id != user_id
+        stmt = select(Project).where(Project.owner_id != user_id).order_by(Project.created_at.desc())
+        result = await session.execute(stmt)
+        return result.scalars().all()
+
+@router.post("/{project_id}/join", status_code=status.HTTP_201_CREATED)
+async def join_project(project_id: int, access_token: str = Cookie(None)):
+    """
+    Request to join a project.
+    """
+    from ..models.join_request import JoinRequest
+
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with get_async_session() as session:
+        # Check if project exists
+        project = await session.get(Project, project_id)
+        if not project:
+            raise HTTPException(status_code=404, detail="Project not found")
+            
+        if project.owner_id == user_id:
+             raise HTTPException(status_code=400, detail="You cannot join your own project")
+
+        # Check if already requested
+        stmt = select(JoinRequest).where(
+            JoinRequest.user_id == user_id, 
+            JoinRequest.project_id == project_id
+        )
+        existing = (await session.execute(stmt)).scalar_one_or_none()
+        
+        if existing:
+            raise HTTPException(status_code=400, detail="Request already sent")
+            
+        # Create request
+        join_req = JoinRequest(
+            user_id=user_id,
+            project_id=project_id,
+            status="pending"
+        )
+        
+        session.add(join_req)
+        await session.commit()
+        
+        return {"status": "success", "message": "Join request sent"}

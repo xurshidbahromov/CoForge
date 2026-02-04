@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
     Zap,
@@ -13,22 +14,69 @@ import {
     TrendingUp,
     Clock,
     CheckCircle2,
-    AlertCircle,
-    MoreHorizontal,
     ArrowRight
 } from "lucide-react";
+import axios from "axios";
+import { toast } from "sonner";
+import { DayZeroDashboard } from "@/components/dashboard/DayZeroDashboard";
 
-export default function DashboardOverview() {
+// --- Main Page Component ---
+
+export default function DashboardPage() {
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const { data } = await axios.get("http://localhost:8000/profile/me", { withCredentials: true });
+                setUser(data);
+            } catch (error) {
+                console.error("Failed to load dashboard data", error);
+                toast.error("Could not load dashboard");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="min-h-[80vh] flex items-center justify-center">
+                <div className="animate-pulse text-foreground/20 font-bold tracking-widest uppercase text-xs">Loading Workspace...</div>
+            </div>
+        );
+    }
+
+    if (!user) return null;
+
+    // Day 0 Logic: specific check for empty projects
+    // We check both projects array and stats for robustness
+    const hasProjects = user.projects && user.projects.length > 0;
+
+    if (!hasProjects) {
+        return <DayZeroDashboard user={user} />;
+    }
+
+    return <DashboardContent user={user} />;
+}
+
+
+// --- Existing Dashboard Content (renamed) ---
+
+function DashboardContent({ user }: { user: any }) {
     return (
         <div className="space-y-8 pb-8">
             {/* 1. Welcome & Status Header */}
             <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/5 pb-6">
                 <div>
-                    <h2 className="text-4xl font-black mb-2 tracking-tight">Good morning, <span className="text-gradient">Xurshid!</span> ☀️</h2>
+                    <h2 className="text-4xl font-black mb-2 tracking-tight">Good morning, <span className="text-gradient capitalize">{user.first_name}!</span> ☀️</h2>
                     <div className="flex items-center gap-3 text-foreground/60 font-medium">
-                        <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-xs uppercase tracking-wider font-bold">Fullstack Developer</span>
+                        <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-xs uppercase tracking-wider font-bold">{user.primary_role}</span>
                         <span className="w-1 h-1 rounded-full bg-foreground/20" />
-                        <span>Level 2 Contributor</span>
+                        <span>Level {user.level === 'junior' ? '1' : user.level === 'mid' ? '2' : '3'} Contributor</span>
                     </div>
                 </div>
                 <div className="text-right hidden md:block">
