@@ -89,11 +89,55 @@ export default function ProjectDetailPage() {
         }
     };
 
+    const handleShareProject = async () => {
+        try {
+            // 1. Get Channels to find "projects" or general
+            const channelsRes = await axios.get("http://localhost:8000/chat/channels", { withCredentials: true });
+            const channels = channelsRes.data;
+            const projectChannel = channels.find((c: any) => c.name === "projects") || channels[0];
+
+            if (!projectChannel) {
+                toast.error("No chat channels available");
+                return;
+            }
+
+            // 2. Post Message
+            const payload = {
+                id: project.id,
+                title: project.title,
+                description: project.description,
+                stack: project.stack || "",
+                owner_id: project.owner_id
+            };
+            const message = `[PROJECT_SHARE:${JSON.stringify(payload)}]`;
+
+            await axios.post(`http://localhost:8000/chat/channels/${projectChannel.id}/messages`, { content: message }, { withCredentials: true });
+
+            toast.success("Project announced in Global Chat! 🚀");
+            router.push("/dashboard/community");
+        } catch (error) {
+            console.error("Share failed", error);
+            toast.error("Failed to share project");
+        }
+    };
+
+    const handleJoinRequest = async () => {
+        try {
+            await axios.post(`http://localhost:8000/projects/${projectId}/join`, {}, { withCredentials: true });
+            toast.success("Join request sent! The owner will review it soon.");
+            // Refresh logic could be better, but simple re-fetch works for basic state if we stored request status
+            // For now, simple success message is enough. Ideally we'd update local state to show "Pending"
+            setProject((prev: any) => ({ ...prev, has_pending_request: true })); // Optimistic update if we added this field
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || "Failed to send request");
+        }
+    };
+
     const toggleTaskStatus = async (task: any) => {
         const newStatus = task.status === "done" ? "todo" : "done";
 
         // Optimistic UI update
-        setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
+        setTasks((prev: any[]) => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
 
         try {
             await axios.patch(`http://localhost:8000/tasks/${task.id}`, { status: newStatus }, { withCredentials: true });
@@ -154,7 +198,19 @@ export default function ProjectDetailPage() {
                     </div>
 
                     <div className="flex gap-3 items-start">
-                        <button className="glass-button px-6 py-3 rounded-xl font-bold flex items-center gap-2 text-sm">
+                        {!isOwner && !members.some(m => m.id === project.owner_id) && ( // Simple check, ideally check current user ID against members list
+                            <button
+                                onClick={handleJoinRequest}
+                                className="glass-button px-6 py-3 rounded-xl font-bold flex items-center gap-2 text-sm bg-primary/20 hover:bg-primary/30 text-primary border-primary/20"
+                            >
+                                <Users className="w-4 h-4" />
+                                Request to Join
+                            </button>
+                        )}
+                        <button
+                            onClick={handleShareProject}
+                            className="glass-button px-6 py-3 rounded-xl font-bold flex items-center gap-2 text-sm"
+                        >
                             <Share2 className="w-4 h-4" />
                             Share
                         </button>

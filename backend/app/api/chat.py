@@ -191,3 +191,53 @@ async def websocket_endpoint(
                     
     except WebSocketDisconnect:
         manager.disconnect(websocket, channel_id)
+
+from pydantic import BaseModel
+
+class MessageCreate(BaseModel):
+    content: str
+
+@router.post("/channels/{channel_id}/messages")
+async def create_message(
+    channel_id: int, 
+    message: MessageCreate,
+    access_token: str | None = Cookie(default=None, alias="access_token")
+):
+    """
+    Post a message to a channel via REST API (e.g. for sharing projects).
+    Broadcasts to WebSocket listeners.
+    """
+    if not access_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_id = decode_jwt_token(access_token)
+    
+    async with AsyncSession(async_engine, expire_on_commit=False) as session:
+        # 1. Fetch User
+        user = await session.get(User, user_id)
+        if not user:
+             raise HTTPException(status_code=404, detail="User not found")
+
+        # 2. Create Message
+        msg = Message(
+            content=message.content,
+            channel_id=channel_id,
+            user_id=user_id
+        )
+        session.add(msg)
+        await session.commit()
+        await session.refresh(msg)
+        
+        # 3. Broadcast
+        response_data = {
+            "id": msg.id,
+            "content": msg.content,
+            "user_id": user_id,
+            "username": user.username,
+            "avatar_url": user.avatar_url,
+            "created_at": msg.created_at.isoformat(),
+            "parent_id": msg.parent_id
+        }
+        await manager.broadcast(response_data, channel_id)
+        
+        return response_data

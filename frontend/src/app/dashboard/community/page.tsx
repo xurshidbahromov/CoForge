@@ -7,7 +7,8 @@ import {
     Send,
     Smile,
     Users,
-    Menu
+    Menu,
+    Layers
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -45,10 +46,14 @@ export default function GlobalChat() {
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const [showProjectPicker, setShowProjectPicker] = useState(false);
+    const [myProjects, setMyProjects] = useState<any[]>([]);
 
     const socketRef = useRef<WebSocket | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const chatContainerRef = useRef<HTMLDivElement>(null);
     const emojiPickerRef = useRef<HTMLDivElement>(null);
+    const projectPickerRef = useRef<HTMLDivElement>(null);
 
     // 1. Fetch User & Channels
     useEffect(() => {
@@ -75,11 +80,21 @@ export default function GlobalChat() {
     useEffect(() => {
         if (!activeChannel) return;
 
+        let isMounted = true;
+        setMessages([]); // Clear old messages
+
         const fetchHistory = async () => {
             try {
                 const res = await axios.get(`http://localhost:8000/chat/channels/${activeChannel.id}/messages`, { withCredentials: true });
-                setMessages(res.data);
-                scrollToBottom();
+                if (isMounted) {
+                    setMessages(res.data);
+                    // Instant scroll to bottom after render
+                    setTimeout(() => {
+                        if (chatContainerRef.current) {
+                            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                        }
+                    }, 0);
+                }
             } catch (error) {
                 console.error("Failed to fetch history", error);
             }
@@ -89,6 +104,7 @@ export default function GlobalChat() {
         connectWebSocket(activeChannel.id);
 
         return () => {
+            isMounted = false;
             if (socketRef.current) {
                 socketRef.current.close();
             }
@@ -112,7 +128,7 @@ export default function GlobalChat() {
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
             setMessages((prev) => [...prev, data]);
-            scrollToBottom();
+            scrollToBottom("smooth"); // Smooth for new incoming messages
         };
 
         ws.onclose = () => {
@@ -140,10 +156,133 @@ export default function GlobalChat() {
         };
     }, [showEmojiPicker]);
 
-    const scrollToBottom = () => {
-        setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
+    // 5. Fetch Projects for Picker
+    useEffect(() => {
+        if (showProjectPicker && myProjects.length === 0) {
+            axios.get("http://localhost:8000/projects", { withCredentials: true })
+                .then(res => {
+                    const teamProjects = res.data.filter((p: any) => p.type === 'team');
+                    setMyProjects(teamProjects);
+                })
+                .catch(err => console.error("Failed to load projects", err));
+        }
+    }, [showProjectPicker]);
+
+    // 6. Click Outside Project Picker
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (projectPickerRef.current && !projectPickerRef.current.contains(event.target as Node)) {
+                setShowProjectPicker(false);
+            }
+        };
+
+        if (showProjectPicker) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [showProjectPicker]);
+
+    const sendProjectShare = (project: any) => {
+        if (!socketRef.current || !isConnected) return;
+
+        const payload = {
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            stack: project.stack,
+            owner_id: project.owner_id
+        };
+        const messageContent = `[PROJECT_SHARE:${JSON.stringify(payload)}]`;
+
+        socketRef.current.send(JSON.stringify({ content: messageContent }));
+        setShowProjectPicker(false);
+    };
+
+    const handleJoinRequest = async (projectId: number) => {
+        try {
+            await axios.post(`http://localhost:8000/projects/${projectId}/join`, {}, { withCredentials: true });
+            toast.success("Join request sent!");
+        } catch (error: any) {
+            toast.error(error.response?.data?.detail || "Failed to send request");
+        }
+    };
+
+    const renderMessageContent = (content: string) => {
+        const projectShareMatch = content.match(/^\[PROJECT_SHARE:(.*)\]$/);
+        if (projectShareMatch) {
+            try {
+                const project = JSON.parse(projectShareMatch[1]);
+                return (
+                    <div className="bg-black/40 border border-white/10 rounded-xl p-4 w-full max-w-sm mt-2">
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="px-2 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-bold uppercase border border-primary/20">
+                                Team Quest
+                            </span>
+                        </div>
+                        <h4 className="font-bold text-lg mb-1">{project.title}</h4>
+                        <p className="text-sm opacity-70 mb-3 line-clamp-2">{project.description}</p>
+
+                        <div className="flex flex-wrap gap-1 mb-4">
+                            {project.stack.split(',').slice(0, 3).map((tech: string, i: number) => (
+                                <span key={i} className="px-1.5 py-0.5 bg-white/5 rounded text-[10px] font-mono opacity-60">
+                                    {tech.trim()}
+                                </span>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <a
+                                href={`/dashboard/projects/${project.id}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold py-2 rounded-lg transition-colors text-center"
+                            >
+                                View Details
+                            </a>
+                            {currentUser && currentUser.id !== project.owner_id && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleJoinRequest(project.id);
+                                    }}
+                                    className="flex-1 bg-primary hover:bg-primary/90 text-white text-xs font-bold py-2 rounded-lg transition-colors shadow-lg shadow-primary/20"
+                                >
+                                    Join Squad
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                );
+            } catch (e) {
+                return <span className="text-red-500 text-xs text-mono">[Invalid Project Card]</span>;
+            }
+        }
+
+        return content.split(/(https?:\/\/[^\s]+)/g).map((part, i) => (
+            part.match(/https?:\/\/[^\s]+/) ? (
+                <a
+                    key={i}
+                    href={part}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-white/30 hover:decoration-white/80 transition-all font-medium break-all"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {part}
+                </a>
+            ) : part
+        ));
+    };
+
+    const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
+                top: chatContainerRef.current.scrollHeight,
+                behavior: behavior
+            });
+        }
     };
 
     const sendMessage = (e?: React.FormEvent) => {
@@ -229,7 +368,10 @@ export default function GlobalChat() {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar flex flex-col">
+                <div
+                    ref={chatContainerRef}
+                    className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar flex flex-col"
+                >
                     {messages.map((msg, i) => {
                         const isMe = currentUser && msg.user_id === currentUser.id;
                         const isConsecutive = i > 0 && messages[i - 1].user_id === msg.user_id;
@@ -264,10 +406,10 @@ export default function GlobalChat() {
                                         </div>
                                     )}
                                     <div className={`px-4 py-2 text-sm leading-relaxed shadow-sm ${isMe
-                                            ? 'bg-primary text-white rounded-2xl rounded-tr-sm'
-                                            : 'bg-white/10 dark:bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm backdrop-blur-md'
+                                        ? 'bg-primary text-white rounded-2xl rounded-tr-sm'
+                                        : 'bg-white/10 dark:bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm backdrop-blur-md'
                                         }`}>
-                                        {msg.content}
+                                        {renderMessageContent(msg.content)}
                                     </div>
                                 </div>
                             </motion.div>
@@ -296,6 +438,37 @@ export default function GlobalChat() {
                                 />
                             </motion.div>
                         )}
+                        {showProjectPicker && (
+                            <motion.div
+                                ref={projectPickerRef}
+                                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                                className="absolute bottom-full left-14 mb-4 z-50 shadow-2xl rounded-3xl overflow-hidden border border-white/10 bg-[#0A0A0A] w-72 max-h-80 flex flex-col"
+                            >
+                                <div className="p-3 border-b border-white/10 bg-white/5">
+                                    <h4 className="font-bold text-sm">Select Project to Share</h4>
+                                </div>
+                                <div className="overflow-y-auto p-2 space-y-2 custom-scrollbar">
+                                    {myProjects.length === 0 ? (
+                                        <div className="p-4 text-center text-xs opacity-50">
+                                            No team projects found.
+                                        </div>
+                                    ) : (
+                                        myProjects.map(p => (
+                                            <button
+                                                key={p.id}
+                                                onClick={() => sendProjectShare(p)}
+                                                className="w-full text-left p-3 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/5 transition-all group"
+                                            >
+                                                <div className="font-bold text-sm group-hover:text-primary transition-colors">{p.title}</div>
+                                                <div className="text-[10px] opacity-50 truncate">{p.description}</div>
+                                            </button>
+                                        ))
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
                     </AnimatePresence>
                     <form
                         onSubmit={sendMessage}
@@ -306,11 +479,28 @@ export default function GlobalChat() {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setShowEmojiPicker(!showEmojiPicker);
+                                setShowProjectPicker(false);
                             }}
                             className={`p-2 rounded-lg transition-colors ${showEmojiPicker ? 'bg-primary/20 text-primary' : 'hover:bg-white/5 text-foreground/50 hover:text-foreground'}`}
                         >
                             <Smile className="w-5 h-5" />
                         </button>
+
+                        {/* Project Picker Button - Only in 'projects' channel */}
+                        {activeChannel?.name === 'projects' && (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowProjectPicker(!showProjectPicker);
+                                    setShowEmojiPicker(false);
+                                }}
+                                className={`p-2 rounded-lg transition-colors ${showProjectPicker ? 'bg-primary/20 text-primary' : 'hover:bg-white/5 text-foreground/50 hover:text-foreground'}`}
+                                title="Share Team Project"
+                            >
+                                <Layers className="w-5 h-5" />
+                            </button>
+                        )}
                         <input
                             type="text"
                             value={inputValue}
