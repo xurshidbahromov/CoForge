@@ -42,7 +42,8 @@ export default function GlobalChat() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [inputValue, setInputValue] = useState("");
     const [isConnected, setIsConnected] = useState(false);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Mobile toggle
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile toggle: Closed by default
+    const [isDesktop, setIsDesktop] = useState(false);
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -167,6 +168,13 @@ export default function GlobalChat() {
                 .catch(err => console.error("Failed to load projects", err));
         }
     }, [showProjectPicker]);
+
+    useEffect(() => {
+        const checkScreen = () => setIsDesktop(window.innerWidth >= 1024);
+        checkScreen();
+        window.addEventListener('resize', checkScreen);
+        return () => window.removeEventListener('resize', checkScreen);
+    }, []);
 
     // 6. Click Outside Project Picker
     useEffect(() => {
@@ -305,36 +313,52 @@ export default function GlobalChat() {
 
             {/* Sidebar */}
             <AnimatePresence>
-                {(isSidebarOpen || typeof window !== 'undefined' && window.innerWidth >= 768) && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        className={`absolute md:relative z-20 w-64 h-full glass-panel rounded-3xl flex flex-col border border-white/5 ${!isSidebarOpen ? 'hidden md:flex' : 'flex'}`}
-                    >
-                        <div className="p-6 border-b border-white/5">
-                            <h2 className="font-black text-xl flex items-center gap-2">
-                                <Users className="w-5 h-5 text-primary" /> Community
-                            </h2>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-                            <div className="text-xs font-bold opacity-50 uppercase px-2 mb-2">Channels</div>
-                            {channels.map(channel => (
+                {(isSidebarOpen || isDesktop) && (
+                    <>
+                        {/* Mobile Backdrop */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsSidebarOpen(false)}
+                            className="lg:hidden absolute inset-0 bg-black/60 z-10 backdrop-blur-sm rounded-3xl"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            className={`absolute lg:relative z-20 w-64 h-full glass-panel rounded-3xl flex flex-col border border-white/5 ${!isSidebarOpen ? 'hidden lg:flex' : 'flex'}`}
+                        >
+                            <div className="p-6 border-b border-white/5 flex items-center justify-between">
+                                <h2 className="font-black text-xl flex items-center gap-2">
+                                    <Users className="w-5 h-5 text-primary" /> Community
+                                </h2>
                                 <button
-                                    key={channel.id}
-                                    onClick={() => {
-                                        setActiveChannel(channel);
-                                        if (window.innerWidth < 768) setIsSidebarOpen(false);
-                                    }}
-                                    className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all ${activeChannel?.id === channel.id ? 'bg-primary/20 text-primary font-bold' : 'hover:bg-white/5 text-foreground/70 hover:text-foreground'}`}
+                                    onClick={() => setIsSidebarOpen(false)}
+                                    className="lg:hidden p-1 hover:bg-white/10 rounded-lg transition-colors"
                                 >
-                                    <Hash className="w-4 h-4 opacity-50" />
-                                    {channel.name}
+                                    <Menu className="w-5 h-5 rotate-90" /> {/* Or X icon if imported */}
                                 </button>
-                            ))}
-                        </div>
-                    </motion.div>
+                            </div>
+
+                            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+                                <div className="text-xs font-bold opacity-50 uppercase px-2 mb-2">Channels</div>
+                                {channels.map(channel => (
+                                    <button
+                                        key={channel.id}
+                                        onClick={() => {
+                                            setActiveChannel(channel);
+                                            if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                                        }}
+                                        className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-all ${activeChannel?.id === channel.id ? 'bg-primary/20 text-primary font-bold' : 'hover:bg-white/5 text-foreground/70 hover:text-foreground'}`}
+                                    >
+                                        <Hash className="w-4 h-4 opacity-50" />
+                                        {channel.name}
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 
@@ -348,7 +372,7 @@ export default function GlobalChat() {
                 <div className="p-6 border-b border-white/5 bg-black/20 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
-                            className="md:hidden p-2 hover:bg-white/5 rounded-lg"
+                            className="lg:hidden p-2 hover:bg-white/5 rounded-lg"
                             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                         >
                             <Menu className="w-5 h-5" />
